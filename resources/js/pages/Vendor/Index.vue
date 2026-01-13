@@ -1,134 +1,62 @@
 <script setup lang="ts">
-import AppLayout from '@/layouts/AppLayout.vue';
-import { dashboard } from '@/routes';
-import { type BreadcrumbItem } from '@/types';
-import { Head, usePage } from '@inertiajs/vue3';
-import { ref } from "vue"
-import { Users, FileText, UserPlus } from "lucide-vue-next" // Lucide icons
-import users from '@/routes/users';
-import type { PageProps } from '@inertiajs/core'
-const breadcrumbs: BreadcrumbItem[] = [
-  {
-    title: 'Dashboard',
-    href: dashboard().url,
-  },
-];
-
-
-
-// Example data (later replace with Inertia or API call)
-
-interface UserDetails {
-  permission_id: number
-  role_id: number
-  department_id: number
-  division_id: number
-  user_function_id: number
-}
-
-interface AuthUser {
-  id: number
-  name: string
-  email: string
-  email_verified_at: string | null
-  created_at: string
-  updated_at: string
-  details?: UserDetails
-}
-
-interface CustomPageProps extends PageProps {
-  auth: {
-    user: AuthUser
-  }
-}
-
-const page = usePage<CustomPageProps>()
-const user = page.props.auth.user
-// Example data (later replace with Inertia or API call)
-const stats = ref({
-  activeUsers: 124,
-  sezadRequests: {
-    new: 12,
-    pending: 8,
-    declined: 3,
-  },
-  bddCreatedUsers: 56,
-})
+import { Menu, MenuButton, MenuItems, MenuItem, Transition } from '@headlessui/vue';
+import LocatorAppSidebarLayout from '@/layouts/locator/LocatorAppSidebarLayout.vue';
+import VendorAppSidebarLayout from '@/layouts/vendor/VendorAppSidebarLayout.vue';
 </script>
-
 <template>
+  <VendorAppSidebarLayout>
+  <div class="grid grid-cols-2 gap-4 w-full mt-4">
 
-    <Head title="Dashboard" />
-      
-    <AppLayout :breadcrumbs="breadcrumbs">
-     <div class="grid gap-6 md:grid-cols-3 px-6 py-6">
-    <!-- Active Users -->
-    <div
-      class="flex flex-col items-center rounded-2xl bg-blue-500 p-6 shadow-lg transition hover:shadow-xl dark:bg-[#1b1b18]"
-    >
-      <div class="flex items-center gap-3">
-        <div class="rounded-full bg-blue-100 p-3 dark:bg-blue-900/40">
-          <Users class="w-6 h-6 text-[#0F75BC]" />
-        </div>
-        <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200">
-          Active Users
-        </h3>
-      </div>
-      <p class="mt-6 text-4xl font-bold text-black-500">
-        {{ stats.activeUsers }}
-      </p>
-    </div>
+    <!-- Left Column -->
+    <Menu as="div" class="relative w-full text-left">
+      <MenuButton as="button" class="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600 transition">
+        Accreditation
+      </MenuButton>
+      <Transition
+        enter="transition duration-100 ease-out"
+        enter-from="transform scale-95 opacity-0"
+        enter-to="transform scale-100 opacity-100"
+        leave="transition duration-75 ease-in"
+        leave-from="transform scale-100 opacity-100"
+        leave-to="transform scale-95 opacity-0"
+      >
+        <MenuItems class="absolute mt-2 w-full rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-10">
+          <MenuItem as="a" href="#" class="text-center block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+            New Accreditation
+          </MenuItem>
+          <MenuItem as="a" href="#" class=" text-center block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+            Pending Approvals
+          </MenuItem>
+        </MenuItems>
+      </Transition>
+    </Menu>
 
-    <!-- SEZAD Requests -->
-    <div
-      class="flex flex-col rounded-2xl bg-green-300 p-6 shadow-lg transition hover:shadow-xl dark:bg-[#1b1b18]"
-    >
-      <div class="flex items-center gap-3">
-        <div class="rounded-full bg-purple-100 p-3 dark:bg-purple-900/40">
-          <FileText class="w-6 h-6 text-purple-600" />
-        </div>
-        <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200">
-          SEZAD Requests
-        </h3>
-      </div>
-      <ul class="mt-6 space-y-3 text-sm text-gray-700 dark:text-gray-300">
-        <li class="flex justify-between">
-          <span>New</span>
-          <span class="font-semibold text-green-600">
-            {{ stats.sezadRequests.new }}
-          </span>
-        </li>
-        <li class="flex justify-between">
-          <span>Pending</span>
-          <span class="font-semibold text-yellow-600">
-            {{ stats.sezadRequests.pending }}
-          </span>
-        </li>
-        <li class="flex justify-between">
-          <span>Declined</span>
-          <span class="font-semibold text-red-600">
-            {{ stats.sezadRequests.declined }}
-          </span>
-        </li>
-      </ul>
-    </div>
+    <!-- Right Column -->
+    <Menu as="div" class="relative w-full text-left">
+      <MenuButton as="button" class="w-full bg-gray-500 text-white py-2 rounded hover:bg-gray-600 transition">
+        Re-Accreditation
+      </MenuButton>
+      <Transition
+        enter="transition duration-100 ease-out"
+        enter-from="transform scale-95 opacity-0"
+        enter-to="transform scale-100 opacity-100"
+        leave="transition duration-75 ease-in"
+        leave-from="transform scale-100 opacity-100"
+        leave-to="transform scale-95 opacity-0"
+      >
+        <MenuItems class="absolute mt-2 w-full rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-10">
+          <MenuItem as="a" href="#" class="block text-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+            Re-Accreditation Requests
+          </MenuItem>
+          <MenuItem as="a" href="#" class="block text-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+            History
+          </MenuItem>
+        </MenuItems>
+      </Transition>
+    </Menu>
 
-    <!-- BDD Created Users -->
-    <div
-      class="flex flex-col items-center rounded-2xl bg-yellow-500 p-6 shadow-lg transition hover:shadow-xl dark:bg-[#1b1b18]"
-    >
-      <div class="flex items-center gap-3">
-        <div class="rounded-full bg-green-100 p-3 dark:bg-black-900/40">
-          <UserPlus class="w-6 h-6 text-green-600" />
-        </div>
-        <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200">
-          BDD Created Users
-        </h3>
-      </div>
-      <p class="mt-6 text-4xl font-bold text-black-600">
-        {{ stats.bddCreatedUsers }}
-      </p>
-    </div>
   </div>
-    </AppLayout>
+  </VendorAppSidebarLayout>
 </template>
+
+

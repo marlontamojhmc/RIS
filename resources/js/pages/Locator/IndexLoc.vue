@@ -48,7 +48,7 @@ const app = page.props.applications[0] ? page.props.applications[0].status : nul
 <template>
   <Head title="Locator Dashboard" />
    
-  <AppSidebarLayout :breadcrumbs="breadcrumbs">
+  <locatorAppSidebarLayout :breadcrumbs="breadcrumbs">
    
       <!-- Apply New -->
         
@@ -66,5 +66,5 @@ const app = page.props.applications[0] ? page.props.applications[0].status : nul
 </div>
 
 <!--end table-->
-  </AppSidebarLayout>
+  </locatorAppSidebarLayout>
 </template>

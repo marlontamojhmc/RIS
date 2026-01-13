@@ -9,6 +9,6 @@ use Inertia\Inertia;
 class LocatorVendorController extends Controller
 {
     public function index(){
-        return Inertia::render('Vendor/Index',[]);
+        return Inertia::render('Vendor/IndexLoc',[]);
     }
 }

@@ -148,7 +148,7 @@ function selectForm(f: any) {
 </script>
 
 <template>
-  <AppSidebarLayout :breadcrumbs="breadcrumbs">
+  <LocatorAppSidebarLayout :breadcrumbs="breadcrumbs">
    
   <TopCard :stats="stat" />
      
@@ -303,6 +303,6 @@ function selectForm(f: any) {
       </form>
       
     </div>
-  </AppSidebarLayout>
+  </LocatorAppSidebarLayout>
 </template>
 
