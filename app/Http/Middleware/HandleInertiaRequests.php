@@ -2,16 +2,16 @@
 
 namespace App\Http\Middleware;
 
-use Illuminate\Foundation\Inspiring;
 use Illuminate\Http\Request;
+use Illuminate\Foundation\Inspiring;
 use Inertia\Middleware;
+use App\Models\Locator\ApplicationModel;
+use Illuminate\Support\Facades\Auth;
 
 class HandleInertiaRequests extends Middleware
 {
     /**
      * The root template that's loaded on the first page visit.
-     *
-     * @see https://inertiajs.com/server-side-setup#root-template
      *
      * @var string
      */
@@ -19,8 +19,6 @@ class HandleInertiaRequests extends Middleware
 
     /**
      * Determines the current asset version.
-     *
-     * @see https://inertiajs.com/asset-versioning
      */
     public function version(Request $request): ?string
     {
@@ -28,24 +26,47 @@ class HandleInertiaRequests extends Middleware
     }
 
     /**
-     * Define the props that are shared by default.
-     *
-     * @see https://inertiajs.com/shared-data
-     *
-     * @return array<string, mixed>
+     * Define the props that are shared by default with every Inertia response.
      */
     public function share(Request $request): array
     {
+        // Split inspiring quote into message and author
         [$message, $author] = str(Inspiring::quotes()->random())->explode('-');
 
-        return [
-            ...parent::share($request),
-            'name' => config('app.name'),
-            'quote' => ['message' => trim($message), 'author' => trim($author)],
+        // Only fetch applications if the user is authenticated
+        $applications = $request->user()
+    ? ApplicationModel::where('user_id', Auth::id())->where('form_title', 'ATO')->get()->toArray()
+    : [];
+
+        return array_merge(parent::share($request), [
+            // 🌐 Global app data
+            'app' => [
+                'name' => config('app.name'),
+                'quote' => [
+                    'message' => trim($message),
+                    'author'  => trim($author),
+                ],
+            ],
+
+            // 👤 Authenticated user
             'auth' => [
                 'user' => $request->user(),
             ],
-            'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
-        ];
+
+            // 📂 Sidebar state
+            'sidebarOpen' => ! $request->hasCookie('sidebar_state') 
+                || $request->cookie('sidebar_state') === 'true',
+
+            // 💬 Flash messages
+            'flash' => [
+                'success' => $request->session()->get('success'),
+                'error'   => $request->session()->get('error'),
+                'info'    => $request->session()->get('info'),
+            ],
+
+            // 📝 Applications
+            'applications' => $applications,
+           'user_details' => optional($request->user())->details ?? [],
+        ]);
     }
 }

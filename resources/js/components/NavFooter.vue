@@ -33,6 +33,7 @@ defineProps<Props>();
                             target="_blank"
                             rel="noopener noreferrer"
                         >
+                                        
                             <component :is="item.icon" />
                             <span>{{ item.title }}</span>
                         </a>

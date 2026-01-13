@@ -19,14 +19,14 @@ const sidebarNavItems: NavItem[] = [
         title: 'Password',
         href: editPassword(),
     },
-    {
-        title: 'Two-Factor Auth',
-        href: show(),
-    },
-    {
-        title: 'Appearance',
-        href: editAppearance(),
-    },
+    // {
+    //     title: 'Two-Factor Auth',
+    //     href: show(),
+    // },
+    // {
+    //     title: 'Appearance',
+    //     href: editAppearance(),
+    // },
 ];
 
 const currentPath = typeof window !== undefined ? window.location.pathname : '';

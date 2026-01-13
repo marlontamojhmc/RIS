@@ -6,6 +6,9 @@ use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\View;
 use Symfony\Component\HttpFoundation\Response;
+use Illuminate\Support\Facades\Gate;
+use Inertia\Middleware as Middleware;
+
 
 class HandleAppearance
 {
@@ -20,4 +23,5 @@ class HandleAppearance
 
         return $next($request);
     }
+    
 }

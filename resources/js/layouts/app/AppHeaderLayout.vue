@@ -14,10 +14,11 @@ withDefaults(defineProps<Props>(), {
 </script>
 
 <template>
-    <AppShell class="flex-col">
-        <AppHeader :breadcrumbs="breadcrumbs" />
-        <AppContent>
-            <slot />
-        </AppContent>
-    </AppShell>
+    <div class="flex items-center">
+      <img
+        src="storage/images/jhmc_logo.png"
+        alt="Logo"
+        class="mb-4 w-48 h-48 object-contain"
+      />
+    </div>
 </template>

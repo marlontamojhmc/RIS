@@ -1,0 +1,70 @@
+public function approveVendorRequest($id)
+{ 
+    $user = auth()->user();
+    //$emailToRemove = $user->email;
+    
+   
+    // Get approver record (not exists)
+    $approver = SignupApprover::where('temporary_user_id', $vendor->id)
+        ->where('approver_id', $user->id)
+        ->first();
+     
+    // Already approved → STOP
+    if ($approver && $approver->status === 'Approved') {
+        return back()->with('error', 'You already approved this vendor');
+    }
+
+    // Update existing approver
+    if ($approver) {
+        $approver->update([
+            'status' => 'Approved',
+            'remark' => 'update',
+            'approved_at' => now(),
+        ]);
+        
+    }
+    
+    // Create new approver
+    else {
+        SignupApprover::create([
+            'temporary_user_id' => $vendor->id,
+            'approver_id' => $user->id,
+            'status' => 'Approved',
+            'remark' => 'approved',
+            'approved_at' => now(),
+        ]);
+       
+    }
+
+    /**
+     * ✅ Create actual user ONLY IF NOT EXISTS
+     */
+    if (!User::where('email', $vendor->email)->exists()) {
+
+        $newVendorUser = User::create([
+            'name' => $vendor->name,
+            'email' => $vendor->email,
+            'password' => $vendor->temp_password,
+        ]);
+
+        UserDetail::create([
+            'user_id' => $newVendorUser->id,
+            'email' => $newVendorUser->email,
+            'status' => 1,
+            'first_name' => $newVendorUser->name,
+            'role_id' => 7,
+            'permission_id' => 2,
+        ]);
+
+        $vendor->update([
+            'status' => 'approved',
+        ]);
+    }
+
+    Log::info(
+        'User '.$user->name.' approved vendor',
+        ['vendor_id' => $vendor->id]
+    );
+
+    return back()->with('success', 'Vendor approved successfully');
+}

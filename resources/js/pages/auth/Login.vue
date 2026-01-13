@@ -23,7 +23,7 @@ defineProps<{
         title="Log in to your account"
         description="Enter your email and password below to log in"
     >
-        <Head title="Log in" />
+        <!-- <Head title="Log in" /> -->
 
         <div
             v-if="status"
@@ -100,10 +100,7 @@ defineProps<{
                 </Button>
             </div>
 
-            <div class="text-center text-sm text-muted-foreground">
-                Don't have an account?
-                <TextLink :href="register()" :tabindex="5">Sign up</TextLink>
-            </div>
+
         </Form>
     </AuthBase>
 </template>

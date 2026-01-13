@@ -8,7 +8,8 @@ import { type BreadcrumbItem } from '@/types';
 import AppLayout from '@/layouts/AppLayout.vue';
 import SettingsLayout from '@/layouts/settings/Layout.vue';
 import { edit } from '@/routes/appearance';
-
+import TopCard from '@/components/common/TopCard.vue';
+import ApplicationTable from '@/components/common/ApplicationTable.vue';
 const breadcrumbItems: BreadcrumbItem[] = [
     {
         title: 'Appearance settings',
@@ -27,8 +28,12 @@ const breadcrumbItems: BreadcrumbItem[] = [
                     title="Appearance settings"
                     description="Update your account's appearance settings"
                 />
+                
                 <AppearanceTabs />
+               
             </div>
+             
         </SettingsLayout>
+         <ApplicationTable/>
     </AppLayout>
 </template>

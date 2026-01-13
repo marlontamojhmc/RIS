@@ -17,7 +17,10 @@ class PasswordController extends Controller
      */
     public function edit(): Response
     {
-        return Inertia::render('settings/Password');
+        //dd(request()->query('temp_password', null));
+        return Inertia::render('settings/Password', [
+            'tempPassword' => request()->query('temp_password', null),
+        ]);
     }
 
     /**
