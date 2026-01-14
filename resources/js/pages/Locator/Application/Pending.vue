@@ -38,8 +38,18 @@ const breadcrumbs: BreadcrumbItem[] = [
 
 // Optional table action handlers
 function handleView(app: any) {
-  console.log(app.application_id)
+ const formNumber =
+    app.form_number ??
+    app.application?.form_number ??
+    ''
+    console.log(app);
+  const upper = String(formNumber).toUpperCase()
+  if (upper.startsWith('VA')) {
+    router.visit(`/vendor/accreditations/${app.id}`)
+   
+  }else{
   router.visit(`/loctr/applications/${app.application_id}`)
+  }
 }
 
 function handleEdit(app: any) {

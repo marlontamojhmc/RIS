@@ -36,7 +36,8 @@ class ApplicationsController extends Controller
      * Display a listing of the resource.
      */
     public function index()
-    { abort(403);
+    { 
+        //abort(403);
         $application = ApplicationModel::with(['selections.option', 'selections.user'])
             ->latest()
             ->first();
@@ -75,10 +76,12 @@ class ApplicationsController extends Controller
      */
     public function create()
 
-    {   $user = auth()->user();
+    {  
+         $user = auth()->user();
         //check if user has approved ATO if it does remove ATO to the Option
         $formOptions = $this->service->getFormOptionsForUser();
-
+        
+        
     
     return Inertia::render('Locator/Application/Create', [
                                             'user' => $user,
@@ -98,13 +101,20 @@ class ApplicationsController extends Controller
     
         $application = $result['application'];
         $approverForm = $result['approverForm'];
-
+        
         if ($request->type === 'ATO') {
             return Inertia::render('ATO/Create2', [
                 'application_id' => $application->id,
                 'approver_group_id' => $approverForm->approver_group_id,
                 'application_form_number' => $application->form_number
             ]);
+        }elseif($request->type === 'Vendor Accreditation'){
+            return Inertia::render('Accreditation/Accreditationform',[
+                'form_number' => $application->form_number,
+                'application_id' =>$application->id,
+                'application_group_id'=>$approverForm->approver_group_id,
+            ]);
+
         }else{ return Inertia::render('Locator/Application/Create', [ 
             'user' => $user, 
             'application_form_id' => $application->id, // Pass the new ID 
@@ -265,3 +275,4 @@ class ApplicationsController extends Controller
     
     }
 }
+

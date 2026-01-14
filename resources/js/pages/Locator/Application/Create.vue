@@ -13,7 +13,7 @@ import TopCard from '@/components/common/TopCard.vue'
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from '@/components/ui/dropdown-menu'
 import { usePage } from '@inertiajs/vue3'
 import { locator } from '@/routes';
-import applications from '@/routes/applications'
+//import applications from '@/routes/applications'
 import { type BreadcrumbItem } from '@/types'
 
 // 🧭 Props
@@ -70,7 +70,7 @@ const selectedDeclaredValue = computed(() => {
 
 const breadcrumbs: BreadcrumbItem[] = [
   { title: 'Locator', href: locator.url() },
-  { title: 'Create Permit', href: applications.create.url() },
+  { title: 'Create Permit', href: '/' },
 ]
 
 // 👂 Watchers
@@ -140,7 +140,7 @@ const [ato] = page.props.applications;
 const stat = ato == null ? '' : ato.status
 // 📑 Form Type Selection
 function selectForm(f: any) {
-  console.log(isSubmitting.value)
+  //console.log(f.name)
   createForm.type = f.name
   approvalForm.approver_group_id = f.approver_group_id
   buttonVisible.value = true

@@ -1,34 +1,71 @@
 <script setup lang="ts">
-import { reactive, ref, onMounted } from 'vue'
+import { reactive, ref, onMounted, watch } from 'vue'
 import { usePage } from '@inertiajs/inertia-vue3'
-import axios from 'axios'
 import { Inertia } from '@inertiajs/inertia'
+import axios from 'axios'
 import VendorAppSidebarLayout from '@/layouts/vendor/VendorAppSidebarLayout.vue'
 
-// Get Inertia page props
-const page = usePage()
+// ----------------------
+// Props
+// ----------------------
+const props = defineProps<{
+  form_number: string
+  application_id: string
+  application_group_id: string
+}>()
 
-// Form model (do NOT include user_id; backend will handle it)
-const form = reactive({
+// ----------------------
+// Reactive Form Model
+// ----------------------
+interface Form {
+  date: string
+  type: 'new' | 'renewal'
+  businessName: string
+  frequency: string
+  services: number[]
+  supplies: number[]
+  address: string
+  email: string
+  contact: string
+  representative: string
+  privacyConsent: boolean
+  form_number: string
+  application_id: string
+  application_group_id: string
+}
+
+const form = reactive<Form>({
   date: '',
   type: 'new',
   businessName: '',
   frequency: '',
-  services: [] as number[],
-  supplies: [] as number[],
+  services: [],
+  supplies: [],
   address: '',
   email: '',
   contact: '',
   representative: '',
-  privacyConsent: false
+  privacyConsent: false,
+  form_number: props.form_number,
+  application_id: props.application_id,
+  application_group_id: props.application_group_id,
 })
 
-// Dynamic options
-const services = ref<{ id: number; name: string }[]>([])
-const supplies = ref<{ id: number; name: string }[]>([])
-const frequencies = ref<{ id: number; name: string }[]>([])
+// ----------------------
+// Dynamic Options
+// ----------------------
+interface Option {
+  id: number
+  name: string
+}
 
-// Load options from API
+const services = ref<Option[]>([])
+const supplies = ref<Option[]>([])
+const frequencies = ref<Option[]>([])
+
+// ----------------------
+// Load Options from API
+// ----------------------
 onMounted(async () => {
   try {
     const { data } = await axios.get('/api/accreditation/options')
@@ -40,34 +77,68 @@ onMounted(async () => {
   }
 })
 
-// Submit form using Inertia POST
+// ----------------------
+// Submit Form
+// ----------------------
 const submit = () => {
-    console.log('submit..');
   Inertia.post('/accreditation/store', form, {
     onSuccess: () => {
       alert('Accreditation submitted successfully!')
-      reset()
+      resetForm()
     },
     onError: (errors) => {
       console.error(errors)
       alert('Please check your inputs.')
-    }
+    },
   })
 }
 
-// Reset form
-const reset = () => {
-  Object.keys(form).forEach(key => {
-    form[key] = Array.isArray(form[key]) ? [] : ''
+// ----------------------
+// Watch for Prop Changes
+// ----------------------
+watch(
+  () => props.form_number,
+  (newVal) => {
+    form.form_number = newVal
+  }
+)
+
+watch(
+  () => props.application_id,
+  (newVal) => {
+    form.application_id = newVal
+  }
+)
+
+watch(
+  () => props.application_group_id,
+  (newVal) => {
+    form.application_group_id = newVal
+  }
+)
+
+// ----------------------
+// Reset Form
+// ----------------------
+const resetForm = () => {
+  Object.keys(form).forEach((key) => {
+    // @ts-ignore
+    form[key] = Array.isArray(form[key])
+      ? []
+      : key === 'privacyConsent'
+      ? false
+      : ''
   })
 }
 </script>
+
+
 
 <template>
   <VendorAppSidebarLayout>
     <div class="bg-slate-50 min-h-screen py-12 px-4 sm:px-6 lg:px-8">
       <div class="max-w-4xl mx-auto">
-       
+        <div class="">{{ form_number }}</div>
         <div class="bg-white shadow-xl rounded-2xl overflow-hidden border border-slate-200">
           <form class="p-8 space-y-10" @submit.prevent="submit">
 

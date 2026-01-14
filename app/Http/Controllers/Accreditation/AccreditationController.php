@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
+use App\Models\Locator\ApplicationForApproval;
 
 
 class AccreditationController extends Controller
@@ -70,9 +71,20 @@ public function store(Request $request){
         if (!empty($validated['supplies'])) {
             $accreditation->supplies()->sync($validated['supplies']);
         }
+       $forApproval = new ApplicationForApproval(); 
 
+    $forApproval->application_id = $request->application_id;
+    $forApproval->approver_group_id = $request->application_group_id;
+    $forApproval->form_number = $request->form_number;
+    $forApproval->status = 'Pending';
+    $forApproval->save();
+        
         // Return a redirect with success message via Inertia
        return response(['success' => true, 'message' => 'Accreditation submitted successfully!']);
+    }
+    public function show(Accreditation $accreditation){
+       //dd($accreditation->id);
+       return $accreditation->id;
     }
 
 }

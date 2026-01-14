@@ -1,4 +1,21 @@
 <?php
-use App\Http\Controllers\VENDOR\VendorController;
-Route::get('/vendor', [VendorController::class,'index']);
-Route::get('accredit/vendor', [VendorController::class, 'accreditation']);
+
+use App\Http\Controllers\Vendor\VendorController;
+use App\Http\Controllers\Accreditation\AccreditationController;
+use Illuminate\Support\Facades\Route;
+
+Route::middleware(['auth'])
+    ->prefix('vendor')
+    ->name('vendor.')
+    ->group(function () {
+
+        Route::get('/', [VendorController::class, 'index'])
+            ->name('dashboard');
+
+        Route::get('/accredit', [VendorController::class, 'accreditation'])
+            ->name('accredit');
+
+        Route::get('/accreditations/{accreditation}', 
+            [AccreditationController::class, 'show']
+        )->name('accreditations.show');
+    });

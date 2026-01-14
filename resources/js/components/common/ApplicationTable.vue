@@ -15,22 +15,36 @@ const emit = defineEmits(['view', 'edit', 'delete'])
  * Auto-detects form title based on form_number
  * Falls back to app.form_title or '-'
  */
+const MAP = [
+  ['TBOC', 'Temporary bring-out application'],
+  ['BOC', 'Bring Out Clearance'],
+  ['BIC', 'Bring In Clearance'],
+  ['GC', 'Gate Clearance'],
+  ['LP', 'Local Purchase'],
+  ['VA', 'Accreditation'],
+  ['A', 'ATO'],
+] as const
+
 function getFormTitle(app: any) {
-  const formNumber = app.form_number ?? app.application?.form_number ?? ''
-  const title = app.form_title ?? app.application?.form_title ?? null
+  const formNumber =
+    app.form_number ??
+    app.application?.form_number ??
+    ''
 
-  if (!formNumber) return title ?? '-'
+  const title =
+    app.form_title ??
+    app.application?.form_title ??
+    '-'
 
-  const upper = formNumber.toUpperCase()
+  const upper = String(formNumber).toUpperCase()
 
-  if (upper.startsWith('A')) return 'ATO'
-  if (upper.startsWith('GC')) return 'Gate Clearance'
-  if (upper.startsWith('TBOC')) return 'Temporary bring-out application'
-  if(upper.startsWith('BOC')) return 'Bring Out Clearance'
-  if(upper.startsWith('BIC')) return 'Bring In Clearance'
-  if(upper.startsWith('LP')) return 'Local Purchase'
-  return title ?? '-'
+  for (const [prefix, label] of MAP) {
+    if (upper.startsWith(prefix)) return label
+  }
+
+  return title
 }
+
 </script>
 
 <template>
