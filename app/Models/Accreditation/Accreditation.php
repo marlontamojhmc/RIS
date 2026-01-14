@@ -13,6 +13,7 @@ class Accreditation extends Model
 
     protected $fillable = [
         'user_id',
+        'form_number',
         'date',
         'type',
         'business_name',

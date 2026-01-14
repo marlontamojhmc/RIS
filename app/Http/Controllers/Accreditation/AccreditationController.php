@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Locator\ApplicationForApproval;
-
+use Inertia\Inertia;
 
 class AccreditationController extends Controller
 {
@@ -53,6 +53,7 @@ public function store(Request $request){
         // Create accreditation tied to the authenticated user
         $accreditation = Accreditation::create([
             'user_id' => auth()->id(),
+            'form_number'=>$request->form_number,
             'date' => $validated['date'],
             'type' => $validated['type'],
             'business_name' => $validated['businessName'],
@@ -78,13 +79,19 @@ public function store(Request $request){
     $forApproval->form_number = $request->form_number;
     $forApproval->status = 'Pending';
     $forApproval->save();
+
         
         // Return a redirect with success message via Inertia
        return response(['success' => true, 'message' => 'Accreditation submitted successfully!']);
     }
-    public function show(Accreditation $accreditation){
-       //dd($accreditation->id);
-       return $accreditation->id;
+    public function show($id)
+    {
+       $forApproval = ApplicationForApproval::where('id', $id)->first();
+       $accreditation = Accreditation::where('form_number', $forApproval->form_number)->first();
+    
+        return Inertia::render('Accreditation/AccreditationShow', [
+            'accreditation' => $accreditation,
+        ]);
     }
 
 }

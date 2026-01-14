@@ -15,7 +15,7 @@ Route::middleware(['auth'])
         Route::get('/accredit', [VendorController::class, 'accreditation'])
             ->name('accredit');
 
-        Route::get('/accreditations/{accreditation}', 
+        Route::get('/accreditations/{id}', 
             [AccreditationController::class, 'show']
         )->name('accreditations.show');
     });

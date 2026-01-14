@@ -138,7 +138,7 @@ const resetForm = () => {
   <VendorAppSidebarLayout>
     <div class="bg-slate-50 min-h-screen py-12 px-4 sm:px-6 lg:px-8">
       <div class="max-w-4xl mx-auto">
-        <div class="">{{ form_number }}</div>
+        
         <div class="bg-white shadow-xl rounded-2xl overflow-hidden border border-slate-200">
           <form class="p-8 space-y-10" @submit.prevent="submit">
 

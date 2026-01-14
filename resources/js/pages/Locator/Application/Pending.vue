@@ -32,8 +32,8 @@ const stats = {
 const ato = props.ATO?.[0]?.status ?? "";
 const breadcrumbs: BreadcrumbItem[] = [
   { title: 'Locator', href: locator.url() },
-  { title: 'Create Permit', href: applications.create.url() },
-  { title: 'Pending Application', href: applications.pending.url() },
+  { title: 'Create Permit', href: '#' },
+  { title: 'Pending Application', href: '/' },
 ]
 
 // Optional table action handlers
@@ -66,7 +66,7 @@ function handleDelete(app: any) {
     <TopCard :stats="ato"/>
   
     <h1 class="text-2xl font-bold mb-4">Pending Application Lists</h1>
-     
+    
     <ApplicationTable
       :applications="props.applications"
       @view="handleView"
