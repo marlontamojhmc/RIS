@@ -13,4 +13,8 @@ class VendorController extends Controller
             return Inertia::render('Vendor/Index',[]);
        
         }
+        public function accreditation(){
+        return Inertia::render('Accreditation/Accreditationform',[]);
+    }
+    pu
 }

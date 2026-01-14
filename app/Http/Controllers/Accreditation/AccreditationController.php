@@ -1,0 +1,78 @@
+<?php
+
+namespace App\Http\Controllers\Accreditation;
+
+use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
+use App\Models\Accreditation\Accreditation;
+use App\Models\Accreditation\ServiceType;
+use App\Models\Accreditation\SupplyType;
+use App\Models\Accreditation\Frequency;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
+
+
+class AccreditationController extends Controller
+{
+    /**
+     * Return dynamic form options
+     */
+    public function options()
+    {
+        return response()->json([
+            'services' => ServiceType::all(),
+            'supplies' => SupplyType::all(),
+            'frequencies' => Frequency::all(),
+        ]);
+    }
+
+    /**
+     * Store new Accreditation
+     */
+
+public function store(Request $request){
+
+        // Validate input
+        $validated = $request->validate([
+            'date' => 'required|date',
+            'type' => 'required|in:new,renewal',
+            'businessName' => 'required|string|max:255',
+            'frequency' => 'required|string|max:50',
+            'services' => 'array',
+            'supplies' => 'array',
+            'address' => 'required|string',
+            'email' => 'required|email',
+            'contact' => 'nullable|string|max:50',
+            'representative' => 'nullable|string|max:150',
+            'privacyConsent' => 'required|boolean',
+        ]);
+
+        // Create accreditation tied to the authenticated user
+        $accreditation = Accreditation::create([
+            'user_id' => auth()->id(),
+            'date' => $validated['date'],
+            'type' => $validated['type'],
+            'business_name' => $validated['businessName'],
+            'frequency' => $validated['frequency'],
+            'address' => $validated['address'],
+            'email' => $validated['email'],
+            'contact' => $validated['contact'] ?? null,
+            'representative' => $validated['representative'] ?? null,
+            'privacy_consent' => $validated['privacyConsent'],
+        ]);
+
+        // Optionally attach services and supplies if you have pivot tables
+        if (!empty($validated['services'])) {
+            $accreditation->services()->sync($validated['services']);
+        }
+        if (!empty($validated['supplies'])) {
+            $accreditation->supplies()->sync($validated['supplies']);
+        }
+
+        // Return a redirect with success message via Inertia
+       return response(['success' => true, 'message' => 'Accreditation submitted successfully!']);
+    }
+
+}

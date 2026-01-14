@@ -181,3 +181,4 @@ require __DIR__ . '/locator/notification.php';
 require __DIR__ .'/Sezad.php';
 require __DIR__ .'/ServiceProvider/SP.php';
 require __DIR__ .'/Vendor/Vendor.php';
+require __DIR__ .'/Accreditation/Accreditation.php';

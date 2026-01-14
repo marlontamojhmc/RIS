@@ -4,6 +4,10 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AblyController;
 use App\Http\Controllers\NotificationAbly\NotificationController;
+use App\Http\Controllers\Accreditation\AccreditationController;
+
+
+
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -25,3 +29,7 @@ Route::post('/ably/publish', [AblyController::class, 'publish']);
 // route to get token request for client-side auth
 Route::get('/ably/token-request', [AblyController::class, 'tokenRequest']);
 Route::post('/notifications/send', [NotificationController::class, 'send'])->name('notifications.send');
+
+
+
+Route::get('/accreditation/options', [AccreditationController::class, 'options']);

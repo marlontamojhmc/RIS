@@ -35,8 +35,11 @@ class HandleInertiaRequests extends Middleware
 
         // Only fetch applications if the user is authenticated
         $applications = $request->user()
-    ? ApplicationModel::where('user_id', Auth::id())->where('form_title', 'ATO')->get()->toArray()
-    : [];
+            ? ApplicationModel::where('user_id', $request->user()->id)
+                ->where('form_title', 'ATO')
+                ->get()
+                ->toArray()
+            : [];
 
         return array_merge(parent::share($request), [
             // 🌐 Global app data
@@ -50,11 +53,16 @@ class HandleInertiaRequests extends Middleware
 
             // 👤 Authenticated user
             'auth' => [
-                'user' => $request->user(),
+                'user' => $request->user() ? [
+                    'id' => $request->user()->id,
+                    'name' => $request->user()->name,
+                    'email' => $request->user()->email,
+                    // add more fields if needed
+                ] : null,
             ],
 
             // 📂 Sidebar state
-            'sidebarOpen' => ! $request->hasCookie('sidebar_state') 
+            'sidebarOpen' => !$request->hasCookie('sidebar_state') 
                 || $request->cookie('sidebar_state') === 'true',
 
             // 💬 Flash messages
@@ -66,7 +74,9 @@ class HandleInertiaRequests extends Middleware
 
             // 📝 Applications
             'applications' => $applications,
-           'user_details' => optional($request->user())->details ?? [],
+
+            // 🧾 User details (optional)
+            'user_details' => optional($request->user())->details ?? [],
         ]);
     }
 }
