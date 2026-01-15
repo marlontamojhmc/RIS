@@ -35,4 +35,5 @@ class Accreditation extends Model
     {
         return $this->belongsToMany(SupplyType::class, 'accreditation_supplies', 'accreditation_id', 'supply_type_id');
     }
+    
 }

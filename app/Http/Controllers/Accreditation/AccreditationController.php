@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Locator\ApplicationForApproval;
+use App\Models\Locator\ApproverGroupApprover;
 use Inertia\Inertia;
 
 class AccreditationController extends Controller
@@ -86,11 +87,18 @@ public function store(Request $request){
     }
     public function show($id)
     {
-       $forApproval = ApplicationForApproval::where('id', $id)->first();
+       $forApproval = ApplicationForApproval::where('id', $id)
+                        ->with('approverGroup.approvers')
+                        ->first();
+    
+    //$forApproval->application_id
+    $approvers = ApproverGroupApprover::where('application_form_id', $forApproval->application_id)->get();
+   // dd($approvers);
        $accreditation = Accreditation::where('form_number', $forApproval->form_number)->first();
     
         return Inertia::render('Accreditation/AccreditationShow', [
             'accreditation' => $accreditation,
+            'approvers' => $approvers,
         ]);
     }
 

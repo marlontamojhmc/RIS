@@ -97,7 +97,7 @@ const ServiceProvider =
     user.details.permission_id === 2 &&
     user.details.department_id === null &&
     user.details.user_function_id === null;
-// permissions.isLocator= true; 
+ permissions.isLocator= true; 
 // console.log(propsAny.permissions);
 /**Marlon you can remove later */
 
