@@ -13,6 +13,7 @@ class Form extends Model
     protected $fillable = [
         'name',
         'description',
+        'form_type',
         'approver_group_id',
     ];
 
