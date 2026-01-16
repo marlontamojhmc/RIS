@@ -28,7 +28,7 @@ withDefaults(
     <!-- Right side: Logo/Image -->
     <div class="flex items-center">
       <img
-        src="storage/images/jhmc_logo.png"
+        src=""
         alt="Logo"
         class="mb-4 w-48 h-48 object-contain"
       />

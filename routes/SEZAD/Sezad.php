@@ -3,9 +3,11 @@ use App\Http\Controllers\OSAC\OsacController;
 use App\Http\Controllers\SEZAD\SezadManagerController;
 use App\Http\Controllers\CCO\CcoController;
 use App\Http\Controllers\FINANCE\FinanceController;
+use App\Http\Controllers\SEZAD\RO\RegistrationOfficerController;
 
      Route::prefix('sezad')->group(function () {
-        
+        //RO
+         Route::get('/ro', [RegistrationOfficerController::class, 'index'])->name('ro.index');
         //CCO/CCA
         Route::get('/cco', [CcoController::class, 'index'])->name('cco.index');
         Route::get('/cco/{id}/show', [CcoController::class, 'show'])->name('cco.show');

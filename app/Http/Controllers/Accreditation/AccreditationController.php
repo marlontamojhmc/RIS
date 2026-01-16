@@ -101,5 +101,11 @@ public function store(Request $request){
             'approvers' => $approvers,
         ]);
     }
+    public function SupplierAccreditation(){
+        return Inertia::render('Accreditation/Supplier/AccreditationForm',[]);
+    }
+    public function TradeFairAccreditation(){
+        return Inertia::render('Accreditation/TradeFair/AccreditationForm',[]);
+    }
 
 }

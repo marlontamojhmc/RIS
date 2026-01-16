@@ -141,7 +141,7 @@ const resetForm = () => {
         
         <div class="bg-white shadow-xl rounded-2xl overflow-hidden border border-slate-200">
           <form class="p-8 space-y-10" @submit.prevent="submit">
-
+            <h1>Vendor Accreditation</h1>
             <!-- Data Privacy -->
             <section class="bg-indigo-50/50 p-6 rounded-xl border border-indigo-100">
               <h2 class="text-indigo-900 font-bold flex items-center gap-2 mb-3">

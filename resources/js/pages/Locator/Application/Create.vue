@@ -214,36 +214,6 @@ function selectForm(f: any) {
     </button>
   </div>
 
-  <!-- <div class="mt-4">
-    <p v-if="selectedForm">Selected Form: <strong>{{ selectedForm.name }}</strong></p>
-  </div> -->
-        <!-- Application Type -->
-        <!-- <div v-if="!props.form_title">
-          <label class="block text-sm font-medium mb">Application Type</label>
-          <DropdownMenu>
-            <DropdownMenuTrigger as-child>
-              <Button variant="ghost" class="w-full justify-between">
-                <span>{{ createForm.type || '-- Select application type --' }}</span>
-                <svg class="ml-2 h-4 w-4 opacity-100" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
-                </svg>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent class="w-full">
-              <DropdownMenuItem
-                v-for="f in props.form"
-                :key="f.id"
-                @click="selectForm(f)"
-              >
-                {{ f.name }}
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-          <div v-if="createForm.errors.type" class="text-red-500 text-sm mt-1">
-            {{ createForm.errors.type }}
-          </div>
-        </div> -->
-
         <!-- Declared Value -->
         <div v-if="props.application_form_id">
           <ApplicationOptionSelect
