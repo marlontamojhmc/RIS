@@ -133,7 +133,7 @@ const resetForm = () => {
             <!-- FORM TITLE -->
             <section class="p-6 rounded-xl bg-indigo-50 border border-indigo-100">
               <h1 class="text-center text-2xl font-bold mb-6">
-                Trade Fair Accreditation Form
+                Vendor and Micro Entrepreneurs Accreditation Form
               </h1>
             </section>
 

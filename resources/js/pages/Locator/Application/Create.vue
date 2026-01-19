@@ -49,9 +49,12 @@ const applicationId = ref(props.application_form_id)
 // 📌 Forms
 const createForm = useForm({
   user_id: props.user?.id,
-  type: props.form?.name ?? '',
-  description: '',
-  application_category_option_id: '',
+  form_name: props.form?.name ?? '',
+  form_user:'',
+  type:'',
+  approver_group_id:'',
+  form_id:'',
+  
 })
 
 const approvalForm = useForm({
@@ -140,8 +143,12 @@ const [ato] = page.props.applications;
 const stat = ato == null ? '' : ato.status
 // 📑 Form Type Selection
 function selectForm(f: any) {
-  //console.log(f.name)
-  createForm.type = f.name
+  //console.log(f.id);
+  createForm.form_id = f.id
+  createForm.form_name = f.name
+  createForm.form_user =f.form_user
+  createForm.type = f.form_type
+  createForm.approver_group_id = f.approver_group_id
   approvalForm.approver_group_id = f.approver_group_id
   buttonVisible.value = true
 }

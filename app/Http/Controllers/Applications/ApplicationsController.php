@@ -97,8 +97,11 @@ class ApplicationsController extends Controller
     public function store(Request $request)
     {    
         $user = auth()->user();
-        $result = $this->service->createApplication($request->type);
-    
+        // if($request->type === 'Accreditation'){
+        //     $result = $this->service->createApplication($request->form_name, $request->form_id);
+        // }elseif($request->type === 'Permit'){
+              $result = $this->service->createApplication($request->type, $request->form_id);
+        // }
         $application = $result['application'];
         $approverForm = $result['approverForm'];
         
@@ -108,13 +111,25 @@ class ApplicationsController extends Controller
                 'approver_group_id' => $approverForm->approver_group_id,
                 'application_form_number' => $application->form_number
             ]);
-        }elseif($request->type === 'Vendor Accreditation'){
-            return Inertia::render('Accreditation/Accreditationform',[
+        }elseif($request->form_user === 'Vendor'){
+            return Inertia::render('Accreditation/Vendor/Accreditationform',[
                 'form_number' => $application->form_number,
                 'application_id' =>$application->id,
                 'application_group_id'=>$approverForm->approver_group_id,
             ]);
-
+        }elseif($request->form_user === 'Supplier' ){
+            return Inertia::render('Accreditation/Supplier/AccreditationForm',[
+                'form_number' => $application->form_number,
+                'application_id' =>$application->id,
+                'application_group_id'=>$approverForm->approver_group_id,
+            ]);
+        }elseif($request->form_user ==='Commercial'){
+             return Inertia::render('Accreditation/TradeFair/AccreditationForm',[
+                'form_number' => $application->form_number,
+                'application_id' =>$application->id,
+                'application_group_id'=>$approverForm->approver_group_id,
+            ]);
+        
         }else{ return Inertia::render('Locator/Application/Create', [ 
             'user' => $user, 
             'application_form_id' => $application->id, // Pass the new ID 

@@ -98,6 +98,7 @@ const resetForm = () => {
     <div class="min-h-screen bg-slate-50 py-12 px-4 sm:px-6 lg:px-8">
       <div class="max-w-4xl mx-auto">
         <div class="bg-white shadow-xl rounded-2xl border border-slate-200">
+          {{ props.form_number }}
           <form class="p-8 space-y-10" @submit.prevent="submit">
 <section class="p-6 rounded-xl bg-indigo-50 border border-indigo-100">
             <h1 class="text-center text-2xl font-bold mb-6">

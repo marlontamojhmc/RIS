@@ -81,18 +81,20 @@ class AppService
     /** -------------------------
      * STORE
      * ------------------------*/
-    public function createApplication($type)
+    public function createApplication($type, $form_id)
     {
         $user = Auth::user();
-        
         $application = ApplicationModel::create([
             'form_title' => $type,
             'user_id'    => $user->id,
         ]);
 
-        $approverForm = Form::where('name', $type)->first();
-        $sets = ApproverSets::where('approver_group_id', $approverForm->approver_group_id)->get();
+      $approverForm = Form::findOrFail($form_id);
 
+$sets = ApproverSets::where(
+                            'approver_group_id',
+                            $approverForm->approver_group_id
+                        )->get();
         foreach ($sets as $set) {
             ApproverGroupApprover::create([
                 'approver_group_id'  => $set->approver_group_id,
@@ -190,6 +192,7 @@ class AppService
             'approverGroupId'  => $form->approver_group_id,
         ];
     }
+    
     public function getApplicationData(string $id)
     {
         // Fetch the application with relations
