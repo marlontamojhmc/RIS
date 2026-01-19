@@ -22,6 +22,7 @@ interface AccreditationForm {
   contact: string
   representative: string
   privacyConsent: boolean
+  files: File[]
   form_number: string
   application_id: string
   application_group_id: string
@@ -39,6 +40,7 @@ const form = reactive<AccreditationForm>({
   contact: '',
   representative: '',
   privacyConsent: false,
+  files: [],
   form_number: props.form_number,
   application_id: props.application_id,
   application_group_id: props.application_group_id,
@@ -53,6 +55,7 @@ const services = ref<Option[]>([])
 const supplies = ref<Option[]>([])
 const frequencies = ref<Option[]>([])
 
+// Load dynamic options
 onMounted(async () => {
   try {
     const { data } = await axios.get('/api/accreditation/options')
@@ -64,16 +67,41 @@ onMounted(async () => {
   }
 })
 
+// Handle file selection
+function handleFiles(event: Event) {
+  const target = event.target as HTMLInputElement
+  if (target.files) {
+    form.files = Array.from(target.files)
+  }
+}
+
+// Submit form using FormData
 const submit = () => {
-  router.post('/accreditation/store', form, {
+  const formData = new FormData()
+  for (const key in form) {
+    if (key === 'files') {
+      form.files.forEach((file) => formData.append('files[]', file))
+    } else {
+      // @ts-ignore
+      formData.append(key, form[key])
+    }
+  }
+
+  router.post('/accreditation/store', formData, {
     preserveScroll: true,
+    headers: { 'Content-Type': 'multipart/form-data' },
     onSuccess: () => {
       alert('Accreditation submitted successfully')
       resetForm()
     },
+    onError: (errors) => {
+      console.error(errors)
+      alert('Please check your inputs.')
+    },
   })
 }
 
+// Reset form
 const resetForm = () => {
   form.date = ''
   form.type = 'new'
@@ -86,6 +114,7 @@ const resetForm = () => {
   form.contact = ''
   form.representative = ''
   form.privacyConsent = false
+  form.files = []
 
   form.form_number = props.form_number
   form.application_id = props.application_id
@@ -99,11 +128,14 @@ const resetForm = () => {
       <div class="max-w-4xl mx-auto">
         <div class="bg-white shadow-xl rounded-2xl border border-slate-200">
           <form class="p-8 space-y-10" @submit.prevent="submit">
-        <section class="p-6 rounded-xl bg-indigo-50 border border-indigo-100">
-            <h1 class="text-center text-2xl font-bold mb-6">
-  Trade Fair Accreditation Form
-</h1>
-</section>
+
+            <!-- FORM TITLE -->
+            <section class="p-6 rounded-xl bg-indigo-50 border border-indigo-100">
+              <h1 class="text-center text-2xl font-bold mb-6">
+                Trade Fair Accreditation Form
+              </h1>
+            </section>
+
             <!-- DATA PRIVACY -->
             <section class="p-6 rounded-xl bg-indigo-50 border border-indigo-100">
               <h2 class="text-indigo-900 font-bold mb-2">
@@ -115,12 +147,8 @@ const resetForm = () => {
               </p>
 
               <label class="flex items-center gap-3 mt-4">
-                <input
-                  type="checkbox"
-                  v-model="form.privacyConsent"
-                  required
-                  class="w-4 h-4 text-indigo-600"
-                />
+                <input type="checkbox" v-model="form.privacyConsent" required
+                  class="w-4 h-4 text-indigo-600" />
                 <span class="text-sm font-semibold text-slate-700">
                   I agree to the Data Privacy Consent
                 </span>
@@ -191,7 +219,7 @@ const resetForm = () => {
               </div>
             </div>
 
-            <!-- CONTACT -->
+            <!-- CONTACT INFO -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 border-t pt-8">
               <div class="md:col-span-2">
                 <label class="block text-xs font-bold uppercase text-slate-500 mb-1">
@@ -230,8 +258,22 @@ const resetForm = () => {
               </div>
             </div>
 
+            <!-- FILE UPLOAD -->
+            <div class="mt-6">
+              <label class="block w-full p-4 text-center border-2 border-dashed rounded-md cursor-pointer hover:border-indigo-500">
+                <span class="text-gray-600">Click to select files</span>
+                <input type="file" multiple class="hidden" @change="handleFiles" />
+              </label>
+
+              <ul class="mt-2 space-y-2">
+                <li v-for="(file, index) in form.files" :key="index" class="text-sm text-gray-700">
+                  {{ file.name }}
+                </li>
+              </ul>
+            </div>
+
             <!-- ACTIONS -->
-            <div class="flex gap-4">
+            <div class="flex gap-4 mt-6">
               <button type="submit"
                 class="flex-1 bg-indigo-600 text-white py-4 rounded-xl font-bold hover:bg-indigo-700">
                 Submit Accreditation
