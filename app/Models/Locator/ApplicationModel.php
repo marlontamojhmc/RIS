@@ -15,6 +15,7 @@ class ApplicationModel extends Model
 
     protected $fillable = [
         'form_title',
+        'form_type',
         'user_id',
         'control_number',
         'form_number',

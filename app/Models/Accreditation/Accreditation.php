@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Accreditation\ServiceType;
 use App\Models\Accreditation\SupplyType;
-
+use App\Models\Locator\Upload;
 class Accreditation extends Model
 {
     use HasFactory;
@@ -25,15 +25,43 @@ class Accreditation extends Model
         'privacy_consent',
     ];
 
-    // Many-to-Many relationships with services and supplies
-    public function services()
+     public function services()
     {
-        return $this->belongsToMany(ServiceType::class, 'accreditation_services', 'accreditation_id', 'service_type_id');
+        return $this->belongsToMany(
+            ServiceType::class,
+            'accreditation_services',
+            'accreditation_id',
+            'service_type_id'
+        );
     }
 
+    // Supplies
     public function supplies()
     {
-        return $this->belongsToMany(SupplyType::class, 'accreditation_supplies', 'accreditation_id', 'supply_type_id');
+        return $this->belongsToMany(
+            SupplyType::class,
+            'accreditation_supplies',
+            'accreditation_id',
+            'supply_type_id'
+        );
+    }
+
+    // Business Enterprise Classifications
+    public function businessEnterpriseClassifications()
+    {
+        return $this->belongsToMany(
+            \App\Models\BusinessEnterpriseClassification::class,
+            'accreditation_business_enterprise_classification'
+        );
+    }
+
+    // ✅ Uploads
+    public function uploads()
+    {
+        return $this->hasMany(
+            Upload::class,
+            'application_form_id'
+        );
     }
     
 }

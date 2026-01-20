@@ -95,13 +95,16 @@ class ApplicationsController extends Controller
      * Store a newly created resource in storage.
      */
     public function store(Request $request)
-    {    
+    { 
         $user = auth()->user();
-        // if($request->type === 'Accreditation'){
-        //     $result = $this->service->createApplication($request->form_name, $request->form_id);
-        // }elseif($request->type === 'Permit'){
-              $result = $this->service->createApplication($request->type, $request->form_id);
-        // }
+        if($request->type === 'Accreditation'){
+            $result = $this->service->createApplication($request->form_name,$request->type, $request->form_id);
+        }elseif($request->type === 'Permit'){
+              $result = $this->service->createApplication($request->form_name, $request->type,$request->form_id);
+         }else{
+            $result = $this->service->createApplication($request->form_name, $request->type,$request->form_id);
+         }
+        
         $application = $result['application'];
         $approverForm = $result['approverForm'];
         
@@ -130,6 +133,12 @@ class ApplicationsController extends Controller
                 'application_group_id'=>$approverForm->approver_group_id,
             ]);
         
+        }elseif($request->form_name === 'Provisional Grant'){
+            return Inertia::render('Accreditation/Provisional/ProvisionalGrantForm',[
+                'form_number' => $application->form_number,
+                'application_id' =>$application->id,
+                'application_group_id'=>$approverForm->approver_group_id,
+            ]);
         }else{ return Inertia::render('Locator/Application/Create', [ 
             'user' => $user, 
             'application_form_id' => $application->id, // Pass the new ID 

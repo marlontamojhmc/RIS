@@ -161,7 +161,7 @@ function selectForm(f: any) {
      
     
     <div class="p-6 w-full mx-6 bg-white shadow-xl rounded-xl border border-gray-100 dark:bg-gray-900 dark:border-gray-700">
-
+    
       <!-- 🏷 Title -->
       <h1 class="text-3xl font-extrabold mb-6 border-b pb-2 text-gray-900 dark:text-gray-100 dark:border-gray-700">
         {{ props.form_title ? `Applying for ${props.form_title}` : ' Application Forms' }}

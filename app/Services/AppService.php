@@ -81,11 +81,12 @@ class AppService
     /** -------------------------
      * STORE
      * ------------------------*/
-    public function createApplication($type, $form_id)
+    public function createApplication($type,$form_type, $form_id)
     {
         $user = Auth::user();
         $application = ApplicationModel::create([
             'form_title' => $type,
+            'form_type'  => $form_type,
             'user_id'    => $user->id,
         ]);
 
