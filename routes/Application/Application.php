@@ -13,7 +13,7 @@ Route::middleware(['auth'])
         })->name('app.index');
         Route::get('/attach', function(){
            $accreditation = ApplicationModel::with('uploads')
-                            ->where('form_number', 'CEO-0002')
+                            ->where('form_number', 'PG-0001')
                             ->get();
             dd($accreditation);
         });

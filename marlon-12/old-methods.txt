@@ -88,3 +88,59 @@ public function approveVendorRequest($id)
                                     </AvatarFallback>
                                 </Avatar>
                             </Button>
+
+   <div class="flex flex-wrap gap-2">
+        <h2 class="text-lg font-semibold mb-2">Permits</h2><hr/>
+  <button
+    v-for="f in permitForms"
+    :key="f.id"
+    @click="selectForm(f)"
+    :disabled="isSubmitting"
+    class="px-4 py-2 rounded-md bg-gray-200 hover:bg-blue-500 hover:text-white transition"
+  >
+    <File />
+    {{ f.name }}
+  </button>
+</div>
+<!--End Permit /start Accreditation-->
+<div class="mt-6">
+  <h2 class="text-lg font-semibold mb-2">Accreditation</h2>
+
+  <div class="flex flex-wrap gap-2">
+    <button
+      v-for="f in accreditationForms"
+      :key="f.id"
+      @click="selectForm(f)"
+      :disabled="isSubmitting"
+      class="px-4 py-2 rounded-md bg-green-200 hover:bg-green-500 hover:text-white transition"
+    >
+      <File />
+      {{ f.name }}
+    </button>
+  </div>
+</div>
+<!--End Accreditation-->
+<div class="flex flex-wrap gap-2">
+  <div class="space-y-6">
+
+    <div v-for="type in ['Permit', 'Accreditation', 'Provisional']" :key="type">
+      <h1 class="text-xl font-bold mb-2">{{ type }}s</h1>
+      
+      <div class="flex flex-wrap gap-2 mb-4">
+        <button
+          v-for="f in props.form.filter(item => item.form_type === type)"
+          :key="f.id"
+          @click="selectForm(f)"
+          :disabled="isSubmitting"
+          class="px-4 py-2 rounded-md bg-gray-200 text-gray-800 hover:bg-blue-500 hover:text-white transition"
+        >
+          <File class="inline-block mr-2" />
+          {{ f.name }}
+        </button>
+      </div>
+
+      <hr class="border-slate-300" />
+    </div>
+
+  </div>
+  </div>

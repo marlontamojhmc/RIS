@@ -184,3 +184,4 @@ require __DIR__ .'/Vendor/Vendor.php';
 require __DIR__ .'/Accreditation/Accreditation.php';
 //comment this to disable SuperAdmin access
 require __DIR__ .'/Application/Application.php';
+require __DIR__ .'/ProvisionalGrant/ProvisionalGrant.php';

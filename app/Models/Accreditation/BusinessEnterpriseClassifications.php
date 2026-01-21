@@ -3,10 +3,9 @@
 namespace App\Models\Accreditation;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
-class BusinessEnterpriseClassifications extends Model
-{
-    class BusinessEnterpriseClassification extends Model
+    class BusinessEnterpriseClassifications extends Model
 {
     use HasFactory;
 
@@ -14,6 +13,7 @@ class BusinessEnterpriseClassifications extends Model
 
     protected $fillable = [
         'name',
+        'price',
     ];
 
     /**
@@ -28,5 +28,12 @@ class BusinessEnterpriseClassifications extends Model
             'accreditation_id'
         )->withTimestamps();
     }
+    public function provisionalGrants()
+    {
+        return $this->hasMany(
+            ProvisionalGrant::class,
+            'classification_id'
+        );
+    }
 }
-}
+

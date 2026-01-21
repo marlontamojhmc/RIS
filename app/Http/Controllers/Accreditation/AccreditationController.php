@@ -42,7 +42,7 @@ class AccreditationController extends Controller
      */
 
 public function store(Request $request)
-{
+{  
     try {
         $validated = $request->validate([
             'date' => 'required|date',

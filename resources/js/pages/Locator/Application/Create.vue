@@ -33,6 +33,7 @@ const props = defineProps({
   form: { type: Object, default: () => null },
   forms: { type: Array, default: () => [] },
   approverGroupId: [String, Number],
+  form_type:[String],
 })
 
 // 📌 State
@@ -55,6 +56,14 @@ const createForm = useForm({
   approver_group_id:'',
   form_id:'',
   
+})
+const groupedForms = computed(() => {
+  return props.form.reduce((acc, f) => {
+    const type = f.form_type || 'Other'
+    if (!acc[type]) acc[type] = []
+    acc[type].push(f)
+    return acc
+  }, {})
 })
 
 const approvalForm = useForm({
@@ -210,18 +219,21 @@ function selectForm(f: any) {
         
 <div class="flex flex-wrap gap-2">
     <button
-      v-for="f in props.form"
-      :key="f.id"
-      @click="selectForm(f)"
-      :disabled="isSubmitting"
-      :class="selectedForm?.id === f.id ? 'bg-blue-600 text-white hidden' : 'bg-gray-200 text-gray-800 py-5 px-5'"
-      class="px-4 py-2 rounded-md hover:bg-blue-500 hover:text-white transition"
-    ><File />
-      {{ f.name }}
-    </button>
+  v-for="f in props.form"
+  :key="f.id"
+  v-if="f.form_type === 'Permit'"
+  @click="selectForm(f)"
+  :disabled="isSubmitting"
+  class="px-4 py-2 rounded-md bg-gray-200 text-gray-800 hover:bg-blue-500 hover:text-white transition"
+>
+  <File class="inline-block mr-2" />
+  {{ f.name }}
+</button>
   </div>
+  
 
-        <!-- Declared Value -->
+
+        <!-- Declared Valupre -->
         <div v-if="props.application_form_id">
           <ApplicationOptionSelect
             v-model="createForm.application_category_option_id"

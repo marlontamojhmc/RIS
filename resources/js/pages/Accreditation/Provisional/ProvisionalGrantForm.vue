@@ -11,6 +11,7 @@ const props = defineProps<{
 }>()
 
 interface AccreditationForm {
+ form_type:string
   date: string
   type: 'new' | 'renewal'
   businessName: string
@@ -30,6 +31,7 @@ interface AccreditationForm {
 }
 
 const form = reactive<AccreditationForm>({
+  form_type:'ProvisionalGrant',
   date: '',
   type: 'new',
   businessName: '',
@@ -66,7 +68,6 @@ onMounted(async () => {
     supplies.value = data.supplies ?? []
     frequencies.value = data.frequencies ?? []
     classification.value =data.classifications ?? []
-    console.log(data.classifications);
     } catch (e) {
     console.error('Failed to load options', e)
   }
@@ -92,7 +93,7 @@ const submit = () => {
     }
   }
 
-  router.post('/accreditation/store', formData, {
+  router.post('/provisional/store', formData, {
     preserveScroll: true,
     headers: { 'Content-Type': 'multipart/form-data' },
     onSuccess: () => {
@@ -133,7 +134,7 @@ const resetForm = () => {
     <div class="min-h-screen bg-slate-50 py-12 px-4 sm:px-6 lg:px-8">
       <div class="max-w-4xl mx-auto">
         <div class="bg-white shadow-xl rounded-2xl border border-slate-200">
-          {{ props.form_number }}
+          
           <form class="p-8 space-y-10" @submit.prevent="submit">
 
             <!-- FORM TITLE -->
