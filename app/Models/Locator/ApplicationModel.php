@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\User;
 use App\Models\ATO\AtoApplication;
+use App\Models\Accreditation\Accreditation;
+use App\Models\ProvisionalGrant\ProvisionalGrant;
 
 class ApplicationModel extends Model
 {
@@ -53,11 +55,6 @@ class ApplicationModel extends Model
     public function articleDetails()
     {
         return $this->hasMany(\App\Models\Locator\ArticleDetail::class, 'application_form_id', 'id');
-    }
-
-    public function uploads()
-    {
-        return $this->hasMany(\App\Models\Locator\Upload::class, 'application_form_id', 'id');
     }
 
     public function selections()
@@ -122,5 +119,18 @@ public function getMeta(string $key, mixed $default = null, bool $asArray = true
         'id',             // Local key on application_forms
         'option_id'       // Key on selections linking to options
     );
+}
+public function accreditation()
+{
+    return $this->hasOne(Accreditation::class, 'application_id');
+}
+public function provisionalGrant()
+{
+    return $this->hasOne(provisionalGrant::class, 'application_id');
+}
+
+public function uploads()
+{
+    return $this->hasMany(Upload::class, 'application_form_id', 'id');
 }
 }

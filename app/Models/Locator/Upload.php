@@ -33,4 +33,15 @@ class Upload extends Model
     {
         return $this->belongsTo(\App\Models\Locator\ApplicationModel::class, 'application_form_id');
     }
+    public function accreditation()
+    {
+        return $this->belongsTo(
+            Accreditation::class,
+            'application_form_id'
+        );
+    }
+    public function application()
+{
+    return $this->belongsTo(ApplicationModel::class, 'application_form_id', 'id');
+}
 }

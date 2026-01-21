@@ -219,16 +219,15 @@ function selectForm(f: any) {
         
 <div class="flex flex-wrap gap-2">
     <button
-  v-for="f in props.form"
-  :key="f.id"
-  v-if="f.form_type === 'Permit'"
-  @click="selectForm(f)"
-  :disabled="isSubmitting"
-  class="px-4 py-2 rounded-md bg-gray-200 text-gray-800 hover:bg-blue-500 hover:text-white transition"
->
-  <File class="inline-block mr-2" />
-  {{ f.name }}
-</button>
+      v-for="f in props.form"
+      :key="f.id"
+      @click="selectForm(f)"
+      :disabled="isSubmitting"
+      :class="selectedForm?.id === f.id ? 'bg-blue-600 text-white hidden' : 'bg-gray-200 text-gray-800 py-5 px-5'"
+      class="px-4 py-2 rounded-md hover:bg-blue-500 hover:text-white transition"
+    ><File />
+      {{ f.name }}
+    </button>
   </div>
   
 

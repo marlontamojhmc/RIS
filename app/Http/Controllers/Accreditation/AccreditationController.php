@@ -76,6 +76,7 @@ public function store(Request $request)
         'form_number' => $request->form_number,
         'date' => $validated['date'],
         'type' => $validated['type'],
+        'application_id' => $accreditationId,
         'business_name' => $validated['businessName'],
         'frequency' => $validated['frequency'],
         'address' => $validated['address'],

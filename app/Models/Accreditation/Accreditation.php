@@ -16,6 +16,7 @@ class Accreditation extends Model
         'form_number',
         'date',
         'type',
+        'application_id',
         'business_name',
         'frequency',
         'address',

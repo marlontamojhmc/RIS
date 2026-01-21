@@ -7,7 +7,13 @@ Route::middleware(['auth'])
     ->prefix('applications')
     ->name('applications.')
     ->group(function () {
+        Route::get('/accredit/{id}', function ($id) {
+            $application = ApplicationModel::with('accreditation','uploads')
+                ->where('id', $id)
+                ->firstOrFail();
 
+            dd($application);
+        });
         Route::get('/permits', function(){
             return Inertia::render('Permiit/GatePass',[]);
         })->name('app.index');

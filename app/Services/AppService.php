@@ -55,8 +55,10 @@ class AppService
     public function getFormOptionsForUser()
     {
         $user = Auth::user();
-
-        $applications = $user->applications()->where('form_title', 'ATO')->first();
+        //kelangan Approved ang status ng ATO permit
+        $applications = $user->applications()->where('form_title', 'ATO')
+        ->where('status','Approved')
+        ->first();
 
         $applicationId = $applications->id ?? null;
 

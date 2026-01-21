@@ -93,5 +93,20 @@ public function uploadFile($file, $title, $applicationFormId, $userId)
             'application_form_id' => $applicationFormId,
         ]);
     }
+    public function UploadAccreditationFiles(array $files,$title, $applicationFormId, $userId){
+           if (!$file || !method_exists($file, 'store')) {
+            return;
+        }   
+        $path = $file->store('uploads', 'accreditation'); 
+        Upload::create([
+            'file_name'           => $title ?: $file->getClientOriginalName(),
+            'file_path'           => $path,
+            'file_type'           => $file->getClientMimeType(),
+            'file_size'           => $file->getSize(),
+            'description'         => null,
+            'user_id'             => $userId,
+            'application_form_id' => $applicationFormId,
+        ]);
+    }
 
 }
