@@ -16,6 +16,7 @@ class ProvisionalGrant extends Model
     protected $fillable = [
         'date',
         'type',
+        'price',
         'business_name',
         'address',
         'email',

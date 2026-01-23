@@ -25,6 +25,7 @@ use App\Http\Controllers\Signup\LocatorController;
 use App\Http\Controllers\Signup\TemporaryUserController;
 use App\Http\Controllers\VENDOR\LocatorVendorController;
 use App\Http\Controllers\TestPdfController;
+use App\Models\Accreditation\Accreditation;
 /*
 |--------------------------------------------------------------------------
 | Web Routes

@@ -24,5 +24,5 @@ use App\Http\Controllers\SEZAD\RO\RegistrationOfficerController;
       Route::prefix('fsd')->group(function(){
             //FINANCE
         Route::get('/finance',[FinanceController::class, 'index'])->name('finance.index');
-        Route::get('/finance/{id}/show', [FinanceController::class, 'show'])->name('finance.show');
+        Route::get('/finance/{id}/show/{form_type}', [FinanceController::class, 'show'])->name('finance.show');
       })->name('fsd');

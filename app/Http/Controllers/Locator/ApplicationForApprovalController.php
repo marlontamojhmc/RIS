@@ -193,9 +193,12 @@ public function returnApproval(Request $request, $formNumber, $approverId)
       * update form add the Invoice number
       */
      public function invoice(Request $request, $formNumber, $approverId)
-    {   //value of invoice from frontend
+    {   
+        //value of invoice from frontend
         $forInvoice = ApplicationForApproval::where('form_number', $formNumber)->first();
-        $forInvoice->IS_Number = $request->IS;
+        $forInvoice->IS_Number = $request->OR_Number;
+        $forInvoice->acted_at = now();
+        $forInvoice->payment_status = 'Paid'; 
         $forInvoice->save();
        
         return back()->with([

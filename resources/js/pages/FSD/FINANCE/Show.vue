@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import { router, usePage } from '@inertiajs/vue3';
 import FinanceViewer from './FinanceComponents/FinanceViewer.vue';
 import Button from '@/components/ui/button/Button.vue';
@@ -9,9 +9,10 @@ import Input from '@/components/ui/input/Input.vue';
 const page = usePage();
 
 const props = defineProps({
-  application: { type: Array, required: true },
+  application: { type: Object, required: true },
   approver_status: { type: String, required: true },
-  group: { type: Object, required: true }
+  group: { type: Object, required: true },
+  Prevapprover: {type:Object, required:true },
 });
 
 // Modal States
@@ -21,43 +22,54 @@ const OR_Number = ref('');
 const Remark = ref('');
 const showApprove = ref(false);
 
+// Compute price based on form_type
+const price = computed(() => {
+  if (props.application.form_type === 'Provisional') {
+    return props.application.provisional_grant.price;
+  } else if (props.application.form_type === 'Accreditation') {
+    return props.application.accreditation.price;
+  }else{
+   return props.application.selections[0].amount;
+  }
+  return 0;
+});
+
 // Open Modals
 const openPaymentModal = () => showPaymentModal.value = true;
 const openReturnModal = () => showReturnModal.value = true;
 
+// Cancel / Close Modals
+const cancelPayment = () => { showPaymentModal.value = false; OR_Number.value = ''; };
+const cancelReturn = () => { showReturnModal.value = false; Remark.value = ''; };
+
 // Confirm Actions
 const confirmPayment = () => {
+  if (!OR_Number.value.trim()) {
+    alert('Please enter OR Number to proceed');
+    return;
+  }
+
   router.post(
     `/application-for-approval/${props.application.form_number}/approvers/${page.props.auth.user.id}/invoice`,
-    { user: 'finance',
-      IS: OR_Number.value,
-     },
     {
-      onSuccess: () =>  showApprove.value = true,
+      user: 'finance',
+      OR_Number: OR_Number.value,
+    },
+    {
+      onSuccess: () => showApprove.value = true,
       onError: (errors) => console.error('Approval failed', errors),
     }
   );
-  //   console.log('OR Number:', OR_Number.value)
-   
-  // if (!OR_Number.value.trim()) {
-  //   alert('Please enter OR Number to proceed');
-  //   return;
-  //}
-  
+
   showPaymentModal.value = false;
   OR_Number.value = '';
 };
 
 const confirmReturn = () => {
   console.log('Return Remark:', Remark.value);
-
   showReturnModal.value = false;
   Remark.value = '';
 };
-
-// Cancel / Close Modals
-const cancelPayment = () => { showPaymentModal.value = false; OR_Number.value = ''; };
-const cancelReturn = () => { showReturnModal.value = false; Remark.value = ''; };
 
 // Approve action
 const handleApprove = () => {
@@ -75,8 +87,14 @@ const handleApprove = () => {
 <template>
 <FinanceAppsidebarLayout>
   <FinanceViewer :application="props.application" :group="props.group" />
+
+  <!-- Display Price -->
+  <p class="text-md text-gray-800 font-bold mt-4">
+   
+  </p>
+
   <!-- ACTION BAR -->
-  <div v-if="props.approver_status === 'Pending'" class="flex justify-center gap-4 mt-8">
+  <div v-if="props.approver_status === 'Pending' || props.Prevapprover.status === 'Approved'  " class="flex justify-center gap-4 mt-8">
     <Button
       v-if="showApprove"
       variant="default"
@@ -107,7 +125,8 @@ const handleApprove = () => {
     <div class="bg-white w-full max-w-md p-6 rounded-xl shadow-xl">
       <h2 class="text-lg font-semibold mb-3">Permit Payment</h2>
       <label class="text-sm font-medium">Total Amount:</label>
-      <p class="text-md text-gray-800 font-bold">₱{{ props.application.selections[0].amount }}</p>
+      <p class="text-md text-gray-800 font-bold">₱{{ price }}</p>
+
       <label class="text-sm font-medium mt-3">Enter OR Number:</label>
       <Input
         v-model="OR_Number"

@@ -9,8 +9,8 @@ const p = defineProps({
  }
 })
 const handleView = (application)=>{
-  console.log('osac Viewing:',application.application_form_id)
-  router.visit(`/fsd/finance/${application.application_form_id}/show`)
+  //console.log('finance:',application.application.form_type)
+  router.visit(`/fsd/finance/${application.application_form_id}/show/${application.application.form_type}`)
 }
 const handleEdit = (application) =>{
   console.log(application)
@@ -23,6 +23,7 @@ const handleDelete =(application) =>{
 <template>
     <FinanceAppSidebarLayout>
   <div>
+    
     <h1 class="text-2xl font-bold text-center mb-4">Finance Dashboard</h1>
     
     <FinanceApplicationTable

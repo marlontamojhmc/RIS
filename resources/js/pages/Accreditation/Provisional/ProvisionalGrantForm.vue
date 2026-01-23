@@ -18,7 +18,7 @@ interface AccreditationForm {
   frequency: string
   services: number[]
   supplies: number[]
-  classification:number[]
+  classification: number[]
   address: string
   email: string
   contact: string
@@ -112,16 +112,13 @@ const resetForm = () => {
   form.date = ''
   form.type = 'new'
   form.businessName = ''
-  form.frequency = ''
-  form.services = []
-  form.supplies = []
   form.address = ''
   form.email = ''
   form.contact = ''
   form.representative = ''
   form.privacyConsent = false
   form.files = []
-  form.c
+  form.classification = []
 
   form.form_number = props.form_number
   form.application_id = props.application_id

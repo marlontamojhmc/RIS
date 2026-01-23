@@ -46,6 +46,7 @@ class ATOController extends Controller
           $userId = auth()->id();
     //for Approval I need(a pplication_id, approver_group_id,form_number, )
     // Create ATO application
+    $price = $request->applicationType === 'new' ? 
         $ato = AtoApplication::create([
             'application_id'        => $request->application_id,
             'application_date'      => now(),
@@ -55,6 +56,7 @@ class ATOController extends Controller
             'parent_company'        => $request->businessProfile['parentCompany'],
             'taxpayer_name'         => $request->businessProfile['taxpayerName'],
             'TIN'                   => $request->businessProfile['TIN'],
+            'price'                 => 
             'PrimaryLine'           => $request->pcic['primaryLine'],
             'SecondaryLine'         => $request->pcic['secondaryLine'],
             'nature_of_contract'    => $request->natureOfContract,

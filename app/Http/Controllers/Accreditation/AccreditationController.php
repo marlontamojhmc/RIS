@@ -70,6 +70,7 @@ public function store(Request $request)
         $validated['privacyConsent'],
         FILTER_VALIDATE_BOOLEAN
     );
+    $price = $validated['type'] === 'new' ? 1000 : 500;
  $accreditationId = $request->application_id;
     $accreditation = Accreditation::create([
         'user_id' => auth()->id(),
@@ -77,6 +78,7 @@ public function store(Request $request)
         'date' => $validated['date'],
         'type' => $validated['type'],
         'application_id' => $accreditationId,
+        'price' =>$price,
         'business_name' => $validated['businessName'],
         'frequency' => $validated['frequency'],
         'address' => $validated['address'],

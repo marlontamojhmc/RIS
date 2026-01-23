@@ -22,6 +22,7 @@ class AtoApplication extends Model
         'parent_company',
         'taxpayer_name',
         'TIN',
+        'price',
         'PrimaryLine',
         'SecondaryLine',
         'nature_of_contract',

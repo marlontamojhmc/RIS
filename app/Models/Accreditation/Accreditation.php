@@ -17,6 +17,7 @@ class Accreditation extends Model
         'date',
         'type',
         'application_id',
+        'price',
         'business_name',
         'frequency',
         'address',

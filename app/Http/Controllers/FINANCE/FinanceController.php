@@ -16,7 +16,7 @@ class FinanceController extends Controller
      public function index(){
         $user = auth()->user();
     
-                $applications = ApproverGroupApprover::with('application')
+                $applications = ApproverGroupApprover::with('application','application.accreditation')
                                 ->where('approver_id', auth()->id())
                                 ->orderBy('id', 'desc')
                                 ->get();
@@ -24,12 +24,20 @@ class FinanceController extends Controller
                                  'applications'=> $applications,
                                 ]);
         }
-    public function show($id)
-{
+    public function show($id,$form_type)
+{    
     $user = auth()->user();
-    $application = ApplicationModel::with(['articleDetails','approval', 'uploads', 'selections','options'])
+    if($form_type === 'Accreditation'){
+    $application = ApplicationModel::with(['articleDetails','approval', 'uploads', 'selections','options','accreditation'])
                     ->find($id);
-
+    }elseif($form_type === 'Provisional'){
+        $application = ApplicationModel::with(['articleDetails','approval', 'uploads', 'selections','options','provisionalGrant'])
+                    ->find($id);
+    }else{
+        $application = ApplicationModel::with(['articleDetails','approval', 'uploads', 'selections','options','app'])
+                    ->find($id);
+    }
+   
     if (!$application) {
         abort(404, 'Application not found');
     }
@@ -42,17 +50,23 @@ class FinanceController extends Controller
                   ->where('approver_id', $user->id)
                   ->where('application_form_id', $application->id)
                   ->first();
-
+   
     if (!$approver || !$approver->status) {
         abort(404, 'Approver not found or no status yet');
     }
-
+$prevApprover = ApproverGroupApprover::where('approver_group_id', $application->approval->approver_group_id)
+                  ->where('sequence', ($approver->sequence - 1))
+                  ->where('application_form_id', $application->id)
+                  ->first();
+   
     $group = ApproverGroup::find($application->approval->approver_group_id);
 
     return Inertia::render('FSD/FINANCE/Show', [
         'application' => $application,
         'approver_status' => $approver->status,
         'group' => $group,
+        'Prevapprover' => $prevApprover,
+        
     ]);
 }
 
