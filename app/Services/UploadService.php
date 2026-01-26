@@ -76,23 +76,32 @@ class UploadService implements ISezrisService
     }
 }
 public function uploadFile($file, $title, $applicationFormId, $userId)
-    {
-        if (!$file || !method_exists($file, 'store')) {
-            return;
-        }
-
-        $path = $file->store('uploads', 'public');
-
-        Upload::create([
-            'file_name'           => $title ?: $file->getClientOriginalName(),
-            'file_path'           => $path,
-            'file_type'           => $file->getClientMimeType(),
-            'file_size'           => $file->getSize(),
-            'description'         => null,
-            'user_id'             => $userId,
-            'application_form_id' => $applicationFormId,
-        ]);
+{
+    // Make sure we have a valid UploadedFile
+    if (!$file instanceof \Illuminate\Http\UploadedFile) {
+        return null;
     }
+
+    // Ensure the disk folder exists
+    
+
+    // Store the file in "uploads" folder of the "ATO" disk
+     $path = $file->store('uploads/ato', 'public');
+
+    // Create a DB record
+    $upload = Upload::create([
+        'file_name'           => $title ?: $file->getClientOriginalName(),
+        'file_path'           => $path,
+        'file_type'           => $file->getClientMimeType(),
+        'file_size'           => $file->getSize(),
+        'description'         => null,
+        'user_id'             => $userId,
+        'application_form_id' => $applicationFormId,
+    ]);
+
+    // Return the saved Upload model (optional)
+    return $upload;
+}
     public function UploadAccreditationFiles(array $files,$title, $applicationFormId, $userId){
            if (!$file || !method_exists($file, 'store')) {
             return;

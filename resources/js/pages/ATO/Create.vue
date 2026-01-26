@@ -1,6 +1,7 @@
 <script setup>
+
 import { useForm, usePage } from '@inertiajs/vue3'
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import AppLayout from '@/layouts/AppLayout.vue'
 import Input from '@/components/ui/input/Input.vue'
 import Label from '@/components/ui/label/Label.vue'
@@ -10,6 +11,7 @@ import Button from '@/components/ui/button/Button.vue'
 const businessType = ref('')
 const page= usePage()
 const file = ref(null)
+
 
 // Form data
 const form = useForm({
@@ -26,6 +28,7 @@ const form = useForm({
   trade_name: '',
   file: null,
 })
+
 
 // Dropdown options
 const applicationTypes = [

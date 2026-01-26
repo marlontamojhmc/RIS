@@ -13,6 +13,8 @@ use App\Services\UploadService;
 use App\Models\Locator\ApplicationForApproval;
 use Illuminate\Support\Facades\Storage;
 use App\Models\User;
+use App\Http\Requests\StoreAtoApplicationRequest;
+use App\Models\ATO\AtoPricing;
 
 class ATOController extends Controller
 {
@@ -41,57 +43,54 @@ class ATOController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request, UploadService $uploadService)
-    { 
-          $userId = auth()->id();
-    //for Approval I need(a pplication_id, approver_group_id,form_number, )
-    // Create ATO application
-    $price = $request->applicationType === 'new' ? 
-        $ato = AtoApplication::create([
-            'application_id'        => $request->application_id,
-            'application_date'      => now(),
-            'application_type'      => $request->applicationType,
-            'business_structure'    => $request->businessStructure,
-            'trades_name'           => $request->businessProfile['businessName'],
-            'parent_company'        => $request->businessProfile['parentCompany'],
-            'taxpayer_name'         => $request->businessProfile['taxpayerName'],
-            'TIN'                   => $request->businessProfile['TIN'],
-            'price'                 => 
-            'PrimaryLine'           => $request->pcic['primaryLine'],
-            'SecondaryLine'         => $request->pcic['secondaryLine'],
-            'nature_of_contract'    => $request->natureOfContract,
-            'pcic_primary_line'     => $request->pcic['PCICPrimary'],
-            'pcic_secondary_line'   => $request->pcic['PCICSecondary'],
-            'pcic_Primary_email'    => $request->pcic['emailPrimary'],
-            'pcic_Secondary_email'  => $request->pcic['emailSecondary'],
-            'pcic_location'         => $request->pcic['location'],
-            'pcic_office_address'   => $request->pcic['officeAddress'],
-            'pcic_contact_person'   => $request->pcic['contactPerson'],
-            'pcic_contact_number'   => $request->pcic['contactNumber'],
-            'user_id'               => $userId,
-        ]);
-        ApplicationForApproval::create([
-                'application_id'    => $request->application_id,
-                'approver_group_id' => $request->approver_group_id,
-                'form_number'       => $request->application_form_number,
-                'status'            => 'Pending',
-            ]);
-    // Use $request->all()['files'] to handle both title & file
-        $files = $request->all()['files'] ?? [];
+    public function store(StoreAtoApplicationRequest $request, UploadService $uploadService)
+{   
+    $userId = auth()->id();
+    $ato = AtoApplication::create([
+        'application_id' => $request->application_id,
+        'application_date' => now(),
+        'application_type' => $request->applicationType,
+        'business_structure' => $request->businessStructure,
+        'trades_name' => $request->businessProfile['businessName'],
+        'parent_company' => $request->businessProfile['parentCompany'],
+        'taxpayer_name' => $request->businessProfile['taxpayerName'],
+        'TIN' => $request->businessProfile['TIN'],
+        'PrimaryLine' => $request->pcic['primaryLine'],
+        'SecondaryLine' => $request->pcic['secondaryLine'],
+        'nature_of_contract' => $request->natureOfContract,
+        'pcic_primary_line' => $request->pcic['PCICPrimary'],
+        'pcic_secondary_line' => $request->pcic['PCICSecondary'],
+        'pcic_Primary_email' => $request->pcic['emailPrimary'],
+        'pcic_Secondary_email' => $request->pcic['emailSecondary'],
+        'pcic_location' => $request->pcic['location'],
+        'pcic_office_address' => $request->pcic['officeAddress'],
+        'pcic_contact_person' => $request->pcic['contactPerson'],
+        'pcic_contact_number' => $request->pcic['contactNumber'],
+        'user_id' => $userId,
+        'price'=> $request->price,
+        'ato_business_enterprise_classification_id' => $request->Enterprise,
+        'ato_business_sector_classification_id' => $request->Sector,
 
-            foreach ($files as $item) {
-                $file = $item['file'] ?? null;
-                $title = $item['title'] ?? null;
+    ]);
 
-                    if ($file) 
-                    {
-                    $uploadService->uploadFile($file, $title, $request->application_id, $userId);
-                    }
-            }
+    ApplicationForApproval::create([
+        'application_id' => $request->application_id,
+        'approver_group_id' => $request->approver_group_id,
+        'form_number' => $request->application_form_number,
+        'status' => 'Pending',
+    ]);
 
-        return redirect()->route('ATO.show', $request->application_id);
+    $files = $request->files ?? [];
+
+
+foreach ($files as $item) {
+    if (isset($item['file']) && $item['file'] instanceof \Illuminate\Http\UploadedFile) {
+        $uploadService->uploadFile($item['file'], $item['title'], $request->application_id, $userId);
     }
+}
 
+    return redirect()->route('ATO.show', $request->application_id);
+}
     
     
 

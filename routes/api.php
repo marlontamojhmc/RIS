@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AblyController;
 use App\Http\Controllers\NotificationAbly\NotificationController;
 use App\Http\Controllers\Accreditation\AccreditationController;
+use App\Http\Controllers\ATO\EnterptiseAndSectorClassification;
 
 
 
@@ -33,3 +34,4 @@ Route::post('/notifications/send', [NotificationController::class, 'send'])->nam
 
 
 Route::get('/accreditation/options', [AccreditationController::class, 'options']);
+Route::get('/ATO/options',[EnterptiseAndSectorClassification::class,'options']);
