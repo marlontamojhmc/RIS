@@ -52,7 +52,7 @@ const validUntil =
 
     <!-- Main Details Section -->
     <div class="space-y-10 px-2 sm:px-6">
-      <h2 class="text-2xl font-bold text-center tracking-tight">ATO Permit Details</h2>
+      <h2 class="text-2xl font-bold text-center tracking-tight">Authority to Operate(ATO) Permit Details</h2>
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 
@@ -77,6 +77,8 @@ const validUntil =
             'Contact Person': props.ATOapplication.pcic_contact_person,
             'Contact Number': props.ATOapplication.pcic_contact_number,
             'Application Date': formatDate(props.ATOapplication.application_date),
+            'Fee:':`₱${props.ATOapplication.price}`,
+            'form number: ': props.ATOapplication.form_number,
           }"
           :key="label"
           class="bg-white border rounded-xl shadow-sm p-6 hover:shadow-md transition"
@@ -84,10 +86,11 @@ const validUntil =
           <p class="text-sm text-muted-foreground">{{ label }}</p>
           <p class="font-medium text-lg mt-1">{{ value }}</p>
         </div>
-       {{ props.ATOapplication.price }}
+      
+       
         <!-- Uploaded Files -->
         <div class="bg-white border rounded-xl shadow-sm p-6 md:col-span-2">
-          <p class="text-sm text-muted-foreground mb-3">Uploaded Documents</p>
+          <p class="text-sm text-muted-foreground mb-3">Attachments/ Uploaded Supporting Documents</p>
 
           <div v-if="props.ATOapplication.uploads?.length">
             <ul class="space-y-3">

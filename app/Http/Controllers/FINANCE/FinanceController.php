@@ -34,7 +34,7 @@ class FinanceController extends Controller
         $application = ApplicationModel::with(['articleDetails','approval', 'uploads', 'selections','options','provisionalGrant'])
                     ->find($id);
     }else{
-        $application = ApplicationModel::with(['articleDetails','approval', 'uploads', 'selections','options','app'])
+        $application = ApplicationModel::with(['articleDetails','approval', 'uploads', 'selections','options'])
                     ->find($id);
     }
    

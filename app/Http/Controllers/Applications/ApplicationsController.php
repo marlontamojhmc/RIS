@@ -37,7 +37,7 @@ class ApplicationsController extends Controller
      */
     public function index()
     { 
-        //abort(403);
+        abort(403);
         $application = ApplicationModel::with(['selections.option', 'selections.user'])
             ->latest()
             ->first();

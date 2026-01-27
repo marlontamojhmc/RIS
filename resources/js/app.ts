@@ -1,4 +1,3 @@
-// resources/js/app.ts
 import '../css/app.css'
 
 import { createInertiaApp } from '@inertiajs/vue3'
@@ -9,20 +8,20 @@ import { initializeTheme } from './composables/useAppearance'
 import axios from 'axios'
 import Vue3EasyDataTable from 'vue3-easy-data-table'
 import 'vue3-easy-data-table/dist/style.css'
+import Toast, { POSITION } from 'vue-toastification';
+import 'vue-toastification/dist/index.css';
 
 // --------------------
 // Axios global setup
 // --------------------
-axios.defaults.withCredentials = true               // send cookies for Sanctum
+axios.defaults.withCredentials = true
 axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest'
 
-// Optional: helper for POST requests with CSRF
 export async function postWithCsrf(url: string, data: object) {
-  await axios.get('/sanctum/csrf-cookie')           // ensure CSRF token cookie
+  await axios.get('/sanctum/csrf-cookie')
   return axios.post(url, data)
 }
 
-// Similarly, you can make helpers for PUT, PATCH, DELETE:
 export async function putWithCsrf(url: string, data: object) {
   await axios.get('/sanctum/csrf-cookie')
   return axios.put(url, data)
@@ -43,6 +42,16 @@ createInertiaApp({
   setup({ el, App, props, plugin }) {
     const vueApp = createApp({ render: () => h(App, props) })
     vueApp.use(plugin)
+
+    // --------------------
+    // Global Plugins
+    // --------------------
+    vueApp.use(Toast, {
+      position: POSITION.TOP_RIGHT,
+      timeout: 3000,
+      closeOnClick: true,
+      pauseOnHover: true,
+    })
 
     // Register global components
     vueApp.component('EasyDataTable', Vue3EasyDataTable)

@@ -16,6 +16,7 @@ class AtoApplication extends Model
 
     protected $fillable = [
         'application_id',
+        'form_number',
         'application_date',
         'application_type',
         'business_structure',

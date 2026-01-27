@@ -23,6 +23,7 @@ class StoreAtoApplicationRequest extends FormRequest
     {
         return [
             'application_id' => 'required|string',
+            'application_form_number'=> 'string',
             'approver_group_id' => 'required|string',
             'application_form_number' => 'required|string',
             'Enterprise' => 'required|exists:Ato_business_enterprise_classifications,id',

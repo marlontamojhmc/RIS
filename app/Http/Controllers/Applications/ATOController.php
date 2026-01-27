@@ -48,6 +48,7 @@ class ATOController extends Controller
     $userId = auth()->id();
     $ato = AtoApplication::create([
         'application_id' => $request->application_id,
+        'form_number' => $request->application_form_number,
         'application_date' => now(),
         'application_type' => $request->applicationType,
         'business_structure' => $request->businessStructure,
