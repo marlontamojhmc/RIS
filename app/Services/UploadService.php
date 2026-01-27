@@ -4,6 +4,8 @@ namespace App\Services;
 
 use App\Services\Contracts\ISezrisService;
 use App\Models\Locator\Upload;
+use Illuminate\Http\UploadedFile;
+
 class UploadService implements ISezrisService
 {
     public function fetchData(array $filters): array
@@ -61,7 +63,7 @@ class UploadService implements ISezrisService
         }
 
         // Upload file
-        $path = $file->store('uploads', 'public');
+        $path = $file->store('uploads/', 'public');
 
         // Save upload record
         Upload::create([
@@ -117,5 +119,40 @@ public function uploadFile($file, $title, $applicationFormId, $userId)
             'application_form_id' => $applicationFormId,
         ]);
     }
+    public function multipleUpload(
+    array $files,
+    $applicationFormId,
+    $userId,
+    string $folder = null
+) {
+    $uploads = [];
 
+    // Build path: uploads/{folder} OR just uploads
+    $directory = $folder ? "uploads/{$folder}" : "uploads";
+
+    foreach ($files as $fileItem) {
+
+        $file  = $fileItem['file'] ?? null;
+        $title = $fileItem['title'] ?? null;
+
+        if (!$file instanceof UploadedFile) {
+            continue;
+        }
+
+        // temporarily override folder without touching uploadFile()
+        $path = $file->store($directory, 'public');
+
+        $uploads[] = \App\Models\Locator\Upload::create([
+            'file_name'           => $title ?: $file->getClientOriginalName(),
+            'file_path'           => $path,
+            'file_type'           => $file->getClientMimeType(),
+            'file_size'           => $file->getSize(),
+            'description'         => null,
+            'user_id'             => $userId,
+            'application_form_id' => $applicationFormId,
+        ]);
+    }
+
+    return $uploads;
+}
 }

@@ -80,14 +80,25 @@ class ATOController extends Controller
         'status' => 'Pending',
     ]);
 
-    $files = $request->files ?? [];
+    $filesInput = $request->input('files');     // titles
+    $filesUpload = $request->file('files');     // UploadedFile objects
 
+$files = [];
 
-foreach ($files as $item) {
-    if (isset($item['file']) && $item['file'] instanceof \Illuminate\Http\UploadedFile) {
-        $uploadService->uploadFile($item['file'], $item['title'], $request->application_id, $userId);
+foreach ($filesInput as $index => $item) {
+    if (!isset($filesUpload[$index]['file'])) {
+        continue;
     }
+
+    $files[] = [
+        'title' => $item['title'] ?? null,
+        'file'  => $filesUpload[$index]['file'],
+    ];
 }
+
+$folder = 'ATO';
+  
+    $uploadService->multipleUpload( $files, $request->application_id, $userId, $folder);
 
     return redirect()->route('ATO.show', $request->application_id);
 }
