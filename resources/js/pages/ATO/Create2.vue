@@ -142,51 +142,65 @@ function submitForm() {
 
       <div v-if="!loading" class="space-y-4">
         <!-- Enterprise -->
-        <div>
-          <Label>Business Enterprise Classification</Label>
-          <select v-model="form.Enterprise" class="border rounded p-2 w-full">
-            <option disabled value="">Select Enterprise</option>
-            <option v-for="item in options.Enterprise" :key="item.id" :value="item.id">
-              {{ item.name }}
-            </option>
-          </select>
-        </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+  <!-- Enterprise -->
+  <div>
+    <Label>Business Enterprise Classification</Label>
+    <select v-model="form.Enterprise" class="border rounded p-2 w-full">
+      <option disabled value="">Select Enterprise</option>
+      <option
+        v-for="item in options.Enterprise"
+        :key="item.id"
+        :value="item.id"
+      >
+        {{ item.name }}
+      </option>
+    </select>
+  </div>
 
-        <!-- Sector -->
-        <div>
-          <Label>Business Sector Classification</Label>
-          <select v-model="form.Sector" class="border rounded p-2 w-full">
-            <option disabled value="">Select Sector</option>
-            <option v-for="sector in options.Sector" :key="sector.id" :value="sector.id">
-              {{ sector.name }}
-            </option>
-          </select>
-        </div>
+  <!-- Sector -->
+  <div>
+    <Label>Business Sector Classification</Label>
+    <select v-model="form.Sector" class="border rounded p-2 w-full">
+      <option disabled value="">Select Sector</option>
+      <option
+        v-for="sector in options.Sector"
+        :key="sector.id"
+        :value="sector.id"
+      >
+        {{ sector.name }}
+      </option>
+    </select>
+  </div>
+</div>
 
         <!-- Application Type -->
-        <div>
-          <Label>Type of Application</Label>
-          <select v-model="form.applicationType" class="border rounded p-2 w-full">
-            <option disabled value="">Select Type</option>
-            <option value="New">New</option>
-            <option value="Renewal">Renewal</option>
-          </select>
-        </div>
+       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+  <!-- Type of Application -->
+  <div>
+    <Label>Type of Application</Label>
+    <select v-model="form.applicationType" class="border rounded p-2 w-full">
+      <option disabled value="">Select Type</option>
+      <option value="New">New</option>
+      <option value="Renewal">Renewal</option>
+    </select>
+  </div>
 
-        <!-- Leased Area -->
-        <div>
-          <Label>Leased Area</Label>
-          <select v-model="form.leased_area_id" class="border rounded p-2 w-full">
-            <option disabled value="">Select Leased Area</option>
-            <option v-for="area in leasedAreas" :key="area.id" :value="area.id">
-              {{ area.label }}
-            </option>
-          </select>
-        </div>
+  <!-- Leased Area -->
+  <div>
+    <Label>Leased Area</Label>
+    <select v-model="form.leased_area_id" class="border rounded p-2 w-full">
+      <option disabled value="">Select Leased Area</option>
+      <option v-for="area in leasedAreas" :key="area.id" :value="area.id">
+        {{ area.label }}
+      </option>
+    </select>
+  </div>
+</div>
 
         <!-- Price (readonly) -->
         <div>
-          <Label>Application Fee</Label>
+          <Label>Application Fee:</Label>
           <input type="text" class="border rounded p-2 w-full bg-gray-100" :value="`₱ ${form.price}`" readonly />
         </div>
       </div>

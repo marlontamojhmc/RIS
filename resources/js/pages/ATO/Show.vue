@@ -84,7 +84,7 @@ const validUntil =
           <p class="text-sm text-muted-foreground">{{ label }}</p>
           <p class="font-medium text-lg mt-1">{{ value }}</p>
         </div>
-
+       {{ props.ATOapplication.price }}
         <!-- Uploaded Files -->
         <div class="bg-white border rounded-xl shadow-sm p-6 md:col-span-2">
           <p class="text-sm text-muted-foreground mb-3">Uploaded Documents</p>
