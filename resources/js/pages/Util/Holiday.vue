@@ -2,9 +2,8 @@
 import { ref } from 'vue'
 import { useForm } from '@inertiajs/vue3'
 import { Inertia } from '@inertiajs/inertia'
-import ContextMenu from '@/Components/ContextMenu.vue'
+import AppLayout from '@/layouts/AppLayout.vue';
 
-// Props from controller
 const { holidays } = defineProps<{
   holidays: {
     id: number
@@ -21,7 +20,7 @@ const { holidays } = defineProps<{
 // Modal visibility
 const showModal = ref(false)
 
-// Form for creating a holiday
+// Form
 const holidayForm = useForm({
   name: '',
   date: '',
@@ -32,33 +31,25 @@ const holidayForm = useForm({
 
 // Submit form
 const submitHoliday = () => {
-  holidayForm.post(route('holidays.store'), {
-    onSuccess: () => {
-      holidayForm.reset()
-      showModal.value = false
-    }
-  })
+    console.log(holidayForm);
+//   holidayForm.post(route('holidays.store'), {
+//     onSuccess: () => {
+//       holidayForm.reset()
+//       showModal.value = false
+//     }
+//   })
 }
 
-// Delete
+// Delete holiday
 const confirmDelete = (id: number) => {
   if (confirm('Are you sure you want to delete this holiday?')) {
     Inertia.delete(route('holidays.destroy', id))
   }
 }
-
-// Right-click context menu
-const contextMenuRef: any = ref(null)
-const selectedHoliday = ref<any>(null)
-
-const contextMenuItems = (holiday: any) => [
-  { label: 'View', action: () => Inertia.get(route('holidays.show', holiday.id)) },
-  { label: 'Edit', action: () => Inertia.get(route('holidays.edit', holiday.id)) },
-  { label: 'Delete', action: () => confirmDelete(holiday.id) },
-]
 </script>
 
 <template>
+    <AppLayout>
   <div class="p-6">
 
     <!-- Header -->
@@ -72,7 +63,7 @@ const contextMenuItems = (holiday: any) => [
       </button>
     </div>
 
-    <!-- Holiday Table -->
+    <!-- Table -->
     <table class="w-full border">
       <thead class="bg-gray-100">
         <tr>
@@ -87,19 +78,13 @@ const contextMenuItems = (holiday: any) => [
       </thead>
 
       <tbody>
-        <tr
-          v-for="holiday in holidays"
-          :key="holiday.id"
-          @contextmenu.prevent="() => { selectedHoliday.value = holiday; contextMenuRef.openMenu($event) }"
-        >
+        <tr v-for="holiday in holidays" :key="holiday.id">
           <td class="border p-2 text-center">{{ holiday.id }}</td>
           <td class="border p-2 text-center">{{ holiday.name }}</td>
           <td class="border p-2 text-center">{{ new Date(holiday.date).toLocaleDateString() }}</td>
           <td class="border p-2 text-center">{{ holiday.is_recurring ? 'Yes' : 'No' }}</td>
           <td class="border p-2 text-center">{{ holiday.type }}</td>
           <td class="border p-2 text-center">{{ holiday.notes }}</td>
-
-          <!-- Action Buttons -->
           <td class="border p-2 text-center">
             <div class="inline-flex">
               <button
@@ -123,7 +108,6 @@ const contextMenuItems = (holiday: any) => [
             </div>
           </td>
         </tr>
-
         <tr v-if="holidays.length === 0">
           <td colspan="7" class="p-4 text-center text-gray-500">
             No holidays found.
@@ -132,48 +116,93 @@ const contextMenuItems = (holiday: any) => [
       </tbody>
     </table>
 
-    <!-- Add Holiday Modal -->
-    <div v-if="showModal" class="fixed inset-0 z-50 flex items-center justify-center">
+    <!-- Modal -->
+    <div
+      v-if="showModal"
+      class="fixed inset-0 z-50 flex items-center justify-center"
+    >
       <!-- Backdrop -->
-      <div class="absolute inset-0 bg-black/50" @click="showModal = false"></div>
+      <div
+        class="absolute inset-0 bg-black/50"
+        @click="showModal = false"
+      ></div>
 
       <!-- Modal box -->
       <div class="relative bg-white rounded-lg shadow-lg w-full max-w-lg p-6">
         <h2 class="text-lg font-semibold mb-4">Add Holiday</h2>
 
         <form @submit.prevent="submitHoliday" class="space-y-4">
+          <!-- Name -->
           <div>
             <label class="block text-sm font-medium mb-1">Name</label>
-            <input v-model="holidayForm.name" type="text" class="border rounded p-2 w-full" />
-            <p v-if="holidayForm.errors.name" class="text-red-500 text-sm">{{ holidayForm.errors.name }}</p>
+            <input
+              v-model="holidayForm.name"
+              type="text"
+              class="border rounded p-2 w-full"
+            />
+            <p v-if="holidayForm.errors.name" class="text-red-500 text-sm">
+              {{ holidayForm.errors.name }}
+            </p>
           </div>
 
+          <!-- Date -->
           <div>
             <label class="block text-sm font-medium mb-1">Date</label>
-            <input v-model="holidayForm.date" type="date" class="border rounded p-2 w-full" />
-            <p v-if="holidayForm.errors.date" class="text-red-500 text-sm">{{ holidayForm.errors.date }}</p>
+            <input
+              v-model="holidayForm.date"
+              type="date"
+              class="border rounded p-2 w-full"
+            />
+            <p v-if="holidayForm.errors.date" class="text-red-500 text-sm">
+              {{ holidayForm.errors.date }}
+            </p>
           </div>
 
+          <!-- Recurring -->
           <div class="flex items-center gap-2">
-            <input type="checkbox" v-model="holidayForm.is_recurring" id="recurring" class="rounded" />
+            <input
+              type="checkbox"
+              v-model="holidayForm.is_recurring"
+              id="recurring"
+              class="rounded"
+            />
             <label for="recurring" class="text-sm">Recurring</label>
           </div>
 
+          <!-- Type -->
           <div>
             <label class="block text-sm font-medium mb-1">Type</label>
-            <input v-model="holidayForm.type" type="text" class="border rounded p-2 w-full" />
+            <input
+              v-model="holidayForm.type"
+              type="text"
+              class="border rounded p-2 w-full"
+            />
           </div>
 
+          <!-- Notes -->
           <div>
             <label class="block text-sm font-medium mb-1">Notes</label>
-            <textarea v-model="holidayForm.notes" class="border rounded p-2 w-full" rows="3"></textarea>
+            <textarea
+              v-model="holidayForm.notes"
+              class="border rounded p-2 w-full"
+              rows="3"
+            ></textarea>
           </div>
 
+          <!-- Actions -->
           <div class="flex justify-end gap-2 pt-4">
-            <button type="button" @click="showModal = false" class="px-4 py-2 text-sm border rounded">
+            <button
+              type="button"
+              @click="showModal = false"
+              class="px-4 py-2 text-sm border rounded"
+            >
               Cancel
             </button>
-            <button type="submit" :disabled="holidayForm.processing" class="px-4 py-2 text-sm bg-blue-600 text-white rounded disabled:opacity-50">
+            <button
+              type="submit"
+              :disabled="holidayForm.processing"
+              class="px-4 py-2 text-sm bg-blue-600 text-white rounded disabled:opacity-50"
+            >
               Save
             </button>
           </div>
@@ -181,7 +210,6 @@ const contextMenuItems = (holiday: any) => [
       </div>
     </div>
 
-    <!-- Context Menu -->
-    <ContextMenu ref="contextMenuRef" :items="contextMenuItems(selectedHoliday)" />
   </div>
+    </AppLayout>
 </template>
