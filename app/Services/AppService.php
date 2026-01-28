@@ -121,8 +121,12 @@ $sets = ApproverSets::where(
      * ------------------------*/
     public function getApplicationDetails($id)
     {
-        return ApplicationModel::with(['articleDetails', 'uploads', 'selections'])
-            ->findOrFail($id);
+       $app = ApplicationModel::with(['articleDetails', 'uploads', 'selections','options'])
+        ->findOrFail($id);
+
+     return $app;
+
+    
     }
 
     public function getApproverDetails($id)

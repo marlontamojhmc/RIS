@@ -33,6 +33,7 @@ Route::group(['prefix' => 'loctr', 'middleware' => 'auth'], function () {
     Route::get('applications/approved', [ApplicationsController::class, 'approvedList'])->name('applications.approved');
     //route for creating application (crud) 
     Route::resource('applications', ApplicationsController::class);
+    
     //route articles(crud) 
     Route::resource('articles', \App\Http\Controllers\Locator\ArticleDetailController::class);
     Route::post('/articles/{id}/verify', [ArticleDetailController::class, 'verifyArticle'])

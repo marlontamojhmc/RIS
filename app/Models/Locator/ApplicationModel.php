@@ -115,9 +115,9 @@ public function getMeta(string $key, mixed $default = null, bool $asArray = true
         ApplicationOption::class,
         UserApplicationSelection::class,
         'application_id', // FK on selections table
-        'id',             // FK on application_options table
+        'id',             // PK on options table
         'id',             // Local key on application_forms
-        'option_id'       // Key on selections linking to options
+        'option_id'       // FK on selections linking to options
     );
 }
 public function accreditation()

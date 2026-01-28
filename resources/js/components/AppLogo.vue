@@ -8,9 +8,9 @@ import AppLogoIcon from '@/components/AppLogoIcon.vue';
     >
         <AppLogoIcon class="size-5 fill-current text-white dark:text-white" />
     </div> -->
-    <div class="ml-1 grid flex-1 text-left text-sm">
+    <div class="ml-1 grid flex-1 text-center text-sm">
         <span class="mb-0.5 truncate leading-tight font-semibold"
-            >JHMC SEZRIS</span
+            >JHMC-RIS</span
         >
     </div>
 </template>

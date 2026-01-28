@@ -25,6 +25,7 @@ use Illuminate\Support\Facades\Gate;
 use App\Models\Signup\TemporaryUser;
 use App\Models\Signup\SignupApprover;
 
+
 class ApplicationsController extends Controller
 {
     protected $service;
@@ -297,6 +298,33 @@ class ApplicationsController extends Controller
         
     ]);
     
+    }
+    public function appEdit($id)
+   {
+        $data = $this->service->getApplicationData($id);
+        $appOption = ApplicationOption::all();
+        
+        return Inertia::render('Locator/Application/Edit',[
+            'application' => $data['application'],    // main application record
+        'approverGroup' => $data['approverGroup'],
+        'appOptions' => $appOption,
+         'approvers' => $data['approvers']->map(function ($item) {
+           
+            return [
+                'id' => $item['id'] ?? null,
+                'name' => $item['name'] ?? '(Unknown)',
+                'email' => $item['email'] ?? null,
+                'pivot' => [
+                    'role' => $item['pivot']['role'] ?? null,
+                    'sequence' => $item['pivot']['sequence'] ?? null,
+                    'status' => $item['pivot']['status'] ?? null,
+                    'acted_at' => $item['pivot']['acted_at'] ?? null,
+                    'remark' => $item['pivot']['remark'] ?? null,
+                ],
+            ];
+                        })
+        
+        ]);
     }
 }
 

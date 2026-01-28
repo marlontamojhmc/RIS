@@ -17,15 +17,15 @@ import { Head, Link } from '@inertiajs/vue3';
       class="flex w-full max-w-sm flex-col items-center rounded-2xl bg-white p-8 shadow-lg dark:bg-[#1b1b18] transition-all"
     >
       <!-- Logo -->
-      <img
+      <!-- <img
         src=""
         alt="Logo"
         class="mb-4 w-48 h-48 object-contain"
-      />
+      /> -->
 
       <!-- Heading -->
       <h2 class="mb-6 text-2xl font-semibold text-center">
-        Welcome to SEZRIS
+         RIS
       </h2>
 
       <!-- Navigation (login button or dashboard) -->

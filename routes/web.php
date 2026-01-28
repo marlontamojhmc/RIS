@@ -26,6 +26,7 @@ use App\Http\Controllers\Signup\TemporaryUserController;
 use App\Http\Controllers\VENDOR\LocatorVendorController;
 use App\Http\Controllers\TestPdfController;
 use App\Models\Accreditation\Accreditation;
+use App\Http\Controllers\Applications\ApplicationsController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -171,7 +172,7 @@ Route::get('/422', function(){
 Route::get('/test-pdf', [TestPdfController::class, 'index']);
 Route::get('/pdf/{id}/generate', [TestPdfController::class, 'generate'])
     ->name('pdf.generate');
-
+Route::get('applications/{id}/edit',[ApplicationsController::class,'appEdit'])->name('applications.appEdit');
 
 
 // 🔹 Include other route files

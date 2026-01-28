@@ -53,7 +53,8 @@ function handleView(app: any) {
 }
 
 function handleEdit(app: any) {
-  console.log('Edit', app)
+  router.visit(`/applications/${app.application_id}/edit`)
+  
 }
 
 function handleDelete(app: any) {
