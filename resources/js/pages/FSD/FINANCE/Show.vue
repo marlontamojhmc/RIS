@@ -13,6 +13,7 @@ const props = defineProps({
   approver_status: { type: String, required: true },
   group: { type: Object, required: true },
   Prevapprover: {type:Object, required:true },
+  price:{type:Number, required:true },
 });
 
 // Modal States
@@ -29,7 +30,7 @@ const price = computed(() => {
   } else if (props.application.form_type === 'Accreditation') {
     return props.application.accreditation.price;
   }else{
-   return props.application.selections[0].amount;
+   return 
   }
   return 0;
 });
@@ -125,7 +126,7 @@ const handleApprove = () => {
     <div class="bg-white w-full max-w-md p-6 rounded-xl shadow-xl">
       <h2 class="text-lg font-semibold mb-3">Permit Payment</h2>
       <label class="text-sm font-medium">Total Amount:</label>
-      <p class="text-md text-gray-800 font-bold">₱{{ price }}</p>
+      <p class="text-md text-gray-800 font-bold">₱{{ props.price }}</p>
 
       <label class="text-sm font-medium mt-3">Enter OR Number:</label>
       <Input

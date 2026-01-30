@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { appEdit } from '@/routes/applications'
 import { Eye, Pencil, Trash2 } from 'lucide-vue-next'
 
 const props = defineProps({
@@ -52,6 +53,7 @@ function getFormTitle(app: any) {
     class="overflow-x-auto bg-white border border-gray-300 rounded-lg shadow-sm
            dark:bg-gray-900 dark:border-gray-700"
   >
+  
     <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
       <!-- Header -->
       <thead class="bg-gray-100 dark:bg-gray-800">
@@ -61,10 +63,10 @@ function getFormTitle(app: any) {
           <th class="px-4 py-2 text-left text-sm font-semibold text-gray-700 dark:text-gray-200">Control Number</th>
           <th class="px-4 py-2 text-left text-sm font-semibold text-gray-700 dark:text-gray-200">Form Number</th>
           <th class="px-4 py-2 text-left text-sm font-semibold text-gray-700 dark:text-gray-200">Status</th>
-          <th class="px-4 py-2 text-left text-sm font-semibold text-gray-700 dark:text-gray-200 text-center">Actions</th>
+          <th class="px-4 py-2 text-sm font-semibold text-gray-700 dark:text-gray-200 text-center">Actions</th>
         </tr>
       </thead>
-
+    
       <!-- Body -->
       <tbody
         v-if="applications.length"

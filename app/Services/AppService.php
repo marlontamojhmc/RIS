@@ -56,7 +56,7 @@ class AppService
     {
         $user = Auth::user();
         //kelangan Approved ang status ng ATO permit
-        $applications = $user->applications()->where('form_title', 'ATO')
+        $applications = $user->applications()->where('form_type', 'ATO')
         ->where('status','Approved')
         ->first();
 
@@ -67,13 +67,13 @@ class AppService
                 ->where('user_id', $user->id)
                 ->first()
             : null;
-
+         //dd($hasATO);
         if ($hasATO) {
-            return Form::all()->except([8]); // remove ATO
+            return Form::all()->except([8,9]); // remove ATO
         }
 
         if (!$hasATO || !$applicationId) {
-            return Form::where('name', 'ATO')->get();
+            return Form::where('form_type', 'ATO')->get();
         }
 
         return Form::all();

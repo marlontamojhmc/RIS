@@ -81,9 +81,6 @@ class ApplicationsController extends Controller
          $user = auth()->user();
         //check if user has approved ATO if it does remove ATO to the Option
         $formOptions = $this->service->getFormOptionsForUser();
-        
-        
-    
     return Inertia::render('Locator/Application/Create', [
                                             'user' => $user,
                                             'application_form_id' => null,
@@ -96,13 +93,14 @@ class ApplicationsController extends Controller
      * Store a newly created resource in storage.
      */
     public function store(Request $request)
-    { 
+    {
         $user = auth()->user();
         if($request->type === 'Accreditation'){
             $result = $this->service->createApplication($request->form_name,$request->type, $request->form_id);
         }elseif($request->type === 'Permit'){
               $result = $this->service->createApplication($request->form_name, $request->type,$request->form_id);
-         }else{
+         
+        }else{
             $result = $this->service->createApplication($request->form_name, $request->type,$request->form_id);
          }
         
@@ -140,6 +138,12 @@ class ApplicationsController extends Controller
                 'application_id' =>$application->id,
                 'application_group_id'=>$approverForm->approver_group_id,
             ]);
+        }elseif($request->form_name === 'ATO(AccomodationProvider)'){
+           return Inertia::render('ATO/CreateAccommodation',[
+                'form_number' => $application->form_number,
+                'application_id' =>$application->id,
+                'application_group_id'=>$approverForm->approver_group_id,
+           ]);
         }else{ return Inertia::render('Locator/Application/Create', [ 
             'user' => $user, 
             'application_form_id' => $application->id, // Pass the new ID 
@@ -220,7 +224,7 @@ class ApplicationsController extends Controller
     }
     public function pendingList()
     {
-            $ato = ApplicationModel::where('user_id', Auth::id())->where('form_title', 'ATO')->get();
+            $ato = ApplicationModel::where('user_id', Auth::id())->where('form_type', 'ATO')->get();
             $appForm_number = ApplicationModel::where('user_id', Auth::id())->pluck('form_number');
             $applications = ApplicationForApproval::with([
                                     'application',
@@ -326,5 +330,26 @@ class ApplicationsController extends Controller
         
         ]);
     }
+    public function getApprovers($id)
+{
+    $data = $this->service->getApplicationData($id);
+
+    $approvers = $data['approvers']->map(function ($item) {
+        return [
+            'id' => $item['id'] ?? null,
+            'name' => $item['name'] ?? '(Unknown)',
+            'email' => $item['email'] ?? null,
+            'pivot' => [
+                'role' => $item['pivot']['role'] ?? null,
+                'sequence' => $item['pivot']['sequence'] ?? null,
+                'status' => $item['pivot']['status'] ?? null,
+                'acted_at' => $item['pivot']['acted_at'] ?? null,
+                'remark' => $item['pivot']['remark'] ?? null,
+            ],
+        ];
+    });
+
+    return response()->json($approvers);
+}
 }
 

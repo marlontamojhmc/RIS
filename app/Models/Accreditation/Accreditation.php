@@ -36,6 +36,7 @@ class Accreditation extends Model
             'service_type_id'
         );
     }
+    
 
     // Supplies
     public function supplies()

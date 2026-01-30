@@ -98,7 +98,7 @@
                   :key="opt.id"
                   :value="opt.id"
                 >
-                  {{ opt.name }} — {{ opt.price }}
+                  {{ opt.name }}
                 </option>
               </select>
             </td>
@@ -137,7 +137,24 @@
               <input v-model="upload.description" disabled class="input bg-gray-100" />
             </td>
             <td class="border p-2">
-              <input v-model="upload.file_path" disabled class="input bg-gray-100" />
+            <div class="inline-block">
+    <a
+      v-if="upload.file_path"
+      :href="`/storage/${upload.file_path}`"
+      target="_blank"
+      rel="noopener noreferrer"
+      class="inline-block"
+    >
+      <img
+        :src="`/storage/${upload.file_path}`"
+        alt="Uploaded File"
+        class="h-12 w-12 object-cover rounded border cursor-pointer transform transition-transform duration-500 ease-in-out hover:scale-200"
+      />
+    </a>
+
+    
+  </div>
+              <!-- <input v-model="upload.file_path" disabled class="input bg-gray-100" /> -->
             </td>
           </tr>
         </tbody>

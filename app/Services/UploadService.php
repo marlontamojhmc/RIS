@@ -121,33 +121,37 @@ public function uploadFile($file, $title, $applicationFormId, $userId)
     }
     public function multipleUpload(
     array $files,
-    $applicationFormId,
-    $userId,
+    int $applicationFormId,
+    int $userId,
     string $folder = null
-) {
+): array {
     $uploads = [];
 
     // Build path: uploads/{folder} OR just uploads
     $directory = $folder ? "uploads/{$folder}" : "uploads";
 
     foreach ($files as $fileItem) {
-
+        /** @var UploadedFile|null $file */
         $file  = $fileItem['file'] ?? null;
         $title = $fileItem['title'] ?? null;
 
         if (!$file instanceof UploadedFile) {
-            continue;
+            continue; // skip invalid file
         }
 
-        // temporarily override folder without touching uploadFile()
-        $path = $file->store($directory, 'public');
+        // Determine final file name
+        $fileName = $title ?: $file->getClientOriginalName();
 
-        $uploads[] = \App\Models\Locator\Upload::create([
-            'file_name'           => $title ?: $file->getClientOriginalName(),
-            'file_path'           => $path,
+        // Store file exactly in folder with chosen name
+        $path = $file->storeAs($directory, $fileName, 'public');
+
+        // Save record in DB
+        $uploads[] = Upload::create([
+            'file_name'           => $fileName,
+            'file_path'           => $path, // e.g., uploads/ATO/im.png
             'file_type'           => $file->getClientMimeType(),
             'file_size'           => $file->getSize(),
-            'description'         => null,
+            'description'         => $fileItem['description'] ?? null,
             'user_id'             => $userId,
             'application_form_id' => $applicationFormId,
         ]);

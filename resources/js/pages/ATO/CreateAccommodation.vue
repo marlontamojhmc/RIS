@@ -137,7 +137,7 @@ function submitForm() {
   <AppLayout>
     <div class="p-6 space-y-8">
       <h3 class="text-xl font-bold mb-6 text-center">
-        Business Enterprise- Primary/Secondary
+        Accommodation Provider
        
       </h3>
       <h3 class="text-xl font-bold mb-6 text-center">

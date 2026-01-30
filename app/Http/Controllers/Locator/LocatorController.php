@@ -21,33 +21,32 @@ use App\Models\Signup\SignupApprover;
 
 class LocatorController extends Controller
 {
-    public function index(){
+    public function index()
+    {
         
          $user = auth()->user();
     
-  if (Gate::denies('access-locator')) {
-            abort(403, 'Unauthorized');
-        }
-       
-       $AppForapprovals = $user->approvals;
-       
-         $applications = auth()->user()?->applications ?? [];
-        return Inertia::render('Locator/Index', [
-            'applications' => $AppForapprovals,
-        ]);
+            if (Gate::denies('access-locator')) {
+                        abort(403, 'Unauthorized');
+                    }
+      
+            $AppForapprovals = $user->approvals;
+                $applications = auth()->user()?->applications ?? [];
+                return Inertia::render('Locator/Index', [
+                                'applications' => $AppForapprovals,
+                                'applications_with_form_type' => $applications,
+                ]);
     }
     
-    public function show(String $id){
-
-
-       
+    public function show(String $id)
+    {
        $application = ApplicationModel::with(['articleDetails', 'uploads', 'selections'])
-    ->where('id', $id)
-    ->first();
+                      ->where('id', $id)
+                      ->first();
     
-       return Inertia::render('Locator/View',[
-        'app' => $application,
-       ]);
+        return Inertia::render('Locator/View',[
+            'app' => $application,
+        ]);
     }
     public function serviceProviderRequest()
     { 
@@ -59,40 +58,39 @@ class LocatorController extends Controller
                                     ->get();
                       
                 return Inertia::render('Locator/ServiceProvider/ServiceProviderRequest',[
-                   'serviceProvider' => $tempUsers,  
+                                        'serviceProvider' => $tempUsers,  
                 ]);
     }
     
     public function approveServiceProviderRequest($id)
-    { $user = auth()->user();
+    { 
+        $user = auth()->user();
         $serviceprovider =  TemporaryUser::findOrFail($id);
         if (User::where('email', $serviceprovider->email)->exists()) {
-    abort(422, 'Email already exists');
-}      
-      $newServiceProviderUser = User::create([
-        'name' => $serviceprovider->name,
-        'email' => $serviceprovider->email,
-        'password' => $serviceprovider->temp_password,
-        'created_at'=> now(),// date of vendor was verified
-        'updated_at' =>now(),
-      ]);
-      $userDetails = UserDetail::create([
-        'user_id' => $newServiceProviderUser->id,
-        'email' => $newServiceProviderUser->email,
-        'status' => 1,
-        'first_name'=> $newServiceProviderUser->name,
-        'role_id' => 4,
-        'permission_id' => 2,
-        'created_at'=> now(),
-        'upddated_at' =>now(),
-        
-    ]);
+             abort(422, 'Email already exists');
+         }      
+        $newServiceProviderUser = User::create([
+            'name' => $serviceprovider->name,
+            'email' => $serviceprovider->email,
+            'password' => $serviceprovider->temp_password,
+            'created_at'=> now(),// date of vendor was verified
+            'updated_at' =>now(),
+        ]);
+        $userDetails = UserDetail::create([
+            'user_id' => $newServiceProviderUser->id,
+            'email' => $newServiceProviderUser->email,
+            'status' => 1,
+            'first_name'=> $newServiceProviderUser->name,
+            'role_id' => 4,
+            'permission_id' => 2,
+            'created_at'=> now(),
+            'upddated_at' =>now(),
+            
+        ]);
    
-    $serviceprovider->status ='approved';
-    $serviceprovider->save();
+        $serviceprovider->status ='approved';
+        $serviceprovider->save();
      }
- 
-
     public function MyServiceProviders()
     { 
         $user = auth()->user();

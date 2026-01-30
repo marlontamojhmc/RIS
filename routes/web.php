@@ -59,7 +59,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::get('/list', [UserDetailsController::class, 'index'])->name('users.list');
             Route::post('/addUser', [UserDetailsController::class, 'store'])->name('userDetails.store');
         });
-   
+    Route::get('/applications/{id}/approvers', [ApplicationsController::class, 'getApprovers']);
 
     /*
     |--------------------------------------------------------------------------

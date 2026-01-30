@@ -71,10 +71,10 @@ const permissions: Permissions = {
 
 const user = propsAny.auth?.user ?? {};
 const userDetails = user.details ?? {};
-console.log('userRole_id= '+userDetails.role_id);
-console.log('userDepartment_id= '+userDetails.department_id);
-console.log('userPermission_id= '+userDetails.permission_id);
-console.log('useFunction_id= '+userDetails.user_function_id);
+// console.log('userRole_id= '+userDetails.role_id);
+// console.log('userDepartment_id= '+userDetails.department_id);
+// console.log('userPermission_id= '+userDetails.permission_id);
+// console.log('useFunction_id= '+userDetails.user_function_id);
 /* ===============================
    ROLE CHECKS
    =============================== */
