@@ -93,13 +93,12 @@ class ApplicationsController extends Controller
      * Store a newly created resource in storage.
      */
     public function store(Request $request)
-    {
+    {    
         $user = auth()->user();
         if($request->type === 'Accreditation'){
             $result = $this->service->createApplication($request->form_name,$request->type, $request->form_id);
         }elseif($request->type === 'Permit'){
               $result = $this->service->createApplication($request->form_name, $request->type,$request->form_id);
-         
         }else{
             $result = $this->service->createApplication($request->form_name, $request->type,$request->form_id);
          }
@@ -107,12 +106,18 @@ class ApplicationsController extends Controller
         $application = $result['application'];
         $approverForm = $result['approverForm'];
         
-        if ($request->type === 'ATO') {
+        if ($request->form_id === 8) {
             return Inertia::render('ATO/Create2', [
                 'application_id' => $application->id,
                 'approver_group_id' => $approverForm->approver_group_id,
                 'application_form_number' => $application->form_number
             ]);
+        }elseif($request->form_id === 9){
+           return Inertia::render('ATO/Create-Accommodation',[
+                'form_number' => $application->form_number,
+                'application_id' =>$application->id,
+                'application_group_id'=>$approverForm->approver_group_id,
+           ]);
         }elseif($request->form_user === 'Vendor'){
             return Inertia::render('Accreditation/Vendor/Accreditationform',[
                 'form_number' => $application->form_number,
@@ -138,12 +143,6 @@ class ApplicationsController extends Controller
                 'application_id' =>$application->id,
                 'application_group_id'=>$approverForm->approver_group_id,
             ]);
-        }elseif($request->form_name === 'ATO(AccomodationProvider)'){
-           return Inertia::render('ATO/CreateAccommodation',[
-                'form_number' => $application->form_number,
-                'application_id' =>$application->id,
-                'application_group_id'=>$approverForm->approver_group_id,
-           ]);
         }else{ return Inertia::render('Locator/Application/Create', [ 
             'user' => $user, 
             'application_form_id' => $application->id, // Pass the new ID 
