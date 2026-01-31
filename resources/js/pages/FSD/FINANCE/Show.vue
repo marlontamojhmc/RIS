@@ -85,7 +85,7 @@ const handleApprove = () => {
 };
 </script>
 
-<template>
+<template> 
 <FinanceAppsidebarLayout>
   <FinanceViewer :application="props.application" :group="props.group" />
 
@@ -126,8 +126,19 @@ const handleApprove = () => {
     <div class="bg-white w-full max-w-md p-6 rounded-xl shadow-xl">
       <h2 class="text-lg font-semibold mb-3">Permit Payment</h2>
       <label class="text-sm font-medium">Total Amount:</label>
-      <p class="text-md text-gray-800 font-bold">₱{{ props.price }}</p>
+     <p
+  v-if="props.application.form_type === 'ATO'"
+  class="text-md text-gray-800 font-bold"
+>
+  ₱{{ props.price }}
+</p>
 
+<p
+  v-if="props.application.form_type === 'Permit' && props.application.options?.length"
+  class="text-md text-gray-800 font-bold"
+>
+  ₱{{ props.application.options[0]?.price }}
+</p>
       <label class="text-sm font-medium mt-3">Enter OR Number:</label>
       <Input
         v-model="OR_Number"
