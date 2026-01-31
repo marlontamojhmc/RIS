@@ -11,6 +11,7 @@ use App\Models\User;
 use App\Models\Locator\ApplicationModel;
 use App\Models\ApproverGroup;
 use App\Models\Accreditation\Accreditation;
+use App\Models\ATO\AtoApplication;
 
 class FinanceController extends Controller
 {
@@ -26,7 +27,7 @@ class FinanceController extends Controller
                                 ]);
         }
     public function show($id,$form_type)
-{    
+    {    
     $user = auth()->user();
     if($form_type === 'Accreditation'){
     $application = ApplicationModel::with(['accreditation','accreditation.supplies','accreditation.services','accreditation.businessEnterpriseClassifications','accreditation.uploads'])
@@ -45,7 +46,7 @@ class FinanceController extends Controller
         $application = ApplicationModel::with(['articleDetails','approval', 'uploads', 'selections','options'])
                     ->find($id);
     }
-   dd($application->atoApplication);
+   
     if (!$application) {
         abort(404, 'Application not found');
     }
@@ -53,7 +54,7 @@ class FinanceController extends Controller
     if (!$application->approval) {
         abort(404, 'Approval not found');
     }
-    $atoapp = AtoApplication::where('application_id',$id)->fist();
+    $atoapp = AtoApplication::where('application_id',$id)->first();
     $approver = ApproverGroupApprover::where('approver_group_id', $application->approval->approver_group_id)
                   ->where('approver_id', $user->id)
                   ->where('application_form_id', $application->id)
@@ -68,14 +69,13 @@ $prevApprover = ApproverGroupApprover::where('approver_group_id', $application->
                   ->first();
    
     $group = ApproverGroup::find($application->approval->approver_group_id);
-     
+    
     return Inertia::render('FSD/FINANCE/Show', [
         'application' => $application,
         'approver_status' => $approver->status,
         'group' => $group,
         'Prevapprover' => $prevApprover,
-        'price' =>$atoapp->price,
-
+        'price' =>$atoapp?->price,
         
     ]);
 }
