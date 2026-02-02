@@ -76,9 +76,13 @@ class ApplicationsController extends Controller
      * Show the form for creating a new resource.
      */
     public function create()
-
     {  
          $user = auth()->user();
+         //pwedeng natin macheck ang applicationModel kung anong form yung inapplyan ng user
+         //  gamit yung id ng application_form table
+         $application = ApplicationModel::find(516);
+        //$formId = $application->form_id;
+        //dd($user->atoApplication);
         //check if user has approved ATO if it does remove ATO to the Option
         $formOptions = $this->service->getFormOptionsForUser();
     return Inertia::render('Locator/Application/Create', [
@@ -93,7 +97,7 @@ class ApplicationsController extends Controller
      * Store a newly created resource in storage.
      */
     public function store(Request $request)
-    {    
+    {  dd($request->all());  
         $user = auth()->user();
         if($request->type === 'Accreditation'){
             $result = $this->service->createApplication($request->form_name,$request->type, $request->form_id);
@@ -107,13 +111,13 @@ class ApplicationsController extends Controller
         $approverForm = $result['approverForm'];
         
         if ($request->form_id === 8) {
-            return Inertia::render('ATO/Create2', [
+            return Inertia::render('ATO/ATO-Business-Enterprise-Create', [
                 'application_id' => $application->id,
                 'approver_group_id' => $approverForm->approver_group_id,
                 'application_form_number' => $application->form_number
             ]);
         }elseif($request->form_id === 9){
-           return Inertia::render('ATO/Create-Accommodation',[
+           return Inertia::render('ATO/Accommodation-Create',[
                 'form_number' => $application->form_number,
                 'application_id' =>$application->id,
                 'application_group_id'=>$approverForm->approver_group_id,

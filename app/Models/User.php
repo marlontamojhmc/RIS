@@ -17,6 +17,7 @@ use App\Models\UserDetails\Permission;
 use App\Models\UserDetails\Position;
 use App\Models\UserDetails\Location;
 use App\Models\Locator\LocatorModel;
+use App\Models\ATO\AtoApplication;
 
 class User extends Authenticatable
 {
@@ -113,8 +114,8 @@ class User extends Authenticatable
     }
 
     public function role()
-    {
-        return $this->belongsTo(Role::class);
+     {
+    return $this->belongsTo(Role::class, 'role_id');
     }
 
     public function permissions()
@@ -129,4 +130,8 @@ class User extends Authenticatable
     public function profile(){
         return $this->hasOne(LocatorModel::class);
     }
+    public function atoApplication()  // singular
+{
+    return $this->hasOne(AtoApplication::class, 'user_id', 'id');
+}
 }

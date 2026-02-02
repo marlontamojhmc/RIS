@@ -8,6 +8,7 @@ use App\Models\ATO\AtoBusinessEnterpriseClassification;
 use App\Models\ATO\AtoBusinessSectorClassification;
 use App\Models\ATO\AtoPricing;
 use App\Models\ATO\AccommodationUnit;
+use App\Models\Signup\BusinessType;
 
 class EnterptiseAndSectorClassification extends Controller
 {
@@ -18,6 +19,7 @@ class EnterptiseAndSectorClassification extends Controller
             'Sector' => AtoBusinessSectorClassification::all(),
             'pricing' =>AtoPricing::all(),
             'unit' =>AccommodationUnit::all(),
+            'businessTypes' => BusinessType::all(),
             
         ]);
     }

@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Models\Locator\ApplicationModel;
 use App\Models\ATO\AtoBusinessEnterpriseClassification;
 use App\Models\ATO\AtoBusinessSectorClassification;
+use App\Models\User;
 
 class AtoApplication extends Model
 {
@@ -58,7 +59,10 @@ class AtoApplication extends Model
     {
         return $this->belongsTo(ApplicationModel::class, 'application_id');
     }
-
+    public function user()
+{
+    return $this->belongsTo(User::class);
+}
     /**
      * Uploads
      */

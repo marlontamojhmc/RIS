@@ -76,7 +76,11 @@ class HandleInertiaRequests extends Middleware
             'applications' => $applications,
 
             // 🧾 User details (optional)
-            'user_details' => optional($request->user())->details ?? [],
+           'user_details' => $request->user()
+    ? $request->user()
+        ->load('details.businessType')
+        ->details
+    : null,
         ]);
     }
 }

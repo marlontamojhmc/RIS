@@ -104,13 +104,17 @@ const roles = {
         userDetails.department_id === null &&
         userDetails.user_function_id === null,
 
-    Locator: userDetails.role_id === 3,
+    Locator: userDetails.role_id === 3 &&
+             page.props.user_details?.business_type?.id === 4,
+             
+     
 
     Cco:
              userDetails.role_id === 2 &&
              userDetails.permission_id === 2 &&
              userDetails.user_function_id === null &&
              userDetails.department_id === 12
+
 };
 
 /* ===============================
@@ -156,6 +160,7 @@ const navConfig: Record<string, NavItem[]> = {
         { title: 'My Vendors', href: '/MyVendors', icon: LayoutGrid },
         { title: 'My Service Providers', href: '/MyServiceProviders', icon: Users },
         { title: 'Service Provider Requests', href: '/serviceProviderRequest', icon: Users },
+       
     ],
     vendor: [
         { title: 'Vendor Dashboard', href: '/', icon: LayoutGrid },
@@ -219,6 +224,7 @@ function clearNotification() {
     <Sidebar collapsible="icon" variant="inset">
         <!-- HEADER -->
         <SidebarHeader>
+            
             <SidebarMenu>
                 <SidebarMenuItem>
                     <SidebarMenuButton size="lg" as-child>
@@ -234,7 +240,7 @@ function clearNotification() {
         <SidebarContent>
             <NavMain :items="mainNavItems" />
         </SidebarContent>
-
+             
         <!-- FOOTER -->
         <SidebarFooter>
             <NavFooter :items="footerNavItems" />
@@ -245,6 +251,7 @@ function clearNotification() {
             />
         </SidebarFooter>
     </Sidebar>
-
+      
     <slot />
+    
 </template>

@@ -90,6 +90,7 @@ class AppService
             'form_title' => $type,
             'form_type'  => $form_type,
             'user_id'    => $user->id,
+            'form_id'    => $form_id,
         ]);
 
       $approverForm = Form::findOrFail($form_id);

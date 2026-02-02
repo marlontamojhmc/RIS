@@ -14,6 +14,7 @@ import { show } from '@/routes/two-factor';
 
 
 // --- Dropdown state ---
+const business_type = ref<any[]>([]);
 const departments = ref<any[]>([]);
 const divisions = ref<any[]>([]);
 const roles = ref<any[]>([]);
@@ -74,7 +75,14 @@ async function loadRoles() {
     const res = await fetch("/roles");
     roles.value = await res.json();
 }
+async function loadbusinessType(){
+    const res = await fetch("/api/ATO/options");
+    const data = await res.json()
 
+    business_type.value = data.businessTypes 
+    
+    
+}
 async function loadPermissions() {
     const res = await fetch("/permissions");
     permissions.value = await res.json();
@@ -224,6 +232,7 @@ function updateUser() {
 
 
 const form = useForm({
+
     employee_id: '',
     first_name: '',
     middle_name: '',
@@ -237,6 +246,7 @@ const form = useForm({
     position: '',
     status: '1',
     user_function_id: '',
+    business_type_id:'',
     // birth_date: '',
     sex: '',
     // phone: '',
@@ -352,6 +362,8 @@ const provinces = ref<any[]>([]);
 const municipalities = ref<any[]>([]);
 const barangays = ref<any[]>([]);
 
+
+
 // Fetch regions on load
 onMounted(async () => {
     //const res = await fetch("https://psgc.cloud/api/regions");
@@ -359,6 +371,7 @@ onMounted(async () => {
     await loadDepartments();
     await loadRoles();
     await loadPermissions();
+    await loadbusinessType();
     //console.log(editableUser.address)
     handleDepartmentChange();
     console.log(form);
@@ -764,6 +777,19 @@ const getFunctionName = (id: number | string) => {
                                         <option>Male</option>
                                         <option>Female</option>
                                     </select>
+                                </div>
+                                <div>
+                                    <Label>Business Type</Label>
+<select v-model="form.business_type_id" class="border rounded p-2 w-full">
+  <option disabled value="">Select Business Type</option>
+  <option
+    v-for="type in business_type"
+    :key="type.id"
+    :value="type.id"
+  >
+    {{ type.description }}
+  </option>
+</select>
                                 </div>
 
                                 <!-- WORK DETAILS -->

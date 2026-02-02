@@ -9,6 +9,7 @@ use App\Models\Signup\ProvitionalGrant;
 use App\Models\Signup\SPSNBE;
 use App\Models\Signup\TFBOSTA;
 use App\Models\Signup\VME;
+use App\Models\UserDetails\Role;
 
 class BusinessType extends Model
 {
@@ -49,4 +50,8 @@ class BusinessType extends Model
         // Example: returning CEOC as default category type
         return $this->ceoc();
     }
+    public function role()
+{
+    return $this->hasMany(Role::class, 'business_type_id');
+}
 }

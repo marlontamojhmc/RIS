@@ -21,6 +21,7 @@ class ApplicationModel extends Model
         'user_id',
         'control_number',
         'form_number',
+        'form_id',
     ];
 
     protected static function booted()
@@ -133,4 +134,8 @@ public function uploads()
 {
     return $this->hasMany(Upload::class, 'application_form_id', 'id');
 }
+public function form()
+    {
+        return $this->belongsTo(Form::class, 'form_id', 'id');
+    }
 }

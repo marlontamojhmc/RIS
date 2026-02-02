@@ -24,6 +24,7 @@ class ATOController extends Controller
     public function index()
     {
        $userId = Auth::id();
+
       $ato = ApplicationModel::where('user_id', $userId)
               ->where('form_title','ATO')
               ->first();
@@ -43,8 +44,8 @@ class ATOController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreAtoApplicationRequest $request, UploadService $uploadService)
-{   
+    public function store(Request $request, UploadService $uploadService)
+{   dd($request->all());
     $userId = auth()->id();
     $ato = AtoApplication::create([
         'application_id' => $request->application_id,
