@@ -45,7 +45,7 @@ class ATOController extends Controller
      * Store a newly created resource in storage.
      */
     public function store(Request $request, UploadService $uploadService)
-{   dd($request->all());
+{   
     $userId = auth()->id();
     $ato = AtoApplication::create([
         'application_id' => $request->application_id,

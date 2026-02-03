@@ -136,6 +136,7 @@ class ApplicationController extends Controller
      */
         public function show(String $id)
 {    
+    dd('get');
     $application = ApplicationModel::with(['articleDetails', 'uploads', 'selections'])
                    ->findOrFail($id);
     $approvers = ApplicationForApproval::with('approverGroup.approvers')

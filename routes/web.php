@@ -173,7 +173,7 @@ Route::get('/test-pdf', [TestPdfController::class, 'index']);
 Route::get('/pdf/{id}/generate', [TestPdfController::class, 'generate'])
     ->name('pdf.generate');
 Route::get('applications/{id}/edit',[ApplicationsController::class,'appEdit'])->name('applications.appEdit');
-
+Route::get('/fee', [ApplicationsController::class,'Fee'])->name('applications.fee');
 
 // 🔹 Include other route files
 require __DIR__ . '/settings.php';

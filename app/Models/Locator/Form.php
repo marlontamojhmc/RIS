@@ -5,6 +5,7 @@ namespace App\Models\Locator;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Locator\ApplicationModel;
+use App\Models\PERMIT\permitClearanceFee;
 
 class Form extends Model
 {
@@ -32,4 +33,8 @@ class Form extends Model
     {
         return $this->hasMany(ApplicationModel::class);
     }
+    public function permitClearanceFees()
+{
+    return $this->hasMany(PermitClearanceFee::class, 'form_id');
+}
 }

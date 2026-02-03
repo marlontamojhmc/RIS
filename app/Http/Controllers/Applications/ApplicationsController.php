@@ -24,15 +24,16 @@ use App\Services\AppService;
 use Illuminate\Support\Facades\Gate;
 use App\Models\Signup\TemporaryUser;
 use App\Models\Signup\SignupApprover;
+use App\Models\PERMIT\PermitClearanceFee;
 
 
 class ApplicationsController extends Controller
 {
     protected $service;
     public function __construct(AppService $service)
-{
+    {
     $this->service = $service;
-}
+    }
     /**
      * Display a listing of the resource.
      */
@@ -71,12 +72,18 @@ class ApplicationsController extends Controller
             ]
         ]);
     }
-
+    public function Fee()
+    {
+        return;
+       $form = Form::with('permitClearanceFees')->findOrFail(2);
+    dd($form);
+    
+    }
     /**
      * Show the form for creating a new resource.
      */
     public function create()
-    {  
+    {    
          $user = auth()->user();
          //pwedeng natin macheck ang applicationModel kung anong form yung inapplyan ng user
          //  gamit yung id ng application_form table
@@ -97,7 +104,7 @@ class ApplicationsController extends Controller
      * Store a newly created resource in storage.
      */
     public function store(Request $request)
-    {  dd($request->all());  
+    {   
         $user = auth()->user();
         if($request->type === 'Accreditation'){
             $result = $this->service->createApplication($request->form_name,$request->type, $request->form_id);
@@ -157,14 +164,15 @@ class ApplicationsController extends Controller
             'options' => ApplicationOption::select('id', 'name', 'value', 'validity')->get(),
             'approverGroupId' => $approverForm->approver_group_id, 
             ]); 
+         }
     }
-}
+
 
     /**
      * Display the specified resource.
      */
     public function show(String $id)
-    {
+    {  
        $data = $this->service->getApplicationData($id);
        $applicationForApproval = ApplicationForApproval::with('approverGroup.approvers')
                             ->where('application_id', $id)
@@ -172,8 +180,7 @@ class ApplicationsController extends Controller
        $approver = ApproverGroupApprover::with(['approver', 'approverGroup'])
                             ->where('approver_group_id', $data['approverGroup']->id)
                             ->where('application_form_id', $id)
-                            ->get(['id', 'approver_id', 'sequence', 'role','remark', 'status', 'acted_at', 'approver_group_id']);
-        
+                            ->get(['id', 'approver_id', 'sequence', 'role','remark', 'status', 'acted_at', 'approver_group_id']); 
             if($data['approverGroup']->allApproversStatusApproved()){
                 $data['application']->status= AppConstants::STATUS_APPROVED;
                 $data['application']->save();
@@ -334,7 +341,7 @@ class ApplicationsController extends Controller
         ]);
     }
     public function getApprovers($id)
-{
+    {
     $data = $this->service->getApplicationData($id);
 
     $approvers = $data['approvers']->map(function ($item) {
@@ -353,6 +360,6 @@ class ApplicationsController extends Controller
     });
 
     return response()->json($approvers);
-}
+   }
 }
 

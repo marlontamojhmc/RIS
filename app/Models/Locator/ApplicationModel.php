@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Models\ATO\AtoApplication;
 use App\Models\Accreditation\Accreditation;
 use App\Models\ProvisionalGrant\ProvisionalGrant;
+use App\Models\PERMIT\permitClearanceFee;
 
 class ApplicationModel extends Model
 {
@@ -138,4 +139,8 @@ public function form()
     {
         return $this->belongsTo(Form::class, 'form_id', 'id');
     }
+public function permitClearanceFee()
+{
+    return $this->hasOne(PermitClearanceFee::class);
+}
 }
