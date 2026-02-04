@@ -21,7 +21,8 @@ class UserHelper
                             'role_id',
                             'department_id',
                             'division_id',
-                            'user_function_id'
+                            'user_function_id',
+                            'business_type_id',
                         );
                     },
                 ]);

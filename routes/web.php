@@ -174,7 +174,16 @@ Route::get('/pdf/{id}/generate', [TestPdfController::class, 'generate'])
     ->name('pdf.generate');
 Route::get('applications/{id}/edit',[ApplicationsController::class,'appEdit'])->name('applications.appEdit');
 Route::get('/fee', [ApplicationsController::class,'Fee'])->name('applications.fee');
+//--test user->meta-----//
+Route::get('/usermeta',function(){
+    $user = auth()->user();
 
+if ($user) {
+    $user->setMeta('signature', 'uploads/ATO/Letter of Intent');
+    dd($user->getMeta('signature'));
+}
+
+})->name('User.meta');
 // 🔹 Include other route files
 require __DIR__ . '/settings.php';
 require __DIR__ . '/auth.php';

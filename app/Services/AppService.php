@@ -94,16 +94,6 @@ public function createApplication($type, $form_type, $form_id)
         'form_id'    => $form_id,
     ]);
      $approverForm = Form::findOrFail($form_id);
-//    ApplicationForApproval::create([
-//     'application_id'     => $application->id,
-//     'approver_group_id'  => $approverForm->approver_group_id,
-//     'form_number'        => $application->form_number,
-//     'status'             => AppConstants::STATUS_PENDING,
-//     'remark'             => null,
-//     'is_number'          => null, // ⚠️ check actual column name
-//     'payment_status'     => AppConstants::STATUS_PENDING,
-//     'acted_at'           => null,
-//       ]);
 
     $sets = ApproverSets::where(
         'approver_group_id',
@@ -116,6 +106,7 @@ public function createApplication($type, $form_type, $form_id)
         'user_id' => $user->id,
         'role' => 'Owner',
         'sequence' => 0,
+        'status' =>AppConstants::STATUS::APPROVED
     ]);
 
     $sets->prepend($ownerSet);
@@ -124,7 +115,7 @@ public function createApplication($type, $form_type, $form_id)
         ApproverGroupApprover::create([
             'approver_group_id'   => $set->approver_group_id,
             'approver_id'         => $set->user_id,
-            'sequence'            => $set->sequence,
+            'sequence'            => $set->sequence + 1,
             'role'                => $set->role,
             'application_form_id' => $application->id,
             'status'              => AppConstants::STATUS_PENDING,

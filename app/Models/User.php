@@ -18,6 +18,7 @@ use App\Models\UserDetails\Position;
 use App\Models\UserDetails\Location;
 use App\Models\Locator\LocatorModel;
 use App\Models\ATO\AtoApplication;
+use App\Models\UserDetails\UserMeta;
 
 class User extends Authenticatable
 {
@@ -83,9 +84,9 @@ class User extends Authenticatable
     public function approvals()
 {
     return $this->hasManyThrough(
-        ApplicationForApproval::class, // Final model
-        ApplicationModel::class,       // Intermediate model
-        'user_id',                     // Foreign key on ApplicationModel
+        ApplicationForApproval::class, 
+        ApplicationModel::class,       
+        'user_id',                     
         'application_id',              // Foreign key on ApplicationForApproval
         'id',                          // Local key on User
         'id'                           // Local key on ApplicationModel
@@ -133,5 +134,24 @@ class User extends Authenticatable
     public function atoApplication()  // singular
 {
     return $this->hasOne(AtoApplication::class, 'user_id', 'id');
+}
+//=========UserMeta=============================//
+   public function meta()
+    {
+        return $this->hasMany(UserMeta::class);
+    }
+    public function getMeta($key, $default = null)
+{
+    return $this->meta()
+        ->where('meta_key', $key)
+        ->value('meta_value') ?? $default;
+}
+
+public function setMeta($key, $value)
+{
+    return $this->meta()->updateOrCreate(
+        ['meta_key' => $key],
+        ['meta_value' => $value]
+    );
 }
 }
