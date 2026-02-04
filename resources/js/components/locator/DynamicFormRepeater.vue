@@ -18,7 +18,7 @@ const form = ref({
   marks_and_number: '',
   qty: null,
   detailed_description_of_article: '',
-  gross_weight: ''
+  Price: ''
 })
 
 const editingId = ref<number | null>(null)
@@ -125,6 +125,7 @@ watch(() => props.modelValue, (newVal) => {
 
 <template>
   <div class="space-y-6">
+    {{ savedArticles }}
     <!-- Add Button -->
     <button
       @click="openModal"

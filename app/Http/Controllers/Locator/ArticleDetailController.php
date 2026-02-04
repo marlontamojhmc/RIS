@@ -34,13 +34,12 @@ class ArticleDetailController extends Controller
     public function store(StoreArticleDetail $request)
 {  
     $validated = $request->validated();
-      
     $article = ArticleDetail::create([
         'application_form_id' => $validated['application_form_id'],
         'marks_and_number' => $validated['marks_and_number'],
         'qty' => $validated['qty'],
         'detailed_description_of_article' => $validated['detailed_description_of_article'],
-        'gross_weight' => $validated['gross_weight'] ?? null,
+        'Price' => $validated['Price'] ?? null,
         'user_id' => auth()->id(),
     ]);
 
@@ -82,14 +81,7 @@ class ArticleDetailController extends Controller
     /**
      * Remove the specified resource from storage.
      */
- public function destroy($id)
-{
-    $article = ArticleDetail::findOrFail($id);
-    $article->delete();
-
-    
-    return response()->noContent(); 
-}
+ 
 public function verifyArticle(Request $request, $id)
 {      dd($id);
     

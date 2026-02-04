@@ -26,7 +26,7 @@ class StoreArticleDetail extends FormRequest
             'marks_and_number' => 'required|string|max:255',
             'qty' => 'required|integer|min:1',
             'detailed_description_of_article' => 'required|string|max:500',
-            'gross_weight' => 'nullable|string|max:255',
+            'Price' => 'nullable|string|max:255',
         ];
     }
 }

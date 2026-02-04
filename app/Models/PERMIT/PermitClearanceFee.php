@@ -24,7 +24,7 @@ class PermitClearanceFee extends Model
     ];
 
     protected $casts = [
-        'validity' => 'date',
+       
         'price' => 'decimal:2',
     ];
 

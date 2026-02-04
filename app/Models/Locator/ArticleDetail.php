@@ -14,7 +14,7 @@ class ArticleDetail extends Model
         'marks_and_number',
         'qty',
         'detailed_description_of_article',
-        'gross_weight',
+        'Price',
     ];
 
     // ✅ Each article belongs to one application form

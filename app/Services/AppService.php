@@ -106,7 +106,7 @@ public function createApplication($type, $form_type, $form_id)
         'user_id' => $user->id,
         'role' => 'Owner',
         'sequence' => 0,
-        'status' =>AppConstants::STATUS::APPROVED
+        'status' =>AppConstants::STATUS_APPROVED
     ]);
 
     $sets->prepend($ownerSet);

@@ -12,6 +12,7 @@ use App\Data\ATOmeta;
 use Carbon\Carbon;
 use App\Models\ATO\AtoApplication;
 use App\Http\Controllers\SERVICEPROVIDER\LocatorServiceProviderController;
+
 //ServiceProvider
 Route::get('/SP', [LocatorServiceProviderController::class,'index'])->name('locator.serviceProvider.index');
 Route::post('/locator/serviceProviderRequest/{id}/approve',[LocatorController::class, 'approveServiceProviderRequest'])->name('locator.serviceProvider.approve');
@@ -35,7 +36,7 @@ Route::group(['prefix' => 'loctr', 'middleware' => 'auth'], function () {
     Route::resource('applications', ApplicationsController::class);
     
     //route articles(crud) 
-    Route::resource('articles', \App\Http\Controllers\Locator\ArticleDetailController::class);
+    Route::resource('articles', ArticleDetailController::class);
     Route::post('/articles/{id}/verify', [ArticleDetailController::class, 'verifyArticle'])
     ->name('articles.verify');
     //route for uploads/attachment (crud) 

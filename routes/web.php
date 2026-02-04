@@ -197,3 +197,4 @@ require __DIR__ .'/Accreditation/Accreditation.php';
 require __DIR__ .'/Application/Application.php';
 require __DIR__ .'/ProvisionalGrant/ProvisionalGrant.php';
 require __DIR__ .'/Util/Util.php';
+require __DIR__ .'/PERMITS/GatePass.php';
