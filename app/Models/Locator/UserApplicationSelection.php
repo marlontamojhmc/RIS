@@ -5,6 +5,7 @@ namespace App\Models\Locator;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\User;
+use App\Models\PERMIT\PermitClearanceFee;
 
 class UserApplicationSelection extends Model
 {
@@ -27,13 +28,18 @@ class UserApplicationSelection extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function application()
-    {
-        return $this->belongsTo(Application::class);
-    }
+    // public function application()
+    // {
+    //     return $this->belongsTo(Application::class);
+    // }
 
-    public function option()
+    public function application()
+{
+    return $this->belongsTo(ApplicationModel::class, 'application_id');
+}
+
+    public function feeoption()
     {
-        return $this->belongsTo(ApplicationOption::class, 'option_id');
+    return $this->belongsTo(PermitClearanceFee::class,'option_id');
     }
 }

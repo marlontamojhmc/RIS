@@ -35,4 +35,11 @@ class PermitClearanceFee extends Model
     {
         return $this->belongsTo(Form::class);
     }
+    public function selections()
+{
+    return $this->hasMany(
+        UserApplicationSelection::class,
+        'option_id' // FK on user_application_selections
+    );
+}
 }

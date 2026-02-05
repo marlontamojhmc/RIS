@@ -114,7 +114,11 @@ class ApplicationsController extends Controller
             $result = $this->service->createApplication($request->form_name, $request->type,$request->form_id);
          }
 
-        $validity= Form::with('permitClearanceFees')->findOrFail(1);
+        $GcValidity= Form::with('permitClearanceFees')->findOrFail(1);
+        $BicValidity= Form::with('permitClearanceFees')->findOrFail(2);
+        $BocValidity = Form::with('permitClearancefees')->findOrFail(3);
+        $TbocValidity = Form::with('permitClearancefees')->findOrFail(4);
+        $LpcValidity = Form::with('permitClearancefees')->findOrFail(5);
         $application = $result['application'];
         $approverForm = $result['approverForm'];
         
@@ -157,12 +161,59 @@ class ApplicationsController extends Controller
             ]);
         }elseif($request->form_id === 1){
             return Inertia::render('PERMIT/GatePass', [
+                              'user'=> $user,
+                              'application' => $application,
                          'application_id' => $application->id,
                       'approver_group_id' => $approverForm->approver_group_id,
                 'application_form_number' => $application->form_number,
-                'permitClearanceFees' => $validity->permitClearanceFees,
+                'permitClearanceFees' => $GcValidity->permitClearanceFees,
             ]);
 
+        }elseif($request->form_id === 2){
+            return Inertia::render('PERMIT/BringInClearance',[
+                                      'user'=> $user,
+                              'application' => $application,
+                           'application_id' => $application->id,
+                        'approver_group_id' => $approverForm->approver_group_id,
+                  'application_form_number' => $application->form_number,
+                      'permitClearanceFees' => $BicValidity->permitClearanceFees,
+            ]);
+        }elseif($request->form_id === 3){
+            return Inertia::render('PERMIT/BringOutClearance',[
+                                      'user'=> $user,
+                              'application' => $application,
+                           'application_id' => $application->id,
+                        'approver_group_id' => $approverForm->approver_group_id,
+                  'application_form_number' => $application->form_number,
+                      'permitClearanceFees' => $BocValidity->permitClearanceFees,
+            ]);
+        }elseif($request->form_id === 4){
+           return Inertia::render('PERMIT/TemporaryBringOutClearance',[
+                                      'user'=> $user,
+                              'application' => $application,
+                           'application_id' => $application->id,
+                        'approver_group_id' => $approverForm->approver_group_id,
+                  'application_form_number' => $application->form_number,
+                      'permitClearanceFees' => $TbocValidity->permitClearanceFees,
+            ]);
+        }elseif($request->form_id === 5){
+             return Inertia::render('PERMIT/LocalPurchaseClearance',[
+                                      'user'=> $user,
+                              'application' => $application,
+                           'application_id' => $application->id,
+                        'approver_group_id' => $approverForm->approver_group_id,
+                  'application_form_number' => $application->form_number,
+                      'permitClearanceFees' => $LpcValidity->permitClearanceFees,
+            ]);
+        }elseif($request->form_id === 6){
+           return Inertia::render('PERMIT/BringOutClearance',[
+                                      'user'=> $user,
+                              'application' => $application,
+                           'application_id' => $application->id,
+                        'approver_group_id' => $approverForm->approver_group_id,
+                  'application_form_number' => $application->form_number,
+                      'permitClearanceFees' => $BocValidity->permitClearanceFees,
+            ]);
         }else{ return Inertia::render('Locator/Application/Create', [ 
             'user' => $user, 
             'application_form_id' => $application->id, // Pass the new ID 

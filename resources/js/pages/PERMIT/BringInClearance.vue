@@ -141,7 +141,7 @@
       <select v-model="form.selectedFeeId" class="border-b border-gray-300 w-full p-2">
         <option disabled value="">-- Select Validity --</option>
         <option v-for="fee in permitClearanceFees" :key="fee.id" :value="fee.id">
-          {{ fee.title }} {{ fee.validity }} 
+         {{ fee.validity }} / {{ fee.title }} 
         </option>
       </select>
     </div>

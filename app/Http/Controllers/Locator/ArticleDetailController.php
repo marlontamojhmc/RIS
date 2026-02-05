@@ -39,11 +39,18 @@ class ArticleDetailController extends Controller
         'marks_and_number' => $validated['marks_and_number'],
         'qty' => $validated['qty'],
         'detailed_description_of_article' => $validated['detailed_description_of_article'],
-        'Price' => $validated['Price'] ?? null,
+        'Price' => $validated['price'] ?? null,
         'user_id' => auth()->id(),
     ]);
 
-    return response()->json(['article' => $article]);
+    return response()->json([
+    'id' => $article->id,
+    'marksBag' => $article->marks_and_number,
+    'quantity' => $article->qty,
+    'description' => $article->detailed_description_of_article,
+    'declaredValue' => (float) $article->Price, // <-- map to declaredValue
+    'saved' => true
+]);
 }
 
     /**
@@ -81,6 +88,14 @@ class ArticleDetailController extends Controller
     /**
      * Remove the specified resource from storage.
      */
+    public function destroy(ArticleDetail $article)
+    {
+        $article->delete();
+
+        return response()->json([
+            'message' => 'Article deleted successfully'
+        ]);
+    }
  
 public function verifyArticle(Request $request, $id)
 {      dd($id);
