@@ -104,7 +104,7 @@ class ApplicationsController extends Controller
      * Store a newly created resource in storage.
      */
     public function store(Request $request)
-    {  // dd($request->form_id);
+    {  
         $user = auth()->user();
         if($request->type === 'Accreditation'){
             $result = $this->service->createApplication($request->form_name,$request->type, $request->form_id);
@@ -134,26 +134,26 @@ class ApplicationsController extends Controller
                 'application_id' =>$application->id,
                 'application_group_id'=>$approverForm->approver_group_id,
            ]);
-        }elseif($request->form_user === 'Vendor'){
+        }elseif($request->form_id === 6){
             return Inertia::render('Accreditation/Vendor/Accreditationform',[
                 'form_number' => $application->form_number,
                 'application_id' =>$application->id,
                 'application_group_id'=>$approverForm->approver_group_id,
             ]);
-        }elseif($request->form_user === 'Supplier' ){
+        }elseif($request->form_id === 13 ){
             return Inertia::render('Accreditation/Supplier/AccreditationForm',[
                 'form_number' => $application->form_number,
                 'application_id' =>$application->id,
                 'application_group_id'=>$approverForm->approver_group_id,
             ]);
-        }elseif($request->form_user ==='Commercial'){
+        }elseif($request->form_id === 12){
              return Inertia::render('Accreditation/TradeFair/AccreditationForm',[
                 'form_number' => $application->form_number,
                 'application_id' =>$application->id,
                 'application_group_id'=>$approverForm->approver_group_id,
             ]);
         
-        }elseif($request->form_name === 'Provisional Grant'){
+        }elseif($request->form_id === 14){
             return Inertia::render('Accreditation/Provisional/ProvisionalGrantForm',[
                 'form_number' => $application->form_number,
                 'application_id' =>$application->id,
@@ -205,15 +205,15 @@ class ApplicationsController extends Controller
                   'application_form_number' => $application->form_number,
                       'permitClearanceFees' => $LpcValidity->permitClearanceFees,
             ]);
-        }elseif($request->form_id === 6){
-           return Inertia::render('PERMIT/BringOutClearance',[
-                                      'user'=> $user,
-                              'application' => $application,
-                           'application_id' => $application->id,
-                        'approver_group_id' => $approverForm->approver_group_id,
-                  'application_form_number' => $application->form_number,
-                      'permitClearanceFees' => $BocValidity->permitClearanceFees,
-            ]);
+        // }elseif($request->form_id === 6){
+        //    return Inertia::render('PERMIT/BringOutClearance',[
+        //                               'user'=> $user,
+        //                       'application' => $application,
+        //                    'application_id' => $application->id,
+        //                 'approver_group_id' => $approverForm->approver_group_id,
+        //           'application_form_number' => $application->form_number,
+        //               'permitClearanceFees' => $BocValidity->permitClearanceFees,
+        //     ]);
         }else{ return Inertia::render('Locator/Application/Create', [ 
             'user' => $user, 
             'application_form_id' => $application->id, // Pass the new ID 
