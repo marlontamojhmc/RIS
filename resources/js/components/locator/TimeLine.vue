@@ -31,17 +31,17 @@ const statusColor = (status) => {
 
     <div class="relative">
       <!-- Start Node (Applicant) -->
-      <div class="flex items-start relative mb-8">
+      <!-- <div class="flex items-start relative mb-8">
         <!-- Icon & Connector -->
-        <div class="flex flex-col items-center relative">
+        <!--div class="flex flex-col items-center relative">
           <div class="w-12 h-12 flex items-center justify-center rounded-full bg-green-500 text-white shadow border-4 border-white z-10">
             <Play class="w-5 h-5" />
           </div>
           <div class="absolute top-12 left-1/2 w-0.5 h-full bg-gray-300"></div>
-        </div>
+        </div-->
 
         <!-- Connector Line to Text -->
-        <div class="ml-4 relative flex-1">
+        <!-- <div class="ml-4 relative flex-1">
           <div class="absolute top-6 left-0 w-6 h-0.5 bg-gray-300"></div>
           <div class="pl-8">
             <p class="font-semibold text-gray-700">{{ page.props.auth.user.name }}</p>
@@ -51,7 +51,7 @@ const statusColor = (status) => {
             </p>
           </div>
         </div>
-      </div>
+      </div> -->
 
       <!-- Approvers -->
       <template v-for="(approver, index) in props.data" :key="approver.id">

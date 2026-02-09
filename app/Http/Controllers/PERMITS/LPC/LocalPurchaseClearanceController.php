@@ -1,26 +1,26 @@
 <?php
 
-namespace App\Http\Controllers\PERMITS;
+namespace App\Http\Controllers\PERMITS\LPC;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use App\Models\Locator\ApplicationForApproval;
-use App\Models\PERMIT\GatePass;
+use App\Models\PERMIT\Permits;
 use App\Models\PERMIT\PermitClearanceFee;
 use App\Helpers\PermitHelper;
-class GatePassController extends Controller
-{
-    public function index(){
-       return Inertia::render('PERMIT/GatePass',[
-         'application_id' => 1,
-                      'approver_group_id' => 2,
-                'application_form_number' => 3,
-       ]);
-    }
-    public function store(Request $request){
-       $form = json_decode($request->input('form'), true);
 
+class LocalPurchaseClearanceController extends Controller
+{
+    public function index()
+    {
+              return Inertia::render('PERMITS/LPC/LocalPurchaseClearance',[
+                
+            ]);
+    }
+    public function store(Request $request)
+    {
+       $form = json_decode($request->input('form'), true);
        $price = isset($form['amount']) 
         ? (float) str_replace(['₱', ','], '', $form['amount']) 
         : 0;
@@ -28,13 +28,14 @@ class GatePassController extends Controller
         
         $validity =  PermitHelper::computeValidity((int)$fee->value);
         
-        $gatepass = GatePass::create([
+        $gatepass = Permits::create([
+            'form_id' =>$form['form_id'] ?? '',
         'locator_name' => $form['clearanceTo'] ?? '',
-        'validity' => $validity,
+        'validity' => $validity->toDateTimeString(),
         'IS_number' => '',
         'price' => $price,
+        'form_type' => 'Local-Purchase-Clearance',
         'delivery_date' => $form['deliveryDate'] ?? null,
-        'expiration_date' => $form['expirationDate'] ?? null,
         'form_number' => $form['gcNo'] ??  '',
         'control_number' => $form['controlNo'] ?? '',
         'application_id' => $form['application_form_id'] ?? null,
@@ -54,7 +55,7 @@ class GatePassController extends Controller
         ]);
 
     return response()->json([
-        'message' => 'Gate Pass created successfully',
+        'message' => 'Local-Purchase-Clearance created successfully',
         'gatePass' => $gatepass,
     ]);
     }

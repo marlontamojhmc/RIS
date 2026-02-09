@@ -3,7 +3,9 @@ import { reactive, ref, onMounted } from 'vue'
 import { router } from '@inertiajs/vue3'
 import axios from 'axios'
 import VendorAppSidebarLayout from '@/layouts/vendor/VendorAppSidebarLayout.vue'
+import { useToast } from 'vue-toastification'
 
+const toast = useToast()
 const props = defineProps<{
   form_number: string
   application_id: string
@@ -68,7 +70,7 @@ const submit = () => {
   router.post('/accreditation/store', form, {
     preserveScroll: true,
     onSuccess: () => {
-      alert('Accreditation submitted successfully')
+      toast.success(`${props.form_number} submitted Successfully `);
       resetForm()
     },
   })

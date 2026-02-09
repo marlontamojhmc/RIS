@@ -3,7 +3,8 @@ import { reactive, ref, onMounted } from 'vue'
 import { router } from '@inertiajs/vue3'
 import axios from 'axios'
 import VendorAppSidebarLayout from '@/layouts/vendor/VendorAppSidebarLayout.vue'
-
+import { useToast } from 'vue-toastification'
+const toast = useToast()
 const props = defineProps<{
   form_number: string
   application_id: string
@@ -97,7 +98,7 @@ const submit = () => {
     preserveScroll: true,
     headers: { 'Content-Type': 'multipart/form-data' },
     onSuccess: () => {
-      alert('Accreditation submitted successfully')
+      toast.success(`${props.form_number} submitted Successsfully`)
       resetForm()
     },
     onError: (errors) => {

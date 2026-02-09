@@ -17,13 +17,20 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\Locator\ApplicationForApproval;
 use App\Models\Locator\ApproverGroupApprover;
 use App\Models\Locator\Upload;
+use App\Models\Locator\Form;
 use Inertia\Inertia;
 
 class AccreditationController extends Controller
 {
-    public function index(){
-        return Inertia::render('Accreditation/Index',[]);
-    }
+    public function index()
+{    $user = Auth()->user();
+    $forms = Form::whereIn('id', [6, 12, 13])->get();
+    
+    return Inertia::render('Accreditation/Index', [
+        'forms' => $forms,
+        'user' => $user,
+    ]);
+}
     /**
      * Return dynamic form options
      */

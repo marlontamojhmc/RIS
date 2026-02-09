@@ -6,6 +6,9 @@ import AppLayout from '@/layouts/AppLayout.vue'
 import Input from '@/components/ui/input/Input.vue'
 import Label from '@/components/ui/label/Label.vue'
 import Button from '@/components/ui/button/Button.vue'
+import { useToast } from 'vue-toastification'
+
+const toast = useToast()
 
 // Business type radio value: "sole" or "partnership"
 const businessType = ref('')
@@ -48,10 +51,12 @@ function submit() {
   form.post('/ATO', {
     onStart: () => console.log('Submitting...'),
     onSuccess: () => {
+      toast.success(`Authority to operate form Successfully Submitted`)
       console.log('Success!');
       // do something after save
     },
     onError: (errors) => {
+      toast.error(`Validation error: ${errors}`);
       console.log('Validation errors:', errors);
     },
     onFinish: () => console.log('Finished'),

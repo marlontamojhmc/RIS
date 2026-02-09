@@ -2,270 +2,260 @@
 
 namespace App\Http\Controllers\Applications;
 
+use App\Helpers\AppConstants;
+use App\Helpers\PermitHelper;
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
+use App\Models\ATO\AtoApplication;
+use App\Models\Locator\ApplicationForApproval;
 use App\Models\Locator\ApplicationModel;
 use App\Models\Locator\ApplicationOption;
-use Inertia\Inertia;
-use App\Models\ApplicationCategory;
-use App\Models\Locator\UserApplicationSelection;
-use App\Helpers\PermitHelper;
-use App\Models\User;
-use App\Models\Locator\Form;
-use App\Models\ApproverGroup;
-use App\Models\ApproverSets;
 use App\Models\Locator\ApproverGroupApprover;
-use App\Models\Locator\ApplicationForApproval;
-use App\Helpers\AppConstants;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Auth;
-use App\Models\ATO\AtoApplication;
+use App\Models\Locator\Form;
+use App\Models\Locator\UserApplicationSelection;
+use App\Models\User;
 use App\Services\AppService;
-use Illuminate\Support\Facades\Gate;
-use App\Models\Signup\TemporaryUser;
-use App\Models\Signup\SignupApprover;
-use App\Models\PERMIT\PermitClearanceFee;
-
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Inertia\Inertia;
 
 class ApplicationsController extends Controller
 {
     protected $service;
+
     public function __construct(AppService $service)
     {
-    $this->service = $service;
+        $this->service = $service;
     }
+
     /**
      * Display a listing of the resource.
      */
     public function index()
-    { 
+    {
         abort(403);
         $application = ApplicationModel::with(['selections.option', 'selections.user'])
             ->latest()
             ->first();
-        
-        if (!$application) {
+
+        if (! $application) {
             return response()->json(['message' => 'No application found'], 404);
         }
-        
+
         // Format the selections
-        $selections = $application->selections->map(function($selection) {
+        $selections = $application->selections->map(function ($selection) {
             $amount = $selection->amount;
+
             return [
                 'option_name' => $selection->option->name,
-                'amount'      => $selection->amount,
-                'validity'    => $selection->option->validity,
+                'amount' => $selection->amount,
+                'validity' => $selection->option->validity,
                 'selected_at' => $selection->selected_at,
-                'user_name'   => $selection->user->name,
+                'user_name' => $selection->user->name,
             ];
         });
         $totalAmount = $application->selections->sum('amount');
-        
-       
+
         return response()->json([
             'application' => [
-                'id'           => $application->id,
-                'form_title'   => $application->form_title,
-                'control_no'   => $application->control_number,
-                'form_number'  => $application->form_number,
-                'selections'   => $selections,
-            ]
+                'id' => $application->id,
+                'form_title' => $application->form_title,
+                'control_no' => $application->control_number,
+                'form_number' => $application->form_number,
+                'selections' => $selections,
+            ],
         ]);
     }
+
     public function Fee()
     {
         return;
-       $form = Form::with('permitClearanceFees')->findOrFail(2);
-    dd($form);
-    
+        $form = Form::with('permitClearanceFees')->findOrFail(2);
+        dd($form);
+
     }
+
     /**
      * Show the form for creating a new resource.
      */
     public function create()
-    {    
-         $user = auth()->user();
-         //pwedeng natin macheck ang applicationModel kung anong form yung inapplyan ng user
-         //  gamit yung id ng application_form table
-         $application = ApplicationModel::find(516);
-        //$formId = $application->form_id;
-        //dd($user->atoApplication);
-        //check if user has approved ATO if it does remove ATO to the Option
+    {
+        $user = auth()->user();
+        // pwedeng natin macheck ang applicationModel kung anong form yung inapplyan ng user
+        //  gamit yung id ng application_form table
+        $application = ApplicationModel::find(516);
+        // $formId = $application->form_id;
+        // dd($user->atoApplication);
+        // check if user has approved ATO if it does remove ATO to the Option
         $formOptions = $this->service->getFormOptionsForUser();
-    return Inertia::render('Locator/Application/Create', [
-                                            'user' => $user,
-                                            'application_form_id' => null,
-                                            'form' => $formOptions,
-                                            'approverGroupId' => null,
-        
-                             ]);
+
+        return Inertia::render('Locator/Application/Create', [
+            'user' => $user,
+            'application_form_id' => null,
+            'form' => $formOptions,
+            'approverGroupId' => null,
+
+        ]);
     }
+
     /**
      * Store a newly created resource in storage.
      */
     public function store(Request $request)
-    {  
+    {   
         $user = auth()->user();
-        if($request->type === 'Accreditation'){
-            $result = $this->service->createApplication($request->form_name,$request->type, $request->form_id);
-        }elseif($request->type === 'Permit'){
-              $result = $this->service->createApplication($request->form_name, $request->type,$request->form_id);
-        }else{
-            $result = $this->service->createApplication($request->form_name, $request->type,$request->form_id);
-         }
+        if ($request->type === 'Accreditation') {
+            $result = $this->service->createApplication($request->form_name, $request->type, $request->form_id);
+        } elseif ($request->type === 'Permit') {
+            $result = $this->service->createApplication($request->form_name, $request->type, $request->form_id);
+        } else {
+            $result = $this->service->createApplication($request->form_name, $request->type, $request->form_id);
+        }
 
-        $GcValidity= Form::with('permitClearanceFees')->findOrFail(1);
-        $BicValidity= Form::with('permitClearanceFees')->findOrFail(2);
+        $GcValidity = Form::with('permitClearanceFees')->findOrFail(1);
+        $BicValidity = Form::with('permitClearanceFees')->findOrFail(2);
         $BocValidity = Form::with('permitClearancefees')->findOrFail(3);
         $TbocValidity = Form::with('permitClearancefees')->findOrFail(4);
         $LpcValidity = Form::with('permitClearancefees')->findOrFail(5);
         $application = $result['application'];
         $approverForm = $result['approverForm'];
-        
+
         if ($request->form_id === 8) {
             return Inertia::render('ATO/ATO-Business-Enterprise-Create', [
                 'application_id' => $application->id,
                 'approver_group_id' => $approverForm->approver_group_id,
-                'application_form_number' => $application->form_number
+                'application_form_number' => $application->form_number,
             ]);
-        }elseif($request->form_id === 9){
-           return Inertia::render('ATO/Accommodation-Create',[
+        } elseif ($request->form_id === 9) {
+            return Inertia::render('ATO/Accommodation-Create', [
+                'form_id' => $request->form_id,
                 'form_number' => $application->form_number,
-                'application_id' =>$application->id,
-                'application_group_id'=>$approverForm->approver_group_id,
-           ]);
-        }elseif($request->form_id === 6){
-            return Inertia::render('Accreditation/Vendor/Accreditationform',[
-                'form_number' => $application->form_number,
-                'application_id' =>$application->id,
-                'application_group_id'=>$approverForm->approver_group_id,
+                'application_id' => $application->id,
+                'approver_group_id' => $approverForm->approver_group_id,
             ]);
-        }elseif($request->form_id === 13 ){
-            return Inertia::render('Accreditation/Supplier/AccreditationForm',[
+        } elseif ($request->form_id === 6) {
+            return Inertia::render('Accreditation/Vendor/Accreditationform', [
                 'form_number' => $application->form_number,
-                'application_id' =>$application->id,
-                'application_group_id'=>$approverForm->approver_group_id,
+                'application_id' => $application->id,
+                'application_group_id' => $approverForm->approver_group_id,
             ]);
-        }elseif($request->form_id === 12){
-             return Inertia::render('Accreditation/TradeFair/AccreditationForm',[
+        } elseif ($request->form_id === 13) {
+            return Inertia::render('Accreditation/Supplier/AccreditationForm', [
                 'form_number' => $application->form_number,
-                'application_id' =>$application->id,
-                'application_group_id'=>$approverForm->approver_group_id,
+                'application_id' => $application->id,
+                'application_group_id' => $approverForm->approver_group_id,
             ]);
-        
-        }elseif($request->form_id === 14){
-            return Inertia::render('Accreditation/Provisional/ProvisionalGrantForm',[
+        } elseif ($request->form_id === 12) {
+            return Inertia::render('Accreditation/TradeFair/AccreditationForm', [
                 'form_number' => $application->form_number,
-                'application_id' =>$application->id,
-                'application_group_id'=>$approverForm->approver_group_id,
+                'application_id' => $application->id,
+                'application_group_id' => $approverForm->approver_group_id,
             ]);
-        }elseif($request->form_id === 1){
-            return Inertia::render('PERMIT/GatePass', [
-                              'user'=> $user,
-                              'application' => $application,
-                         'application_id' => $application->id,
-                      'approver_group_id' => $approverForm->approver_group_id,
+
+        } elseif ($request->form_id === 14) {
+            return Inertia::render('Accreditation/Provisional/ProvisionalGrantForm', [
+                'form_number' => $application->form_number,
+                'application_id' => $application->id,
+                'application_group_id' => $approverForm->approver_group_id,
+            ]);
+        } elseif ($request->form_id === 1) {
+            return Inertia::render('PERMITS/GP/GatePass', [
+                'user' => $user,
+                'form_id' =>$request->form_id,
+                'application' => $application,
+                'application_id' => $application->id,
+                'approver_group_id' => $approverForm->approver_group_id,
                 'application_form_number' => $application->form_number,
                 'permitClearanceFees' => $GcValidity->permitClearanceFees,
             ]);
 
-        }elseif($request->form_id === 2){
-            return Inertia::render('PERMIT/BringInClearance',[
-                                      'user'=> $user,
-                              'application' => $application,
-                           'application_id' => $application->id,
-                        'approver_group_id' => $approverForm->approver_group_id,
-                  'application_form_number' => $application->form_number,
-                      'permitClearanceFees' => $BicValidity->permitClearanceFees,
+        } elseif ($request->form_id === 2) {
+            return Inertia::render('PERMITS/BIC/BringInClearance', [
+                'user' => $user,
+                'application' => $application,
+                'application_id' => $application->id,
+                'approver_group_id' => $approverForm->approver_group_id,
+                'application_form_number' => $application->form_number,
+                'permitClearanceFees' => $BicValidity->permitClearanceFees,
             ]);
-        }elseif($request->form_id === 3){
-            return Inertia::render('PERMIT/BringOutClearance',[
-                                      'user'=> $user,
-                              'application' => $application,
-                           'application_id' => $application->id,
-                        'approver_group_id' => $approverForm->approver_group_id,
-                  'application_form_number' => $application->form_number,
-                      'permitClearanceFees' => $BocValidity->permitClearanceFees,
+        } elseif ($request->form_id === 3) {
+            return Inertia::render('PERMITS/BOC/BringOutClearance', [
+                'user' => $user,
+                'application' => $application,
+                'application_id' => $application->id,
+                'approver_group_id' => $approverForm->approver_group_id,
+                'application_form_number' => $application->form_number,
+                'permitClearanceFees' => $BocValidity->permitClearanceFees,
             ]);
-        }elseif($request->form_id === 4){
-           return Inertia::render('PERMIT/TemporaryBringOutClearance',[
-                                      'user'=> $user,
-                              'application' => $application,
-                           'application_id' => $application->id,
-                        'approver_group_id' => $approverForm->approver_group_id,
-                  'application_form_number' => $application->form_number,
-                      'permitClearanceFees' => $TbocValidity->permitClearanceFees,
+        } elseif ($request->form_id === 4) {
+            return Inertia::render('PERMITS/TBOC/TemporaryBringOutClearance', [
+                'user' => $user,
+                'application' => $application,
+                'application_id' => $application->id,
+                'approver_group_id' => $approverForm->approver_group_id,
+                'application_form_number' => $application->form_number,
+                'permitClearanceFees' => $TbocValidity->permitClearanceFees,
             ]);
-        }elseif($request->form_id === 5){
-             return Inertia::render('PERMIT/LocalPurchaseClearance',[
-                                      'user'=> $user,
-                              'application' => $application,
-                           'application_id' => $application->id,
-                        'approver_group_id' => $approverForm->approver_group_id,
-                  'application_form_number' => $application->form_number,
-                      'permitClearanceFees' => $LpcValidity->permitClearanceFees,
+        } elseif ($request->form_id === 5) {
+            return Inertia::render('PERMITS/LPC/LocalPurchaseClearance', [
+                'user' => $user,
+                'application' => $application,
+                'application_id' => $application->id,
+                'approver_group_id' => $approverForm->approver_group_id,
+                'application_form_number' => $application->form_number,
+                'permitClearanceFees' => $LpcValidity->permitClearanceFees,
             ]);
-        // }elseif($request->form_id === 6){
-        //    return Inertia::render('PERMIT/BringOutClearance',[
-        //                               'user'=> $user,
-        //                       'application' => $application,
-        //                    'application_id' => $application->id,
-        //                 'approver_group_id' => $approverForm->approver_group_id,
-        //           'application_form_number' => $application->form_number,
-        //               'permitClearanceFees' => $BocValidity->permitClearanceFees,
-        //     ]);
-        }else{ return Inertia::render('Locator/Application/Create', [ 
-            'user' => $user, 
-            'application_form_id' => $application->id, // Pass the new ID 
-            'control_number' => $application->control_number, 
-            'form_number' => $application->form_number, 
-            'form_title' => $application->form_title,
-            'start_date' => $application->created_at,
-            'options' => ApplicationOption::select('id', 'name', 'value', 'validity')->get(),
-            'approverGroupId' => $approverForm->approver_group_id, 
-            ]); 
-         }
+        } else {
+            return Inertia::render('Locator/Application/Create', [
+                'user' => $user,
+                'application_form_id' => $application->id, // Pass the new ID
+                'control_number' => $application->control_number,
+                'form_number' => $application->form_number,
+                'form_title' => $application->form_title,
+                'start_date' => $application->created_at,
+                'options' => ApplicationOption::select('id', 'name', 'value', 'validity')->get(),
+                'approverGroupId' => $approverForm->approver_group_id,
+            ]);
+        }
     }
-
 
     /**
      * Display the specified resource.
      */
-    public function show(String $id)
-    {  
-       $data = $this->service->getApplicationData($id);
-       $applicationForApproval = ApplicationForApproval::with('approverGroup.approvers')
-                            ->where('application_id', $id)
-                            ->first();
-       $approver = ApproverGroupApprover::with(['approver', 'approverGroup'])
-                            ->where('approver_group_id', $data['approverGroup']->id)
-                            ->where('application_form_id', $id)
-                            ->get(['id', 'approver_id', 'sequence', 'role','remark', 'status', 'acted_at', 'approver_group_id']); 
-            if($data['approverGroup']->allApproversStatusApproved()){
-                $data['application']->status= AppConstants::STATUS_APPROVED;
-                $data['application']->save();
-                $applicationForApproval->status = AppConstants::STATUS_APPROVED;
-                $applicationForApproval->save();
-            }   
-    
+    public function show(string $id)
+    {
+        $data = $this->service->getApplicationData($id);
+        $applicationForApproval = ApplicationForApproval::with('approverGroup.approvers')
+            ->where('application_id', $id)
+            ->first();
+        $approver = ApproverGroupApprover::with(['approver', 'approverGroup'])
+            ->where('approver_group_id', $data['approverGroup']->id)
+            ->where('application_form_id', $id)
+            ->get(['id', 'approver_id', 'sequence', 'role', 'remark', 'status', 'acted_at', 'approver_group_id']);
+        if ($data['approverGroup']->allApproversStatusApproved()) {
+            $data['application']->status = AppConstants::STATUS_APPROVED;
+            $data['application']->save();
+            $applicationForApproval->status = AppConstants::STATUS_APPROVED;
+            $applicationForApproval->save();
+        }
+
         return Inertia::render('Locator/Application/Show', [
-        'application' => $data['application'],
-        'approverGroup' => $data['approverGroup'],
-        'approvers' => $data['approvers']->map(function ($item) {
-           
-            return [
-                'id' => $item['id'] ?? null,
-                'name' => $item['name'] ?? '(Unknown)',
-                'email' => $item['email'] ?? null,
-                'pivot' => [
-                    'role' => $item['pivot']['role'] ?? null,
-                    'sequence' => $item['pivot']['sequence'] ?? null,
-                    'status' => $item['pivot']['status'] ?? null,
-                    'acted_at' => $item['pivot']['acted_at'] ?? null,
-                    'remark' => $item['pivot']['remark'] ?? null,
-                ],
-            ];
-                        }),
+            'application' => $data['application'],
+            'approverGroup' => $data['approverGroup'],
+            'approvers' => $data['approvers']->map(function ($item) {
+
+                return [
+                    'id' => $item['id'] ?? null,
+                    'name' => $item['name'] ?? '(Unknown)',
+                    'email' => $item['email'] ?? null,
+                    'pivot' => [
+                        'role' => $item['pivot']['role'] ?? null,
+                        'sequence' => $item['pivot']['sequence'] ?? null,
+                        'status' => $item['pivot']['status'] ?? null,
+                        'acted_at' => $item['pivot']['acted_at'] ?? null,
+                        'remark' => $item['pivot']['remark'] ?? null,
+                    ],
+                ];
+            }),
         ]);
     }
 
@@ -292,98 +282,122 @@ class ApplicationsController extends Controller
     {
         //
     }
+
     public function pendingList()
     {
-            $ato = ApplicationModel::where('user_id', Auth::id())->where('form_type', 'ATO')->get();
-            $appForm_number = ApplicationModel::where('user_id', Auth::id())->pluck('form_number');
-            $applications = ApplicationForApproval::with([
-                                    'application',
-                                    'approverGroup.approvers'
-                                ])
-                                ->whereIn('form_number', $appForm_number)
-                                ->where('status', 'Pending')
-                                ->get();
-         return Inertia::render('Locator/Application/Pending', [
-                            'applications' => $applications,
-                            'ATO' => $ato,
+        $ato = ApplicationModel::where('user_id', Auth::id())->where('form_type', 'ATO')->get();
+        $appForm_number = ApplicationModel::where('user_id', Auth::id())->pluck('form_number');
+        $applications = ApplicationForApproval::with([
+            'application',
+            'approverGroup.approvers',
+        ])
+            ->whereIn('form_number', $appForm_number)
+            ->where('status', 'Pending')
+            ->get();
+
+        return Inertia::render('Locator/Application/Pending', [
+            'applications' => $applications,
+            'ATO' => $ato,
         ]);
     }
 
     public function approvedList()
     {
-            $appIds = ApplicationModel::where('user_id', Auth::id())->pluck('id');
-            $applications = ApplicationForApproval::with([
-                            'application',
-                            'approverGroup.approvers'
-                            ])
-                            ->whereIn('application_id', $appIds)
-                            ->where('status', 'Approved')
-                            ->get();
+        $appIds = ApplicationModel::where('user_id', Auth::id())->pluck('id');
+        $applications = ApplicationForApproval::with([
+            'application',
+            'approverGroup.approvers',
+        ])
+            ->whereIn('application_id', $appIds)
+            ->where('status', 'Approved')
+            ->get();
 
-            return Inertia::render('Locator/Application/Approved', [
-                'applications' => $applications,
-            ]);
+        return Inertia::render('Locator/Application/Approved', [
+            'applications' => $applications,
+        ]);
     }
+
     /**
      * Request $request are application_id and option_id selected by the locator
      * this function saves selected option to user_application_selected Table
-     * 
+     *
      * **/
     public function saveOptionSelection(Request $request)
-    { 
-    $user = auth()->user();
-    $validated = $request->validate([
-        'application_id' => 'required|exists:application_forms,id',
-        'option_id' => 'required|exists:application_options,id',
-    ]);
-    $validity= ApplicationOption::find($validated['option_id'])->value ?? null;  
-    $application = ApplicationModel::findOrFail($validated['application_id'])->get();
-    $expireddate= PermitHelper::computeValidity((int)$validity);
-    
-    $form = Form::where('name', $application[0]->form_title)->get();
+    {
+        $user = auth()->user();
+        $validated = $request->validate([
+            'application_id' => 'required|exists:application_forms,id',
+            'option_id' => 'required|exists:application_options,id',
+        ]);
+        $validity = ApplicationOption::find($validated['option_id'])->value ?? null;
+        $application = ApplicationModel::findOrFail($validated['application_id'])->get();
+        $expireddate = PermitHelper::computeValidity((int) $validity);
 
-    $price = ApplicationOption::find($validated['option_id'])->price;
-    $selection = UserApplicationSelection::updateOrCreate(
-        [
-            'application_id' => $validated['application_id'],
-            'user_id'        => auth()->id(),
-        ],
-        [
-            'option_id'   => $validated['option_id'],
-            'Expired_at'  => PermitHelper::computeValidity((int)$validity),
-            'selected_at' => now(),
-            'amount'      => $price,
-        ]
-    );
-    
-    
-    return Inertia::render('Locator/Application/Create',[
-       'user' => $user,
-        'application_form_id' => $validated['application_id'],
-        'options' => ApplicationOption::select('id', 'name', 'value', 'validity')->get(),
-        'expired_at'=> $expireddate,
-        'form_number' =>$application[0]->form_number,
-        'control_number' =>$application[0]->control_number,
-        'form_title' => $application[0]->form_title,
-        'start_date' => $application[0]->created_at,
-        'price' => $price,
-        'approverGroupId' => $form[0]->approver_group_id,
-        
-        
-    ]);
-    
+        $form = Form::where('name', $application[0]->form_title)->get();
+
+        $price = ApplicationOption::find($validated['option_id'])->price;
+        $selection = UserApplicationSelection::updateOrCreate(
+            [
+                'application_id' => $validated['application_id'],
+                'user_id' => auth()->id(),
+            ],
+            [
+                'option_id' => $validated['option_id'],
+                'Expired_at' => PermitHelper::computeValidity((int) $validity),
+                'selected_at' => now(),
+                'amount' => $price,
+            ]
+        );
+
+        return Inertia::render('Locator/Application/Create', [
+            'user' => $user,
+            'application_form_id' => $validated['application_id'],
+            'options' => ApplicationOption::select('id', 'name', 'value', 'validity')->get(),
+            'expired_at' => $expireddate,
+            'form_number' => $application[0]->form_number,
+            'control_number' => $application[0]->control_number,
+            'form_title' => $application[0]->form_title,
+            'start_date' => $application[0]->created_at,
+            'price' => $price,
+            'approverGroupId' => $form[0]->approver_group_id,
+
+        ]);
+
     }
+
     public function appEdit($id)
-   {
+    {
         $data = $this->service->getApplicationData($id);
         $appOption = ApplicationOption::all();
-        
-        return Inertia::render('Locator/Application/Edit',[
+
+        return Inertia::render('Locator/Application/Edit', [
             'application' => $data['application'],    // main application record
-        'approverGroup' => $data['approverGroup'],
-        'appOptions' => $appOption,
-         'approvers' => $data['approvers']->map(function ($item) {
-           
+            'approverGroup' => $data['approverGroup'],
+            'appOptions' => $appOption,
+            'approvers' => $data['approvers']->map(function ($item) {
+
+                return [
+                    'id' => $item['id'] ?? null,
+                    'name' => $item['name'] ?? '(Unknown)',
+                    'email' => $item['email'] ?? null,
+                    'pivot' => [
+                        'role' => $item['pivot']['role'] ?? null,
+                        'sequence' => $item['pivot']['sequence'] ?? null,
+                        'status' => $item['pivot']['status'] ?? null,
+                        'acted_at' => $item['pivot']['acted_at'] ?? null,
+                        'remark' => $item['pivot']['remark'] ?? null,
+                    ],
+                ];
+            }),
+
+        ]);
+    }
+
+    public function getApprovers($id)
+    {
+        $data = $this->service->getApplicationData($id);
+
+        $approvers = $data['approvers']->map(function ($item) {
             return [
                 'id' => $item['id'] ?? null,
                 'name' => $item['name'] ?? '(Unknown)',
@@ -396,30 +410,8 @@ class ApplicationsController extends Controller
                     'remark' => $item['pivot']['remark'] ?? null,
                 ],
             ];
-                        })
-        
-        ]);
+        });
+
+        return response()->json($approvers);
     }
-    public function getApprovers($id)
-    {
-    $data = $this->service->getApplicationData($id);
-
-    $approvers = $data['approvers']->map(function ($item) {
-        return [
-            'id' => $item['id'] ?? null,
-            'name' => $item['name'] ?? '(Unknown)',
-            'email' => $item['email'] ?? null,
-            'pivot' => [
-                'role' => $item['pivot']['role'] ?? null,
-                'sequence' => $item['pivot']['sequence'] ?? null,
-                'status' => $item['pivot']['status'] ?? null,
-                'acted_at' => $item['pivot']['acted_at'] ?? null,
-                'remark' => $item['pivot']['remark'] ?? null,
-            ],
-        ];
-    });
-
-    return response()->json($approvers);
-   }
 }
-

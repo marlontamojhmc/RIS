@@ -1,11 +1,13 @@
 <template>
   <form @submit.prevent="submitForm" class="p-6 max-w-6xl mx-auto bg-white border border-gray-200 shadow-sm space-y-6">
-    
+    <pre>
+    {{ page }}
+    </pre>
     <!-- Header -->
     <div class="flex justify-between items-start border-b pb-4">
       <div class="space-y-1">
         <input v-model="form.companyName" disabled placeholder="John Hay" class="border-b border-gray-300 font-bold text-xl uppercase w-48" />
-        <input v-model="form.title" placeholder="Gate Clearance" class="border-b border-gray-300 font-extrabold text-2xl uppercase w-full" />
+        <input v-model="form.title" placeholder="Gate Clearance" class="border-b border-gray-300 font-extrabold text-2xl uppercase w-64" />
       </div>
       <div class="text-right text-sm space-y-1">
         <div>
@@ -141,7 +143,7 @@
       <select v-model="form.selectedFeeId" class="border-b border-gray-300 w-full p-2">
         <option disabled value="">-- Select Validity --</option>
         <option v-for="fee in permitClearanceFees" :key="fee.id" :value="fee.id">
-         {{ fee.validity }} / {{ fee.title }}  
+          {{ fee.title }} {{ fee.validity }} 
         </option>
       </select>
     </div>
@@ -199,7 +201,12 @@
 
 <script setup>
 import { reactive, ref, defineProps, watch } from 'vue'
+import { usePage } from '@inertiajs/vue3'
 import axios from 'axios'
+import { useToast } from 'vue-toastification'
+
+const page = usePage();
+const toast = useToast()
 
 const props = defineProps({
   application:{ type: Array, required: true},
@@ -207,7 +214,8 @@ const props = defineProps({
   application_id:{type:Number, required: true},
   approver_group_id:{type:Number, required:true},
   application_form_number:{type:Number, required: true},
-  permitClearanceFees: { type: Array, required: true }
+  permitClearanceFees: { type: Array, required: true },
+  form_id: {type:Number, required:true},
 })
 const saving = ref(false)
 const showModal = ref(false)
@@ -223,6 +231,7 @@ const form = reactive({
   title: props.application.form_title,
   approver_group_id: props.approver_group_id,
   documentCode: '',
+  form_id: props.form_id,
   controlNo: '',
   gcNo:props.application_form_number,
   clearanceTo: props.user.name,
@@ -312,7 +321,8 @@ const submitForm = async () => {
     const res = await axios.post('/permits/gatepass/submit', formData, {
       headers: { 'Content-Type': 'multipart/form-data' }
     })
-    console.log('Form submitted', res.data)
+    toast.success(`${form.title} Permit submitted successfully!`)
+    
   } catch (err) {
     console.error(err)
     alert('Submission failed')

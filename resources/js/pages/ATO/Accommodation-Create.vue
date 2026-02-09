@@ -6,16 +6,25 @@ import AppLayout from '@/layouts/AppLayout.vue'
 import Input from '@/components/ui/input/Input.vue'
 import Label from '@/components/ui/label/Label.vue'
 import Button from '@/components/ui/button/Button.vue'
+import { useToast } from 'vue-toastification'
+import { usePage } from '@inertiajs/inertia-vue3'
+
+const toast = useToast()
+const page = usePage()
 
 // Props
 const props = defineProps({
   application_id: { type: String, required: true },
-  approver_group_id: { type: String, required: true },
-  application_form_number: { type: String, required: true }
+  approver_group_id: { type: Number, required: true },
+  application_form_number: { type: String, required: true },
+  application_group_id:{type: Number,required:true},
+  form_id:{ type:Number, required:true},
+  
 })
 
 // Form
 const form = useForm({
+  form_id: props.form_id,
   application_id: props.application_id,
   approver_group_id: props.approver_group_id,
   application_form_number: props.application_form_number,
@@ -88,7 +97,15 @@ function submitForm() {
   form.post('/ATO', {
     onStart: () => loading.value = true,
     onFinish: () => loading.value = false,
-    onSuccess: () => form.reset()
+    onSuccess: (page) => {
+      if (page.props.message) {
+        toast.success(page.props.message) // ← pass the message here
+      }
+      form.reset() // resets the form
+    },
+    onError: (errors) => {
+      toast.error('Submission failed')
+    }
   })
 }
 </script>
@@ -96,7 +113,7 @@ function submitForm() {
 <template>
   <AppLayout>
     <div class="p-6 space-y-8">
-
+   
       <h3 class="text-xl font-bold text-center">
         Authority to Operate (ATO) Application Form
       </h3>

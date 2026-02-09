@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Storage;
 use App\Models\User;
 use App\Http\Requests\StoreAtoApplicationRequest;
 use App\Models\ATO\AtoPricing;
+use App\MOdels\ATO\AtoAccommodation;
 
 class ATOController extends Controller
 {
@@ -47,33 +48,69 @@ class ATOController extends Controller
     public function store(Request $request, UploadService $uploadService)
 {   
     $userId = auth()->id();
-    $ato = AtoApplication::create([
-        'application_id' => $request->application_id,
-        'form_number' => $request->application_form_number,
-        'application_date' => now(),
-        'application_type' => $request->applicationType,
-        'business_structure' => $request->businessStructure,
-        'trades_name' => $request->businessProfile['businessName'],
-        'parent_company' => $request->businessProfile['parentCompany'],
-        'taxpayer_name' => $request->businessProfile['taxpayerName'],
-        'TIN' => $request->businessProfile['TIN'],
-        'PrimaryLine' => $request->pcic['primaryLine'],
-        'SecondaryLine' => $request->pcic['secondaryLine'],
-        'nature_of_contract' => $request->natureOfContract,
-        'pcic_primary_line' => $request->pcic['PCICPrimary'],
-        'pcic_secondary_line' => $request->pcic['PCICSecondary'],
-        'pcic_Primary_email' => $request->pcic['emailPrimary'],
-        'pcic_Secondary_email' => $request->pcic['emailSecondary'],
-        'pcic_location' => $request->pcic['location'],
-        'pcic_office_address' => $request->pcic['officeAddress'],
-        'pcic_contact_person' => $request->pcic['contactPerson'],
-        'pcic_contact_number' => $request->pcic['contactNumber'],
-        'user_id' => $userId,
-        'price'=> $request->price,
-        'ato_business_enterprise_classification_id' => $request->Enterprise,
-        'ato_business_sector_classification_id' => $request->Sector,
-
+    if($request->form_id ===9){
+       $atoAccommodation = AtoAccommodation::create([
+    'form_id'                          => $request->form_id,
+    'application_id'                   => $request->application_id,
+    'date_of_application'              => $request->date_of_application,
+    'registered_business_name'         => $request->registered_business_name,
+    'application_type'                 => $request->applicationType,
+    'unit'                             => $request->unit,
+    'price'                            => $request->price,
+    'location_of_units'                => $request->location_of_units,
+    'business_owner_name'              => $request->business_owner_name,
+    'contact_numbers'                  => $request->contact_numbers,
+    'official_email'                   => $request->official_email,
+    'authorized_representative_name'   => $request->authorized_representative_name,
+    'authorized_representative_contact'=> $request->authorized_representative_contact,
+]);
+  foreach ($request->caretakers as $caretaker) {
+    $atoAccommodation->caretakers()->create([
+        'application_id' => $atoAccommodation->application_id,
+        'name' => $caretaker['name'],
+        'role' => $caretaker['role'],
     ]);
+}
+ApplicationForApproval::create([
+        'application_id' => $request->application_id,
+        'approver_group_id' => $request->approver_group_id,
+        'form_number' => $request->application_form_number,
+        'status' => 'Pending',
+    ]);
+    return Inertia::render('ATO/Accommodation-Create', [
+    'message' => 'Submitted successfully'
+]);
+
+
+    }else{
+        $ato = AtoApplication::create([
+            'application_id' => $request->application_id,
+            'form_number' => $request->application_form_number,
+            'application_date' => now(),
+            'application_type' => $request->applicationType,
+            'business_structure' => $request->businessStructure,
+            'trades_name' => $request->businessProfile['businessName'],
+            'parent_company' => $request->businessProfile['parentCompany'],
+            'taxpayer_name' => $request->businessProfile['taxpayerName'],
+            'TIN' => $request->businessProfile['TIN'],
+            'PrimaryLine' => $request->pcic['primaryLine'],
+            'SecondaryLine' => $request->pcic['secondaryLine'],
+            'nature_of_contract' => $request->natureOfContract,
+            'pcic_primary_line' => $request->pcic['PCICPrimary'],
+            'pcic_secondary_line' => $request->pcic['PCICSecondary'],
+            'pcic_Primary_email' => $request->pcic['emailPrimary'],
+            'pcic_Secondary_email' => $request->pcic['emailSecondary'],
+            'pcic_location' => $request->pcic['location'],
+            'pcic_office_address' => $request->pcic['officeAddress'],
+            'pcic_contact_person' => $request->pcic['contactPerson'],
+            'pcic_contact_number' => $request->pcic['contactNumber'],
+            'user_id' => $userId,
+            'price'=> $request->price,
+            'ato_business_enterprise_classification_id' => $request->Enterprise,
+            'ato_business_sector_classification_id' => $request->Sector,
+
+        ]);
+    }
 
     ApplicationForApproval::create([
         'application_id' => $request->application_id,

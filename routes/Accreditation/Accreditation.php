@@ -2,8 +2,8 @@
 use App\Http\Controllers\Accreditation\AccreditationController;
 
 Route::middleware(['auth'])->group(function () {
-    Route::prefix('accreditation')->group(function () {
-    Route::get('/index', [AccreditationController::class,'index']);
+    Route::prefix('accreditations')->group(function () {
+    Route::get('/', [AccreditationController::class,'index']);
     });
     Route::post('/accreditation/store', [AccreditationController::class, 'store'])
          ->name('accreditation.store');

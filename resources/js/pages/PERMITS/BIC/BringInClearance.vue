@@ -200,6 +200,9 @@
 <script setup>
 import { reactive, ref, defineProps, watch } from 'vue'
 import axios from 'axios'
+import { useToast } from 'vue-toastification'
+
+const toast = useToast()
 
 const props = defineProps({
   application:{ type: Array, required: true},
@@ -312,6 +315,7 @@ const submitForm = async () => {
     const res = await axios.post('/permits/gatepass/submit', formData, {
       headers: { 'Content-Type': 'multipart/form-data' }
     })
+    toast.success(`${form.title} Permit submitted successfully!`)
     console.log('Form submitted', res.data)
   } catch (err) {
     console.error(err)

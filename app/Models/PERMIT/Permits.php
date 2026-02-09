@@ -6,16 +6,18 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Locator\ApplicationModel;
 use App\Models\PERMIT\PermitClearanceFee;
+use App\Models\Form; // make sure you import the Form model
 
-class GatePass extends Model
+class Permits extends Model
 {
     use HasFactory;
 
-    // Specify table (optional if model name matches table)
-    protected $table = 'gate_pass';
+    // Table name
+    protected $table = 'permits';
 
-    // Fillable fields for mass assignment
+    // Fillable fields
     protected $fillable = [
+        'form_id',
         'locator_name',
         'validity',
         'IS_number',
@@ -28,7 +30,7 @@ class GatePass extends Model
         'option_id',
     ];
 
-    // Cast fields to proper types
+    // Casts
     protected $casts = [
         'price' => 'decimal:2',
         'delivery_date' => 'date',
@@ -36,15 +38,21 @@ class GatePass extends Model
         'validity' => 'date',
     ];
 
-    // Relationship to the application
+    // Relationship to ApplicationModel
     public function application()
     {
         return $this->belongsTo(ApplicationModel::class, 'application_id');
     }
 
-    // Relationship to the selected permit/fee
+    // Relationship to PermitClearanceFee
     public function option()
     {
-        return $this->belongsTo(\App\Models\PERMIT\PermitClearanceFee::class, 'option_id');
+        return $this->belongsTo(PermitClearanceFee::class, 'option_id');
+    }
+
+    // Relationship to Form
+    public function form()
+    {
+        return $this->belongsTo(Form::class, 'form_id');
     }
 }
