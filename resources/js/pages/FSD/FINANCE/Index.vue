@@ -12,14 +12,15 @@ const p = defineProps({
 const form = useForm({
   form_id:'',
   application_form_id:'',
-  application_form_type:'',
+  form_type:'',
 })
 
 
 const handleView = (application)=>{
+     console.log(application)
      form.form_id= application.application.form_id
      form.application_form_id= application.application_form_id
-     form.application_form_type = application.application.form_type
+     form.form_type = application.application.form_type
      form.post('/fsd/finance')
   //router.visit(`/fsd/finance/${application.application_form_id}/show/${application.application.form_type}`)
 }
@@ -34,7 +35,7 @@ const handleDelete =(application) =>{
 <template>
     <FinanceAppSidebarLayout>
   <div>
-    
+   
     <h1 class="text-2xl font-bold text-center mb-4">Finance Dashboard</h1>
     
     <FinanceApplicationTable

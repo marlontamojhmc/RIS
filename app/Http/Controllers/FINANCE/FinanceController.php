@@ -42,8 +42,11 @@ class FinanceController extends Controller
         return Inertia::render('FSD/FINANCE/Accreditation/Show2',[
             'applications'=> $applications,
         ]);
-    }elseif($form_type === 'ATO'){
+        //form_id # 8 is Enterprise Primary/Secondary form_type ATO
+        //form_id # 9 is Accommodation Provider form_type ATO
+    }elseif($form_type === 'ATO' ){
         $applications = ApplicationModel::with('atoApplication')->findOrFail($id);
+        
         return Inertia::render('FSD/FINANCE/ATO/Show',[
             'applications' =>$applications,
         ]);
