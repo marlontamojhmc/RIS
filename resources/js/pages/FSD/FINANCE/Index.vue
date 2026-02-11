@@ -1,5 +1,6 @@
 <script setup>
-import { router } from '@inertiajs/vue3'
+import { ref } from 'vue';
+import { router, useForm } from '@inertiajs/vue3'
 import FinanceAppSidebarLayout from '@/layouts/Finance/FinanceAppsidebarLayout.vue';
 import FinanceApplicationTable from './FinanceComponents/FinanceApplicationTable.vue';
 const p = defineProps({
@@ -8,9 +9,19 @@ const p = defineProps({
       required: true
  }
 })
+const form = useForm({
+  form_id:'',
+  application_form_id:'',
+  application_form_type:'',
+})
+
+
 const handleView = (application)=>{
-  //console.log('finance:',application.application.form_type)
-  router.visit(`/fsd/finance/${application.application_form_id}/show/${application.application.form_type}`)
+     form.form_id= application.application.form_id
+     form.application_form_id= application.application_form_id
+     form.application_form_type = application.application.form_type
+     form.post('/fsd/finance')
+  //router.visit(`/fsd/finance/${application.application_form_id}/show/${application.application.form_type}`)
 }
 const handleEdit = (application) =>{
   console.log(application)

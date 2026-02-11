@@ -1,8 +1,6 @@
 <template>
   <form @submit.prevent="submitForm" class="p-6 max-w-6xl mx-auto bg-white border border-gray-200 shadow-sm space-y-6">
-    <pre>
-    {{ page }}
-    </pre>
+    
     <!-- Header -->
     <div class="flex justify-between items-start border-b pb-4">
       <div class="space-y-1">

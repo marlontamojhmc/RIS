@@ -29,7 +29,7 @@ class OsacController extends Controller
       return Inertia::render('sezad/OSAC/Create',[]);
    }
    public function show($id)
-   {
+   { dd($id);
       $user= auth()->user();
             $application = ApplicationModel::with(['articleDetails', 'uploads', 'options','selections','approval'])
                            ->where('id', $id)

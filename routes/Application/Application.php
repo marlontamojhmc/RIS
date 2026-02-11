@@ -15,7 +15,7 @@ Route::middleware(['auth'])
             dd($application);
         });
         Route::get('/permits', function(){
-            return Inertia::render('Permiit/GatePass',[]);
+            return Inertia::render('PERMITS/GP/GatePass',[]);
         })->name('app.index');
         Route::get('/attach', function(){
            $accreditation = ApplicationModel::with('uploads')

@@ -11,6 +11,8 @@ use App\Models\ProvisionalGrant\ProvisionalGrant;
 use App\Models\PERMIT\permitClearanceFee;
 use App\Models\ATO\ATOCaretaker;
 
+
+
 class ApplicationModel extends Model
 {
     use HasFactory;
@@ -110,7 +112,7 @@ public function getMeta(string $key, mixed $default = null, bool $asArray = true
 }
   public function atoApplication()
     {
-        return $this->hasOne(AtoApplication::class);
+        return $this->hasOne(AtoApplication::class, 'application_id');
     }
 //     public function options()
 // {
@@ -130,7 +132,7 @@ public function userAppSelection()
         'application_id'
     );
 }
-public function accreditation()
+public function accreditations()
 {
     return $this->hasOne(Accreditation::class, 'application_id');
 }
@@ -154,5 +156,9 @@ public function permitClearanceFee()
 public function caretakers()
 {
     return $this->hasMany(ATOCaretaker::class, 'application_id');
+}
+public function permits()
+{
+    return $this->hasMany(\App\Models\PERMIT\Permits::class, 'application_id');
 }
 }

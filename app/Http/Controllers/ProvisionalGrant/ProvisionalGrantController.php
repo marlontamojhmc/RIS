@@ -12,9 +12,11 @@ use Illuminate\Support\Facades\Log;
 use App\Models\Accreditation\BusinessEnterpriseClassifications;
 
 class ProvisionalGrantController extends Controller
-{
+{    
     public function store(Request $request)
-{    $Price = BusinessEnterpriseClassifications::find($request->classification);
+{   
+    $Price = BusinessEnterpriseClassifications::find($request->classification);
+    
     $request->merge([
         'classification_id' => $request->classification,
     ]);
@@ -36,7 +38,7 @@ class ProvisionalGrantController extends Controller
         'privacyConsent' => 'required|in:true,false,1,0',
         'files.*' => 'file|mimes:pdf,jpg,jpeg,png|max:5120',
     ]);
-
+     
     // Log validated data safely
     
 
@@ -82,12 +84,14 @@ class ProvisionalGrantController extends Controller
             'approver_group_id' => $validated['application_group_id'],
             'form_number' => $validated['form_number'],
             'status' => 'Pending',
+            'created_at' =>now(),
+            'updated_at' =>now(),
         ]);
     });
 
-    // return redirect()
-    //     ->route('fsd.finance.index')
-    //     ->with('success', 'Provisional Grant submitted successfully');
+    return redirect()
+        ->route('fsd.finance.index')
+        ->with('success', 'Provisional Grant submitted successfully');
 }
 
     public function all()

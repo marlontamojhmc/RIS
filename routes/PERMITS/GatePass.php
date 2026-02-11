@@ -1,5 +1,5 @@
 <?php
-use App\Http\Controllers\PERMITS\GatePassController;
+use App\Http\Controllers\PERMITS\GP\GatePassController;
 
 
 Route::prefix('permits')->middleware(['auth'])->group(function () {

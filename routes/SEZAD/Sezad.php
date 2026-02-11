@@ -23,6 +23,7 @@ use App\Http\Controllers\SEZAD\RO\RegistrationOfficerController;
       //FSD
       Route::prefix('fsd')->group(function(){
             //FINANCE
-        Route::get('/finance',[FinanceController::class, 'index'])->name('finance.index');
-        Route::get('/finance/{id}/show/{form_type}', [FinanceController::class, 'show'])->name('finance.show');
-      })->name('fsd');
+        Route::get('/finance',[FinanceController::class, 'index'])->name('fsd.finance.index');
+        //Route::get('/finance/{id}/show/{form_type}', [FinanceController::class, 'show'])->name('finance.show')->name('fsd.finance.show');
+        Route::post('/finance', [FinanceController::class, 'show'])->name('finance.show')->name('fsd.finance2.show');
+      });

@@ -86,8 +86,8 @@ const handleApprove = () => {
 </script>
 
 <template> 
-<FinanceAppsidebarLayout>
-  <FinanceViewer :application="props.application" :group="props.group" />
+<!-- <FinanceAppsidebarLayout>
+  <FinanceViewer :application="props.application" :group="props.group" /> -->
 
   <!-- Display Price -->
   <p class="text-md text-gray-800 font-bold mt-4">
@@ -95,7 +95,7 @@ const handleApprove = () => {
   </p>
 
   <!-- ACTION BAR -->
-  <div v-if="props.approver_status === 'Pending' || props.Prevapprover.status === 'Approved'  " class="flex justify-center gap-4 mt-8">
+  <!-- <div v-if="props.approver_status === 'Pending' || props.Prevapprover.status === 'Approved'  " class="flex justify-center gap-4 mt-8"> -->
     <Button
       v-if="showApprove"
       variant="default"
@@ -169,5 +169,5 @@ const handleApprove = () => {
       </div>
     </div>
   </div>
-</FinanceAppsidebarLayout>
+<!-- </FinanceAppsidebarLayout> -->
 </template>

@@ -23,10 +23,10 @@ const sidebarNavItems: NavItem[] = [
     //     title: 'Two-Factor Auth',
     //     href: show(),
     // },
-    // {
-    //     title: 'Appearance',
-    //     href: editAppearance(),
-    // },
+    {
+        title: 'Appearance',
+        href: editAppearance(),
+    },
 ];
 
 const currentPath = typeof window !== undefined ? window.location.pathname : '';

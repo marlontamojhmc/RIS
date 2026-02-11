@@ -66,8 +66,6 @@ class UserDetailsController extends Controller
 
     public function store(Request $request)
     {
-        //dd($request);
-        //dd($request->all());
         DB::beginTransaction();
         $validated = $request->validate([
             'employee_id'   => 'required|string|max:50',
