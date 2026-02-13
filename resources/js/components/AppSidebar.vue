@@ -5,7 +5,6 @@
 import NavFooter from '@/components/NavFooter.vue';
 import NavMain from '@/components/NavMain.vue';
 import NavUser from '@/components/NavUser.vue';
-
 import {
     Sidebar,
     SidebarContent,
@@ -16,24 +15,24 @@ import {
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
 
-import { usersDashboard, sezadDashboard } from '@/routes';
-import { Link, usePage } from '@inertiajs/vue3';
-import type { PageProps } from '@inertiajs/core';
-import AppLogo from './AppLogo.vue';
+import { sezadDashboard, usersDashboard } from '@/routes';
 import type { NavItem } from '@/types';
+import type { PageProps } from '@inertiajs/core';
+import { Link, usePage } from '@inertiajs/vue3';
+import AppLogo from './AppLogo.vue';
 
 import {
-    Users,
     BookOpen,
+    Clock,
+    Eye,
     Folder,
     LayoutGrid,
     SquareUserRound,
-    Clock,
-    Eye,
+    Users,
 } from 'lucide-vue-next';
 
-import { ref, onMounted } from 'vue';
 import * as Ably from 'ably';
+import { onMounted, ref } from 'vue';
 
 /* ===============================
    TYPES
@@ -104,17 +103,15 @@ const roles = {
         userDetails.department_id === null &&
         userDetails.user_function_id === null,
 
-    Locator: userDetails.role_id === 3 &&
-             page.props.user_details?.business_type?.id === 4,
-             
-     
+    Locator:
+        userDetails.role_id === 3 &&
+        page.props.user_details?.business_type?.id === 4,
 
     Cco:
-             userDetails.role_id === 2 &&
-             userDetails.permission_id === 2 &&
-             userDetails.user_function_id === null &&
-             userDetails.department_id === 12
-
+        userDetails.role_id === 2 &&
+        userDetails.permission_id === 2 &&
+        userDetails.user_function_id === null &&
+        userDetails.department_id === 12,
 };
 
 /* ===============================
@@ -131,63 +128,117 @@ const navConfig: Record<string, NavItem[]> = {
         { title: 'SEZAD', href: sezadDashboard(), icon: Folder },
         { title: 'BDD Created Users', href: '/bdd', icon: BookOpen },
         { title: 'Locator', href: '/locator', icon: LayoutGrid },
-        { title: 'Create Application', href: '/loctr/applications/create', icon: SquareUserRound },
-        { title: 'Pending Application', href: '/loctr/applications/pending', icon: Clock },
-        { title: 'Approved Applications', href: '/loctr/applications/approved', icon: Eye },
+        {
+            title: 'Create Application',
+            href: '/loctr/applications/create',
+            icon: SquareUserRound,
+        },
+        {
+            title: 'Pending Application',
+            href: '/loctr/applications/pending',
+            icon: Clock,
+        },
+        {
+            title: 'Approved Applications',
+            href: '/loctr/applications/approved',
+            icon: Eye,
+        },
     ],
     sezadManager: [
         { title: 'SEZAD Dashboard', href: '/sezad', icon: LayoutGrid },
     ],
     accreditationSpsnbe: [
-        { title: 'Service Provider / Supplier', href: '/dashboard', icon: LayoutGrid },
+        {
+            title: 'Service Provider / Supplier',
+            href: '/dashboard',
+            icon: LayoutGrid,
+        },
     ],
     accreditationCeoc: [
-        { title: 'Commercial Event Operator', href: '/dashboard', icon: LayoutGrid },
+        {
+            title: 'Commercial Event Operator',
+            href: '/dashboard',
+            icon: LayoutGrid,
+        },
     ],
     accreditationTfbosta: [
-        { title: 'Trade Fairs & Bazaars', href: '/dashboard', icon: LayoutGrid },
+        {
+            title: 'Trade Fairs & Bazaars',
+            href: '/dashboard',
+            icon: LayoutGrid,
+        },
     ],
     accreditationVme: [
-        { title: 'Vendor & Micro Entrepreneurs', href: '/dashboard', icon: LayoutGrid },
+        {
+            title: 'Vendor & Micro Entrepreneurs',
+            href: '/dashboard',
+            icon: LayoutGrid,
+        },
     ],
     accreditationProvitional: [
         { title: 'Provisional Grant', href: '/dashboard', icon: LayoutGrid },
     ],
     locator: [
-        { title: 'Create Application', href: '/loctr/applications/create', icon: LayoutGrid },
-        { title: 'Apply For ATO', href: '/loctr/applications/create', icon: LayoutGrid },
+        {
+            title: 'Create Application',
+            href: '/loctr/applications/create',
+            icon: LayoutGrid,
+        },
+        {
+            title: 'Apply For ATO',
+            href: '/loctr/applications/create',
+            icon: LayoutGrid,
+        },
         { title: 'Vendor Requests', href: '/VendorVerify', icon: LayoutGrid },
         { title: 'My Vendors', href: '/MyVendors', icon: LayoutGrid },
-        { title: 'My Service Providers', href: '/MyServiceProviders', icon: Users },
-        { title: 'Service Provider Requests', href: '/serviceProviderRequest', icon: Users },
-       
+        {
+            title: 'My Service Providers',
+            href: '/MyServiceProviders',
+            icon: Users,
+        },
+        {
+            title: 'Service Provider Requests',
+            href: '/serviceProviderRequest',
+            icon: Users,
+        },
     ],
     vendor: [
         { title: 'Vendor Dashboard', href: '/', icon: LayoutGrid },
         { title: 'Apply for Accreditation', href: '/', icon: Eye },
-        { title: 'Apply for Permit', href: '/loctr/applications/create', icon: LayoutGrid },
+        {
+            title: 'Apply for Permit',
+            href: '/loctr/applications/create',
+            icon: LayoutGrid,
+        },
     ],
     serviceProvider: [
         { title: 'Service Provider', href: '/', icon: LayoutGrid },
         { title: 'Accreditation', href: '/', icon: LayoutGrid },
-        { title: 'Apply for Permit', href: '/loctr/applications/create', icon: LayoutGrid },
+        {
+            title: 'Apply for Permit',
+            href: '/loctr/applications/create',
+            icon: LayoutGrid,
+        },
     ],
     osac: [
         { title: 'OSAC Dashboard', href: '/osac/dashboard', icon: LayoutGrid },
     ],
-    cco: [
-        {title: 'Custom Officer', href: '#', icon: LayoutGrid},
-    ],
+    cco: [{ title: 'Custom Officer', href: '#', icon: LayoutGrid }],
 };
 
 // Push nav items based on roles & permissions
 if (permissions.isAdmin) mainNavItems.push(...navConfig.admin);
 else if (permissions.sezadManager) mainNavItems.push(...navConfig.sezadManager);
-else if (permissions.accreditationSpsnbe) mainNavItems.push(...navConfig.accreditationSpsnbe);
-else if (permissions.accreditationCeoc) mainNavItems.push(...navConfig.accreditationCeoc);
-else if (permissions.accreditationTfbosta) mainNavItems.push(...navConfig.accreditationTfbosta);
-else if (permissions.accreditationVme) mainNavItems.push(...navConfig.accreditationVme);
-else if (permissions.accreditationProvitional) mainNavItems.push(...navConfig.accreditationProvitional);
+else if (permissions.accreditationSpsnbe)
+    mainNavItems.push(...navConfig.accreditationSpsnbe);
+else if (permissions.accreditationCeoc)
+    mainNavItems.push(...navConfig.accreditationCeoc);
+else if (permissions.accreditationTfbosta)
+    mainNavItems.push(...navConfig.accreditationTfbosta);
+else if (permissions.accreditationVme)
+    mainNavItems.push(...navConfig.accreditationVme);
+else if (permissions.accreditationProvitional)
+    mainNavItems.push(...navConfig.accreditationProvitional);
 else if (roles.Locator) mainNavItems.push(...navConfig.locator);
 else if (roles.Vendor) mainNavItems.push(...navConfig.vendor);
 else if (roles.ServiceProvider) mainNavItems.push(...navConfig.serviceProvider);
@@ -224,13 +275,13 @@ function clearNotification() {
     <Sidebar collapsible="icon" variant="inset">
         <!-- HEADER -->
         <SidebarHeader>
-            
             <SidebarMenu>
                 <SidebarMenuItem>
                     <SidebarMenuButton size="lg" as-child>
                         <Link href="/">
                             <AppLogo class="h-8 w-auto" />
                         </Link>
+                        x
                     </SidebarMenuButton>
                 </SidebarMenuItem>
             </SidebarMenu>
@@ -240,7 +291,7 @@ function clearNotification() {
         <SidebarContent>
             <NavMain :items="mainNavItems" />
         </SidebarContent>
-             
+
         <!-- FOOTER -->
         <SidebarFooter>
             <NavFooter :items="footerNavItems" />
@@ -251,7 +302,6 @@ function clearNotification() {
             />
         </SidebarFooter>
     </Sidebar>
-      
+
     <slot />
-    
 </template>
