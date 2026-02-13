@@ -19,19 +19,19 @@ class FinanceController extends Controller
     public function index(){
         $user = auth()->user();
     
-                $applications = ApproverGroupApprover::with('application','application.accreditations','application.user','application.approval')
+                $applications = ApproverGroupApprover::with('application','application.accreditations','application.user','application.ApproverGroupApprovers.approver')
                                 ->where('approver_id', auth()->id())
                                 ->orderBy('id', 'desc')
-                                ->first();
-             dd($applications);
+                                ->get();
+                    
+             //dd($applications);
                 $approvers = ApproverGroupApprover::where('approver_group_id',$applications[0]->approver_group_id)
                 ->where('application_form_id',$applications[0]->application_form_id)             
                 ->get();
 
-                  dd($approvers);
+                 // dd($approvers);
         return Inertia::render('FSD/FINANCE/Index',[
                                 'applications'=> $applications,
-                                 ''
                                 ]);
     }
     

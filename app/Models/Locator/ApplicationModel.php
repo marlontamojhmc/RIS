@@ -72,7 +72,7 @@ class ApplicationModel extends Model
      */
     public function approval()
     {
-        return $this->hasOne(\App\Models\Locator\ApplicationForApproval::class, 'application_id');
+        return $this->hasMany(\App\Models\Locator\ApplicationForApproval::class, 'application_id');
     }
     
     public function meta()
@@ -160,5 +160,13 @@ public function caretakers()
 public function permits()
 {
     return $this->hasMany(\App\Models\PERMIT\Permits::class, 'application_id');
+}
+public function approverGroupApprovers()
+{
+    return $this->hasMany(
+        \App\Models\Locator\ApproverGroupApprover::class,
+        'application_form_id',
+        'id',
+    );
 }
 }

@@ -46,4 +46,5 @@ class ApproverGroupApprover extends Pivot
 {
     return $this->belongsTo(ApplicationModel::class, 'application_form_id');
 }
+     
 }
