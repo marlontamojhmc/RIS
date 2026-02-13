@@ -22,7 +22,7 @@ const handleView = (application)=>{
      form.application_form_id= application.application_form_id
      form.form_type = application.application.form_type
      form.post('/fsd/finance')
-  //router.visit(`/fsd/finance/${application.application_form_id}/show/${application.application.form_type}`)
+ 
 }
 const handleEdit = (application) =>{
   console.log(application)
@@ -44,7 +44,7 @@ const handleDelete =(application) =>{
       @edit="handleEdit"
       @delete="handleDelete"
     />
-    
+   <pre> {{ p.applications }}</pre>
   </div>
-    </FinanceAppSidebarLayout>
+  </FinanceAppSidebarLayout>
 </template>
