@@ -60,6 +60,13 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+    public function hasApprovedAto()
+{
+    return $this->applications()
+        ->where('form_type', 'ATO')
+        ->where('status', 'Approved')
+        ->exists();
+}
     public function applications()
     {
     return $this->hasMany(ApplicationModel::class, 'user_id');
