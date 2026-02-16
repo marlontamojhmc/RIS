@@ -82,7 +82,7 @@ class HandleInertiaRequests extends Middleware
 
             // 📝 Applications
             'applications' => $applications,
-            'is_ATO_approved'=>$user->>hasApprovedAto(),
+            'is_ATO_approved'=>$user->hasApprovedAto(),
             // 🧾 User details (optional)
            'user_details' => $request->user()
     ? $request->user()
