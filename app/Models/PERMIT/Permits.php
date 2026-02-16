@@ -20,6 +20,7 @@ class Permits extends Model
         'form_id',
         'locator_name',
         'validity',
+        'form_type',
         'IS_number',
         'price',
         'delivery_date',

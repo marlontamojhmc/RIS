@@ -198,50 +198,18 @@ watch(selectedDate, (val) => {
                                 Proceed Payment
                             </button>
 
-                            <button
-                                v-show="openPayment"
-                                type="button"
-                                @click="openPaymentFooter(false)"
-                                class="rounded-md bg-destructive text-destructive-foreground transition hover:bg-destructive/90"
-                            >
-                                Cancel
-                            </button>
-                        </div>
-                    </CardContent>
-
-                    <!-- Footer -->
-                    <CardFooter v-show="openPayment" class="flex flex-row">
-                        <div class="flex flex-col">
-                            <div>
-                                <Input
-                                    type="number"
-                                    name="text"
-                                    ref="iSNumber"
-                                    placeholder="Enter IS Number"
-                                />
-                            </div>
-                            <div>
-                                <Input
-                                    type="number"
-                                    name="amount"
-                                    ref="amount"
-                                    placeholder="Amount"
-                                />
-                            </div>
-                        </div>
-                        <div class="flex flex-col">
-                            <div>
-                                <Calendar v-model="selectedDate" />
-                            </div>
-                            <div>
+                    <!-- <Footer>
+                        <CardFooter>
+                            <div class="flex w-full justify-end">
                                 <button
-                                    class="rounded-md bg-primary px-4 py-2 text-white transition hover:bg-primary/90"
+                                    class="rounded bg-blue-600 px-4 py-2 text-white"
+                                    @click="onClose"
                                 >
-                                    Accept Button
+                                    Close
                                 </button>
                             </div>
-                        </div>
-                    </CardFooter>
+                        </CardFooter>
+                    </Footer> -->
                 </Card>
             </Modal>
         </div>
