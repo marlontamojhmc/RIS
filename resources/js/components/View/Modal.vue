@@ -28,12 +28,12 @@ const emit = defineEmits<{
             <!-- Modal Container -->
             <div
                 :class="[
-                    'relative z-10 w-full rounded-2xl bg-white p-6 shadow-xl',
+                    'relative z-10 w-full rounded-2xl bg-white p-3 shadow-xl',
                     maxWidth,
                 ]"
             >
                 <!-- Header -->
-                <div class="mb-4 flex items-center justify-between">
+                <div class="mb-1 flex items-center justify-between">
                     <slot name="header" />
                     <button
                         class="flex h-8 w-8 items-center justify-center rounded-full border text-lg transition hover:bg-gray-100"
@@ -44,7 +44,7 @@ const emit = defineEmits<{
                 </div>
 
                 <!-- Body -->
-                <div class="mb-4">
+                <div class="mb-2">
                     <slot />
                 </div>
 

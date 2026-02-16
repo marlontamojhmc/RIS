@@ -1,24 +1,26 @@
 <script setup lang="ts">
 import { useForm } from '@inertiajs/vue3';
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 
-import Modal from '@/components/View/Modal.vue';
-import FinanceAppSidebarLayout from '@/layouts/Finance/FinanceAppsidebarLayout.vue';
-import FinanceApplicationTable from './FinanceComponents/FinanceApplicationTable.vue';
-
+import { Calendar } from '@/components/ui/calendar';
 import {
     Card,
     CardContent,
     CardDescription,
+    CardFooter,
     CardHeader,
     CardTitle,
 } from '@/components/ui/card';
-
+import { Input } from '@/components/ui/input';
+import Modal from '@/components/View/Modal.vue';
+import FinanceAppSidebarLayout from '@/layouts/Finance/FinanceAppsidebarLayout.vue';
+import FinanceApplicationTable from './FinanceComponents/FinanceApplicationTable.vue';
 const props = defineProps<{
     applications: Record<string, any>;
 }>();
 
 const showModal = ref(false);
+const openPayment = ref(false);
 
 const form = useForm({
     form_title: '',
@@ -30,10 +32,10 @@ const form = useForm({
     locator_name: '',
     approvers: [] as any[],
 });
-
+const selectedDate = ref<Date | undefined>();
 const handleView = (application: any) => {
     const app = application?.application;
-    console.log(application);
+    console.log(app);
     if (!app) return;
 
     const lastApprover = app.approver_group_approvers?.at(-1);
@@ -46,13 +48,13 @@ const handleView = (application: any) => {
     form.control_number = app.control_number ?? '';
     form.locator_name = app.user?.name ?? '';
     form.approvers = app.approver_group_approvers ?? [];
-
     showModal.value = true;
     console.log(form);
 };
 
 const onClose = () => {
     showModal.value = false;
+    openPaymentFooter(false);
 };
 
 const handleEdit = (application: any) => {
@@ -73,6 +75,26 @@ const formatDate = (value: string | null) => {
         day: '2-digit',
     }).format(date);
 };
+const openPaymentFooter = (value: boolean) => {
+    openPayment.value = value;
+};
+
+const statusClasses: Record<string, string> = {
+    approved: 'bg-green-100 text-green-700',
+    pending: 'bg-yellow-100 text-yellow-700',
+    draft: 'bg-blue-100 text-blue-700',
+    cancelled: 'bg-gray-200 text-gray-700',
+    rejected: 'bg-red-100 text-red-700',
+};
+const normalizeStatus = (status: string) => status?.toLowerCase() ?? '';
+
+watch(selectedDate, (val) => {
+    if (val) {
+        form.application_date = val.toISOString().split('T')[0];
+    } else {
+        form.application_date = '';
+    }
+});
 </script>
 
 <template>
@@ -89,11 +111,13 @@ const formatDate = (value: string | null) => {
                 @delete="handleDelete"
             />
 
-            <Modal :show="showModal" @close="onClose">
-                <Card class="relative z-10 w-full max-w-lg">
+            <Modal :show="showModal" @close="onClose" maxWidth="max-w-2xl">
+                <Card
+                    class="relative z-10 max-h-[90vh] w-full overflow-y-auto border-2 border-amber-50"
+                >
                     <!-- Header -->
                     <CardHeader>
-                        <div class="flex items-start justify-between">
+                        <div class="flex w-full items-start justify-between">
                             <div>
                                 <CardTitle>
                                     {{ form.form_title }}
@@ -107,27 +131,72 @@ const formatDate = (value: string | null) => {
                     </CardHeader>
 
                     <!-- Content -->
-                    <CardContent class="space-y-2">
-                        <p>
-                            Application Date:
-                            {{ formatDate(form.application_date) }}
-                        </p>
-                        <p>
-                            Approved Date:
-                            {{ formatDate(form.approved_date) }}
-                        </p>
-                        <p>Control #: {{ form.control_number }}</p>
-                        <p>Locator: {{ form.locator_name }}</p>
+                    <CardContent class="space-y-1">
+                        <div class="flex flex-row justify-between">
+                            <!-- left -->
+                            <div>
+                                <p>
+                                    Application Date:
+                                    {{ formatDate(form.application_date) }}
+                                </p>
+                                <p>
+                                    Approved Date:
+                                    {{ formatDate(form.approved_date) }}
+                                </p>
+                                <p>Control #: {{ form.control_number }}</p>
+                                <p>Locator: {{ form.locator_name }}</p>
+                            </div>
+                            <!-- right -->
+                            <div v-if="form.approvers.length">
+                                <h3
+                                    class="text-base font-semibold text-gray-800"
+                                >
+                                    Approvers
+                                </h3>
 
-                        <div v-if="form.approvers.length">
-                            <h3 class="mt-4 font-semibold">Approvers:</h3>
-                            <ul class="list-disc pl-5">
-                                <li v-for="(a, i) in form.approvers" :key="i">
-                                    {{ a.approver?.name }}
-                                </li>
-                            </ul>
+                                <ol class="space-y-1">
+                                    <li
+                                        v-for="(a, i) in form.approvers"
+                                        :key="i"
+                                        class="flex items-center justify-between rounded-lg border bg-gray-50 px-1 py-1"
+                                    >
+                                        <!-- Left Section -->
+                                        <div class="flex flex-col">
+                                            <span
+                                                class="font-semibold text-gray-900"
+                                            >
+                                                {{ a.approver?.name }}
+                                            </span>
+
+                                            <span class="text-sm text-gray-500">
+                                                {{ a.role }}
+                                            </span>
+                                        </div>
+
+                                        <!-- Right Section (Status Badge) -->
+                                        <span
+                                            class="rounded-full px-3 py-1 text-xs font-medium capitalize"
+                                            :class="
+                                                statusClasses[
+                                                    normalizeStatus(a.status)
+                                                ] || 'bg-gray-100 text-gray-600'
+                                            "
+                                        >
+                                            {{ a.status }}
+                                        </span>
+                                    </li>
+                                </ol>
+                            </div>
                         </div>
-                    </CardContent>
+                        <div class="flex gap-2">
+                            <button
+                                v-show="!openPayment"
+                                type="button"
+                                @click="openPaymentFooter(true)"
+                                class="rounded-md bg-primary px-4 py-2 text-primary-foreground transition hover:bg-primary/90"
+                            >
+                                Proceed Payment
+                            </button>
 
                     <!-- <Footer>
                         <CardFooter>
