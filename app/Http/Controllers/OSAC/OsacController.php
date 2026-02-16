@@ -14,10 +14,16 @@ class OsacController extends Controller
    public function index()
    { 
       $user= auth()->user();
-         $applications = ApproverGroupApprover::with('application')
-                     ->where('approver_id', auth()->id())
-                     ->orderBy('id', 'desc')
-                     ->get();
+      $applications = ApproverGroupApprover::with('application',
+                                                          'application.accreditations',
+                                                          'application.user',
+                                                          'application.ApproverGroupApprovers.approver',
+                                                          'application.articleDetails',
+                                                          'application.selections',
+                                                          'application.uploads')
+                                ->where('approver_id',$user->id)
+                                ->orderBy('id', 'desc')
+                                ->get();
                      
       return Inertia::render('sezad/OSAC/Index',[
          'applications'=> $applications,

@@ -129,17 +129,18 @@ const formatDate = (value: string | null) => {
                         </div>
                     </CardContent>
 
-                    <!-- Footer -->
-                    <!-- <CardFooter>
-                        <div class="flex w-full justify-end">
-                            <button
-                                class="rounded bg-blue-600 px-4 py-2 text-white"
-                                @click="onClose"
-                            >
-                                Close
-                            </button>
-                        </div>
-                    </CardFooter> -->
+                    <!-- <Footer>
+                        <CardFooter>
+                            <div class="flex w-full justify-end">
+                                <button
+                                    class="rounded bg-blue-600 px-4 py-2 text-white"
+                                    @click="onClose"
+                                >
+                                    Close
+                                </button>
+                            </div>
+                        </CardFooter>
+                    </Footer> -->
                 </Card>
             </Modal>
         </div>
