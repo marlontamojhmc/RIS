@@ -7,7 +7,6 @@ use Illuminate\Foundation\Inspiring;
 use Inertia\Middleware;
 use App\Models\Locator\ApplicationModel;
 use Illuminate\Support\Facades\Auth;
-use App\Models\User;
 
 class HandleInertiaRequests extends Middleware
 {
@@ -35,19 +34,12 @@ class HandleInertiaRequests extends Middleware
         [$message, $author] = str(Inspiring::quotes()->random())->explode('-');
 
         // Only fetch applications if the user is authenticated
-        //$applications = User::with('applications')->find($request->user()->id);
-       $user = $request->user();
-        
-     //dd($user->hasApprovedAto());
-        //$applications = User::with('atoApplication')
-
-
-        // ? ApplicationModel::where('user_id', $request->user()->id)
-            //       ->where('form_title', 'ATO')
-            //       ->where('status', 'Approved')
-            //     ->get()
-            //     //->toArray()
-            // : [];
+        $applications = $request->user()
+            ? ApplicationModel::where('user_id', $request->user()->id)
+                ->where('form_title', 'ATO')
+                ->get()
+                ->toArray()
+            : [];
 
         return array_merge(parent::share($request), [
             // 🌐 Global app data
@@ -82,7 +74,7 @@ class HandleInertiaRequests extends Middleware
 
             // 📝 Applications
             'applications' => $applications,
-            'is_ATO_approved'=>$user->hasApprovedAto(),
+
             // 🧾 User details (optional)
            'user_details' => $request->user()
     ? $request->user()

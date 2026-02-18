@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import { useForm } from '@inertiajs/vue3';
-import { ref, watch } from 'vue';
+import { ref } from 'vue';
 
-import { Calendar } from '@/components/ui/calendar';
 import {
     Card,
     CardContent,
@@ -24,7 +23,10 @@ const openPayment = ref(false);
 
 const form = useForm({
     form_title: '',
+    form_type: '',
+    form_id: '',
     application_date: '',
+    application_id: '',
     status: '',
     approved_date: '',
     form_number: '',
@@ -32,25 +34,15 @@ const form = useForm({
     locator_name: '',
     approvers: [] as any[],
 });
-const selectedDate = ref<Date | undefined>();
-const handleView = (application: any) => {
-    const app = application?.application;
-    console.log(app);
-    if (!app) return;
-
-    const lastApprover = app.approver_group_approvers?.at(-1);
-
-    form.form_title = app.form_title ?? '';
-    form.application_date = application.application.created_at ?? '';
-    form.status = app.status ?? '';
-    form.approved_date = lastApprover?.updated_at ?? '';
-    form.form_number = app.form_number ?? '';
-    form.control_number = app.control_number ?? '';
-    form.locator_name = app.user?.name ?? '';
-    form.approvers = app.approver_group_approvers ?? [];
-    showModal.value = true;
-    console.log(form);
-};
+const formPayment = useForm({
+    application_forms_id: '',
+    form_type: '',
+    form_number: '',
+    form_id: '',
+    approver_id: '',
+    is_number: '',
+    amount: '',
+});
 
 const onClose = () => {
     showModal.value = false;
@@ -88,13 +80,37 @@ const statusClasses: Record<string, string> = {
 };
 const normalizeStatus = (status: string) => status?.toLowerCase() ?? '';
 
-watch(selectedDate, (val) => {
-    if (val) {
-        form.application_date = val.toISOString().split('T')[0];
-    } else {
-        form.application_date = '';
-    }
-});
+// Submits
+const handleView = (application: any) => {
+    const app = application?.application;
+    console.log(app);
+    if (!app) return;
+
+    const lastApprover = app.approver_group_approvers?.at(-1);
+    form.application_id = app.id ?? '';
+    form.form_title = app.form_title ?? '';
+    form.form_id = app.form_id ?? '';
+    form.form_type = app.form_type ?? '';
+    form.application_date = application.application.created_at ?? '';
+    form.status = app.status ?? '';
+    form.approved_date = lastApprover?.updated_at ?? '';
+    form.form_number = app.form_number ?? '';
+    form.control_number = app.control_number ?? '';
+    form.locator_name = app.user?.name ?? '';
+    form.approvers = app.approver_group_approvers ?? [];
+    showModal.value = true;
+    console.log(form);
+};
+const submitPayment = () => {
+    formPayment.application_forms_id = form.application_id;
+    formPayment.form_type = form.form_type;
+    formPayment.form_number = form.form_number;
+    formPayment.form_id = form.form_id;
+    formPayment.approver_id = '';
+
+    console.log(formPayment);
+    formPayment.post('accept-payment');
+};
 </script>
 
 <template>
@@ -198,18 +214,51 @@ watch(selectedDate, (val) => {
                                 Proceed Payment
                             </button>
 
-                    <!-- <Footer>
-                        <CardFooter>
-                            <div class="flex w-full justify-end">
+                            <button
+                                v-show="openPayment"
+                                type="button"
+                                @click="openPaymentFooter(false)"
+                                class="rounded-md bg-destructive text-destructive-foreground transition hover:bg-destructive/90"
+                            >
+                                Cancel
+                            </button>
+                        </div>
+                    </CardContent>
+
+                    <!-- Footer -->
+                    <CardFooter v-show="openPayment" class="flex flex-row">
+                        <div class="flex flex-col">
+                            <div>
+                                <Input
+                                    type="number"
+                                    name="text"
+                                    v-model="formPayment.is_number"
+                                    placeholder="Enter IS Number"
+                                />
+                            </div>
+                            <div>
+                                <Input
+                                    type="number"
+                                    name="amount"
+                                    v-model="formPayment.amount"
+                                    placeholder="Amount"
+                                />
+                            </div>
+                        </div>
+                        <div class="flex flex-col">
+                            <!-- <div>
+                                <Calendar v-model="formPayment.payment_date" />
+                            </div> -->
+                            <div>
                                 <button
-                                    class="rounded bg-blue-600 px-4 py-2 text-white"
-                                    @click="onClose"
+                                    class="rounded-md bg-primary px-4 py-2 text-white transition hover:bg-primary/90"
+                                    @click="submitPayment"
                                 >
-                                    Close
+                                    Accept Button
                                 </button>
                             </div>
-                        </CardFooter>
-                    </Footer> -->
+                        </div>
+                    </CardFooter>
                 </Card>
             </Modal>
         </div>

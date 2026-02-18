@@ -9,9 +9,11 @@ use Illuminate\Support\Facades\Gate;
 use App\Models\Locator\ApproverGroupApprover;
 use App\Models\User;
 use App\Models\Locator\ApplicationModel;
+use App\Models\Locator\ApplicationForApproval;
 use App\Models\ApproverGroup;
 use App\Models\Accreditation\Accreditation;
 use App\Models\ATO\AtoApplication;
+use App\Http\Requests\PaymentRequest;
 
 class FinanceController extends Controller
 {
@@ -114,6 +116,27 @@ class FinanceController extends Controller
         // 'price' =>$atoapp?->price,
         
     
+}
+public function payment(PaymentRequest $request){
+    $user = auth()->user();
+    $validated = $request->validated();
+
+    // dd($validated);
+
+    $applicationForApproval = ApplicationForApproval::where('application_id', $validated['application_forms_id'])->first();
+    if (!$applicationForApproval) {
+        abort(404, 'Application for Approval not found');
+    }
+    $applicationForApproval->IS_Number = $validated['is_number'] ?? null;
+    $applicationForApproval->payment_status = 'Paid' ?? null;
+    $applicationForApproval->save();
+
+
+    // update approver group approver status to paid
+    $approver = ApproverGroupApprover::where('application_form_id', $validated['application_forms_id'])
+    ->where('approver_id', $user->id)
+                ->first();
+                dd($approver);
 }
 
 }
