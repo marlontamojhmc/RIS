@@ -26,4 +26,5 @@ use App\Http\Controllers\SEZAD\RO\RegistrationOfficerController;
         Route::get('/finance',[FinanceController::class, 'index'])->name('fsd.finance.index');
         //Route::get('/finance/{id}/show/{form_type}', [FinanceController::class, 'show'])->name('finance.show')->name('fsd.finance.show');
         Route::post('/finance', [FinanceController::class, 'show'])->name('finance.show')->name('fsd.finance2.show');
+        Route::post('/accept-payment', [FinanceController::class, 'payment'])->name('finance.payment');
       });

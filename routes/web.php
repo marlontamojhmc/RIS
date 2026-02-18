@@ -27,6 +27,8 @@ use App\Http\Controllers\VENDOR\LocatorVendorController;
 use App\Http\Controllers\TestPdfController;
 use App\Models\Accreditation\Accreditation;
 use App\Http\Controllers\Applications\ApplicationsController;
+use App\Http\Controllers\FINANCE\FinanceController;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -177,6 +179,10 @@ Route::get('/fee', [ApplicationsController::class,'Fee'])->name('applications.fe
 //--test user->meta-----//
 Route::get('/usermeta',function(){
     $user = auth()->user();
+
+
+
+
 
 if ($user) {
     $user->setMeta('signature', 'uploads/ATO/Letter of Intent');

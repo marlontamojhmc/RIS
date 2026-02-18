@@ -33,7 +33,7 @@ const emit = defineEmits<{
                 ]"
             >
                 <!-- Header -->
-                <div class="mb-1 flex items-center justify-between">
+                <div class="mb-1 flex items-center justify-end">
                     <slot name="header" />
                     <button
                         class="flex h-8 w-8 items-center justify-center rounded-full border text-lg transition hover:bg-gray-100"
