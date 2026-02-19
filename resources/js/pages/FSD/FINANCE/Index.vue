@@ -1,7 +1,4 @@
 <script setup lang="ts">
-import { useForm } from '@inertiajs/vue3';
-import { ref } from 'vue';
-
 import {
     Card,
     CardContent,
@@ -13,7 +10,12 @@ import {
 import { Input } from '@/components/ui/input';
 import Modal from '@/components/View/Modal.vue';
 import FinanceAppSidebarLayout from '@/layouts/Finance/FinanceAppsidebarLayout.vue';
+import { useForm } from '@inertiajs/vue3';
+import { ref } from 'vue';
 import FinanceApplicationTable from './FinanceComponents/FinanceApplicationTable.vue';
+
+import { useToast } from 'vue-toastification';
+const toast = useToast();
 const props = defineProps<{
     applications: Record<string, any>;
 }>();
@@ -101,6 +103,7 @@ const handleView = (application: any) => {
     showModal.value = true;
     console.log(form);
 };
+
 const submitPayment = () => {
     formPayment.application_forms_id = form.application_id;
     formPayment.form_type = form.form_type;
@@ -109,7 +112,30 @@ const submitPayment = () => {
     formPayment.approver_id = '';
 
     console.log(formPayment);
-    formPayment.post('accept-payment');
+    // formPayment.post('accept-payment');
+
+    formPayment.post('accept-payment', {
+        onSuccess: () => {
+            toast.success('Payment processed successfully.');
+            formPayment.reset();
+            openPayment.value = false;
+            const updated = props.applications.find(
+                (a: any) => a.application.id === form.application_id,
+            );
+
+            if (!updated) return;
+
+            const app = updated.application;
+            const lastApprover = app.approver_group_approvers?.at(-1);
+
+            form.status = app.status;
+            form.approved_date = lastApprover?.updated_at ?? '';
+            form.approvers = app.approver_group_approvers ?? [];
+        },
+        onError: () => {
+            toast.error('Something went wrong.');
+        },
+    });
 };
 </script>
 

@@ -136,7 +136,10 @@ public function payment(PaymentRequest $request){
     $approver = ApproverGroupApprover::where('application_form_id', $validated['application_forms_id'])
     ->where('approver_id', $user->id)
                 ->first();
-                dd($approver);
+
+    $approver->status = 'Approved';
+    $approver->save();
+             return redirect()->back()->with('success', 'Payment processed successfully.');
 }
 
 }
