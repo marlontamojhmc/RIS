@@ -14,15 +14,20 @@ use App\Models\ApproverGroup;
 use App\Models\Accreditation\Accreditation;
 use App\Models\ATO\AtoApplication;
 use App\Http\Requests\PaymentRequest;
+use App\Services\AppService;
 
 class FinanceController extends Controller
 {
-    
+    protected $appService;
+    public function __construct(AppService $appService)
+    {
+        $this->appService = $appService;
+    }
     public function index(){
         $user = auth()->user();
     
-                $applications = ApproverGroupApprover::with('application',
-                                                          'application.accreditations',
+        $applications = ApproverGroupApprover::with('application',
+                                                      'application.accreditations',
                                                           'application.user',
                                                           'application.ApproverGroupApprovers.approver',
                                                           'application.articleDetails',

@@ -2,10 +2,12 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\ApproverSets;
 use Illuminate\Http\Request;
 use Illuminate\Foundation\Inspiring;
 use Inertia\Middleware;
 use App\Models\Locator\ApplicationModel;
+use App\Models\Locator\ApproverGroupApprover;
 use Illuminate\Support\Facades\Auth;
 
 class HandleInertiaRequests extends Middleware
@@ -32,22 +34,26 @@ class HandleInertiaRequests extends Middleware
     {
         // Split inspiring quote into message and author
         [$message, $author] = str(Inspiring::quotes()->random())->explode('-');
-
+        $user = Auth::user();
         // Only fetch applications if the user is authenticated
-        $applications = $request->user()
-            ? ApplicationModel::where('user_id', $request->user()->id)
-                ->where('form_title', 'ATO')
-                ->get()
-                ->toArray()
-            : [];
-
+        $applications = //$request->user()
+            ApproverGroupApprover::with('application',
+                                                          'application.accreditations',
+                                                          'application.user',
+                                                          'application.ApproverGroupApprovers.approver',
+                                                          'application.articleDetails',
+                                                          'application.selections',
+                                                          'application.uploads')
+                                ->where('approver_id',$user->id)
+                                ->orderBy('id', 'desc')
+                                ->get();
+    $userRole = ApproverSets::where('user_id', $user->id)->get(['approver_group_id','role','sequence']);
         return array_merge(parent::share($request), [
             // 🌐 Global app data
-            'app' => [
+            'app' => [  
                 'name' => config('app.name'),
                 'quote' => [
-                    'message' => trim($message),
-                    'author'  => trim($author),
+                    'message' => trim($message),//
                 ],
             ],
 
@@ -57,6 +63,8 @@ class HandleInertiaRequests extends Middleware
                     'id' => $request->user()->id,
                     'name' => $request->user()->name,
                     'email' => $request->user()->email,
+                    'role' => $userRole ?? null,
+
                     // add more fields if needed
                 ] : null,
             ],

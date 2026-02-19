@@ -4,6 +4,7 @@ use App\Http\Controllers\SEZAD\SezadManagerController;
 use App\Http\Controllers\CCO\CcoController;
 use App\Http\Controllers\FINANCE\FinanceController;
 use App\Http\Controllers\SEZAD\RO\RegistrationOfficerController;
+use App\Http\Controllers\SEZAD\SEZADController;
 
      Route::prefix('sezad')->group(function () {
         //RO
@@ -18,6 +19,8 @@ use App\Http\Controllers\SEZAD\RO\RegistrationOfficerController;
         //Sezad Manager
          Route::get('/manager', [SezadManagerController::class, 'index'])->name('sezad.manager.index');
          Route::get('/manager/{id}/show', [SezadManagerController::class, 'show'])->name('sezad.manager.show');
+        Route::post('/approve', [SEZADController::class, 'updateStatus'])->name('signatory.approve');
+
      })->name('sezad');
    
       //FSD

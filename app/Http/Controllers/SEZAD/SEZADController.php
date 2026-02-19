@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\Signup\TemporaryUser;
 use App\Models\Signup\BusinessType;
 use App\Models\User;
+use App\Models\Locator\ApproverGroupApprover;
 use App\Models\UserDetails;
 use App\Models\Position;
 use Illuminate\Support\Facades\Log;
@@ -161,4 +162,33 @@ class SEZADController extends Controller
             'user' => $user ?? null,
         ]);
     }
+
+
+
+    // update status of approvers
+    public function updateStatus(Request $request){
+    $user_id = $request->user()->id ?? null;
+    // dd($request);
+    // $validated = $request->validated();
+
+    // dd($validated);
+
+    // $applicationForApproval = ApplicationForApproval::where('application_id', $validated['application_forms_id'])->first();
+    // if (!$applicationForApproval) {
+    //     abort(404, 'Application for Approval not found');
+    // }
+    // $applicationForApproval->IS_Number = $validated['is_number'] ?? null;
+    // $applicationForApproval->payment_status = 'Paid' ?? null;
+    // $applicationForApproval->save();
+
+
+    // update approver group approver status to paid
+    $approver = ApproverGroupApprover::where('application_form_id', $request['application_form_id'])
+    ->where('approver_id', $user_id)
+                ->first();
+
+    $approver->status = 'Approved';
+    $approver->save();
+             return redirect()->back()->with('success', 'Status changed to approved.');
+}
 }
