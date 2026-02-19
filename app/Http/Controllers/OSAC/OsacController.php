@@ -52,4 +52,16 @@ class OsacController extends Controller
                                              'group' => $group,
                                 ]);
    }
+   public function approve(Request $request){
+
+      dd('Approve Osac');
+      //application id
+      $application_id = $request->app_id;
+
+   }
+   //
+   public function Reject(Request $request){
+
+    dd($request->all());
+   }
 }

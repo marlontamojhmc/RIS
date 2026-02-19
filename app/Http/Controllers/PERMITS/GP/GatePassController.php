@@ -10,6 +10,7 @@ use App\Models\PERMIT\Permits;
 use App\Models\PERMIT\PermitClearanceFee;
 use App\Helpers\PermitHelper;
 use App\Services\UploadService;
+use App\Models\Locator\UserApplicationSelection;
 
 
 class GatePassController extends Controller
@@ -31,6 +32,19 @@ class GatePassController extends Controller
 {
     // Decode JSON form sent from Vue
     $form = json_decode($request->input('form'), true);
+    //dd($form);
+    $fee = isset($form['selectedFeeId']) ? PermitClearanceFee::find($form['selectedFeeId']) : null;
+     $validity = $fee ? PermitHelper::computeValidity($fee->value) : now();
+    $userSelectedOption = UserApplicationSelection::create([
+    'user_id' => auth()->id(),
+    'application_id' => $form['application_form_id'],
+    'option_id' => $form['selectedFeeId'],
+    'Expired_at' => $validity->toDateTimeString(),
+    'selected_at' => now(),
+    'amount' => $fee->price,
+]);
+
+
 
     // Validate required fields
     // $request->validate([
@@ -52,25 +66,25 @@ class GatePassController extends Controller
             );
         }
     }
-
+     
     // Compute validity from selected fee
-    $fee = isset($form['selectedFeeId']) ? PermitClearanceFee::find($form['selectedFeeId']) : null;
-    $validity = $fee ? PermitHelper::computeValidity((int)$fee->value) : now();
+     $fee = isset($form['selectedFeeId']) ? PermitClearanceFee::find($form['selectedFeeId']) : null;
+     $validity = $fee ? PermitHelper::computeValidity((int)$fee->value) : now();
 
-    // Create Gate Pass
-    $gatePass = Permits::create([
-        'form_id' => $form['form_id'] ?? null,
-        'locator_name' => $form['clearanceTo'] ?? '',
-        'validity' => $validity->toDateTimeString(),
-        'IS_number' => $form['siNumber'] ?? '',
-        'price' => isset($form['amount']) ? (float) str_replace(['₱', ','], '', $form['amount']) : 0,
-        'form_type' => 'GatePass',
-        'delivery_date' => $form['deliveryDate'] ?? null,
-        'form_number' => $form['gcNo'] ?? '',
-        'control_number' => $form['controlNo'] ?? '',
-        'application_id' => $form['application_form_id'] ?? null,
-        'option_id' => $form['selectedFeeId'] ?? null,
-    ]);
+    // // Create Gate Pass
+    // $gatePass = Permits::create([
+    //     'form_id' => $form['form_id'] ?? null,
+    //     'locator_name' => $form['clearanceTo'] ?? '',
+    //     'validity' => $validity->toDateTimeString(),
+    //     'IS_number' => $form['siNumber'] ?? '',
+    //     'price' => isset($form['amount']) ? (float) str_replace(['₱', ','], '', $form['amount']) : 0,
+    //     'form_type' => 'GatePass',
+    //     'delivery_date' => $form['deliveryDate'] ?? null,
+    //     'form_number' => $form['gcNo'] ?? '',
+    //     'control_number' => $form['controlNo'] ?? '',
+    //     'application_id' => $form['application_form_id'] ?? null,
+    //     'option_id' => $form['selectedFeeId'] ?? null,
+    // ]);
 
     // Save ApplicationForApproval record
     ApplicationForApproval::create([
@@ -85,7 +99,7 @@ class GatePassController extends Controller
         'created_at' => now(),
         'updated_at' => now(),
     ]);
-
+     $gatePass = 'GatePass data';
     // Return JSON response
     return response()->json([
         'message' => 'Gate Pass submitted successfully',
