@@ -28,6 +28,7 @@ const form = useForm({
 });
 
 const showModal = ref(false);
+const showRemark = ref(false);
 const handleView = (application: any) => {
     const app = application?.application;
 
@@ -50,23 +51,46 @@ const handleView = (application: any) => {
 };
 const formApprove = useForm({
     app_id: '',
+    approver_group_id: '',
+    approver_sequence: '',
 });
 const formReject = useForm({
     app_id: '',
     remark: '',
+    approver_group_id: '',
+    approver_sequence: '',
 });
-
+const HandleRerurn = () => {
+    showRemark.value = !showRemark.value;
+};
 const HandleApprove = (app: any) => {
     let applicationApprove = app;
-    formApprove.app_id = applicationApprove[0].application_id;
+    formApprove.app_id = applicationApprove.approvers[0].application_form_id;
+    formApprove.approver_group_id =
+        applicationApprove.approvers[0].approver_group_id;
+    formApprove.approver_sequence = applicationApprove.approvers[0].sequence;
     formApprove.post('osac/approve');
 };
 const HandleReject = (app: any) => {
     let applicationReject = app;
-    console.log(applicationReject.option[0].application_id);
-    formReject.app_id = applicationReject.option[0].application_id;
+    //console.log(applicationReject.approvers[0].approver_group_id);
+    formReject.app_id = applicationReject.approvers[0].application_form_id;
+    formReject.approver_sequence = applicationReject.approvers[0].sequence;
     formReject.remark = 'Rejecting this application';
-    formReject.post('osac/reject');
+    formReject.approver_group_id =
+        applicationReject.approvers[0].approver_group_id;
+
+    formReject.post('/sezad/osac/return', {
+        onSuccess: (page) => {
+            console.log('Rejected successfully');
+        },
+        onError: (errors) => {
+            console.log(errors);
+        },
+        onFinish: () => {
+            console.log('Request finished');
+        },
+    });
 
     console.log(applicationReject);
 };
@@ -87,6 +111,9 @@ const formatDate = (value: string | null) => {
         month: 'long',
         day: '2-digit',
     }).format(date);
+};
+const onClose = () => {
+    showModal.value = false;
 };
 </script>
 
@@ -292,10 +319,20 @@ const formatDate = (value: string | null) => {
                             </div>
                         </div>
                         <CardFooter>
-                            <Button @click="HandleApprove(form.option)">
+                            <Button @click="HandleApprove(form)">
                                 Approve
                             </Button>
-                            <Button @click="HandleReject(form)">Reject</Button>
+                            <Button @click="HandleReject(form)">Return</Button>
+                            <Button
+                                class="bg-color-red-600 text-black-500"
+                                @click="HandleRerurn"
+                                >Reject</Button
+                            >
+                            <textarea
+                                v-show="showRemark"
+                                name=""
+                                id=""
+                            ></textarea>
                         </CardFooter>
                     </CardContent>
                 </Card>

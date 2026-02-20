@@ -8,6 +8,7 @@ class AppConstants
     const STATUS_PENDING   = 'Pending';
     const STATUS_APPROVED  = 'Approved';
     const STATUS_REJECTED  = 'Rejected';
+    const STATUS_RETURNED  = 'Returned';
 
     // Roles
     const ROLE_ADMIN       = 'Admin';

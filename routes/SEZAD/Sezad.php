@@ -13,11 +13,16 @@ use App\Http\Controllers\SEZAD\SEZADController;
         Route::get('/cco', [CcoController::class, 'index'])->name('cco.index');
         Route::get('/cco/{id}/show', [CcoController::class, 'show'])->name('cco.show');
         //Osac Processor
+        Route::post('/store2',[OsacController::class,'store2'])->name('osac.store2');
+        Route::get('/index2',[OsacController::class,'Index2'])->name('osac.index2');
         Route::get('/osac', [OsacController::class, 'index'])->name('osac.index');
         Route::get('/apply', [OsacController::class, 'create'])->name('osac.create');
         Route::get('/osac/{id}/show', [OsacController::class, 'show'])->name('osac.show');
-        Route::post('/osac/approve',[OsacController::class,'approve'])->name('osac.approve');
-        Route::post('/osac/reject',[OsacController::class, 'Reject'])->name('osac.reject');
+        Route::post('/osac/approve',[OsacController::class,'Approve'])->name('osac.approve');
+        Route::post('/osac/return',[OsacController::class, 'Return'])->name('osac.return');
+        Route::get('/osac/accreditations',[OsacController::class,'AccreditationPage'])->name('osac.accreditation');
+        Route::get('/osac/permits',[OsacController::class,'PermitsPage'])->name('osac.permits');
+        Route::get('/osac/Provisional',[OsacController::class,'ProvisionalGrantPage'])->name('osac.provisionalGrant');
         //Sezad Manager
          Route::get('/manager', [SezadManagerController::class, 'index'])->name('sezad.manager.index');
          Route::get('/manager/{id}/show', [SezadManagerController::class, 'show'])->name('sezad.manager.show');

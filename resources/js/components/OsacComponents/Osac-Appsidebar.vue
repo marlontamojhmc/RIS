@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import NavFooter from '@/components/NavFooter.vue';
-import NavMain from '@/components/NavMain.vue';
 import NavUser from '@/components/NavUser.vue';
-import NavMainOSAC from '@/layouts/Osac/NavMainOSAC.vue';
 import {
     Sidebar,
     SidebarContent,
@@ -12,12 +10,12 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
-import { dashboard,usersDashboard,sezadDashboard,bddDashboard } from '@/routes';
+import NavMainOSAC from '@/layouts/Osac/NavMainOSAC.vue';
+import { dashboard } from '@/routes';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/vue3';
-import { BookOpen, Folder, LayoutGrid,SquareUserRound, Clock, Eye } from 'lucide-vue-next';
+import { LayoutGrid } from 'lucide-vue-next';
 import AppLogo from '../AppLogo.vue';
-
 
 const mainNavItems: NavItem[] = [
     {
@@ -25,24 +23,38 @@ const mainNavItems: NavItem[] = [
         href: '/osac',
         icon: LayoutGrid,
         children: [
-      {
-        title: "Pending Applications",
-        href: "/applications/all",
-      },
-      {
-        title: "Apply for Locator",
-        href:"/osac/apply",
-      },{
-        title:"Assigned to Me",
-        href:"/osac",
-      }
-    ],
+            {
+                title: 'Pending Applications',
+                href: '/applications/all',
+            },
+            {
+                title: 'Apply for Locator',
+                href: '/osac/apply',
+            },
+            {
+                title: 'Assigned to Me',
+                href: '/osac',
+            },
+        ],
     },
-    
+    {
+        title: 'Permits',
+        href: '/sezad/osac/permits',
+        icon: LayoutGrid,
+    },
+    {
+        title: 'Accreditations',
+        href: '/sezad/osac/accreditations',
+        icon: LayoutGrid,
+    },
+    {
+        title: 'Provisional Grant',
+        href: '/sezad/osac/Provisional',
+        icon: LayoutGrid,
+    },
 ];
 
-const footerNavItems: NavItem[] = [
-];
+const footerNavItems: NavItem[] = [];
 </script>
 
 <template>
@@ -53,7 +65,6 @@ const footerNavItems: NavItem[] = [
                     <SidebarMenuButton size="lg" as-child>
                         <Link :href="dashboard()">
                             <AppLogo />
-                        
                         </Link>
                     </SidebarMenuButton>
                 </SidebarMenuItem>
@@ -62,14 +73,11 @@ const footerNavItems: NavItem[] = [
 
         <SidebarContent>
             <NavMainOSAC :items="mainNavItems" />
-           
         </SidebarContent>
 
         <SidebarFooter>
             <NavFooter :items="footerNavItems" />
-             <NavUser />
+            <NavUser />
         </SidebarFooter>
     </Sidebar>
-   
-
 </template>
