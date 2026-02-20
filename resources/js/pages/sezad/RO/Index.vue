@@ -1,10 +1,15 @@
 <script setup lang="ts">
-import AppLayout from '@/layouts/AppLayout.vue';
+import ApplicationFormsTable from '@/components/ApplicationFormsTable.vue';
+import { usePage } from '@inertiajs/vue3';
+const page = usePage();
 
+const userRole = page.props.auth.user.role[0];1
 </script>
 
 <template>
-    <AppLayout>
- <h1>Registration Officer Index</h1>
- </AppLayout>
+ 
+
+    <ApplicationFormsTable :userRole="userRole" />
+    <!-- </FinanceAppSidebarLayout> -->
+    <!-- </AppLayout> -->
 </template>
