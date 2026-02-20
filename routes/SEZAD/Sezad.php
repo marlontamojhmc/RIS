@@ -16,6 +16,8 @@ use App\Http\Controllers\SEZAD\SEZADController;
         Route::get('/osac', [OsacController::class, 'index'])->name('osac.index');
         Route::get('/apply', [OsacController::class, 'create'])->name('osac.create');
         Route::get('/osac/{id}/show', [OsacController::class, 'show'])->name('osac.show');
+        Route::post('/osac/approve',[OsacController::class,'approve'])->name('osac.approve');
+        Route::post('/osac/reject',[OsacController::class, 'Reject'])->name('osac.reject');
         //Sezad Manager
          Route::get('/manager', [SezadManagerController::class, 'index'])->name('sezad.manager.index');
          Route::get('/manager/{id}/show', [SezadManagerController::class, 'show'])->name('sezad.manager.show');

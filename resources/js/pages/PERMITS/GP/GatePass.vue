@@ -213,56 +213,22 @@
                 </div>
             </div>
         </div>
-
         <!-- Permit Validity Dropdown -->
-        <div class="grid grid-cols-1 gap-4 border-b pb-4 md:grid-cols-3">
-            <!-- Fee Title -->
-            <div class="space-y-2">
-                <p class="font-semibold">Fee Title</p>
-                <select
-                    v-model="selectedTitle"
-                    class="w-full border-b border-gray-300 p-2 focus:outline-none"
+        <div class="space-y-2 border-b pb-4">
+            <p class="font-semibold">Select Validity Period:</p>
+            <select
+                v-model="form.selectedFeeId"
+                class="w-full border-b border-gray-300 p-2"
+            >
+                <option disabled value="">-- Select Validity --</option>
+                <option
+                    v-for="fee in permitClearanceFees"
+                    :key="fee.id"
+                    :value="fee.id"
                 >
-                    <option disabled value="">-- Select Title --</option>
-                    <option
-                        v-for="fee in permitClearanceFees"
-                        :key="fee.id"
-                        :value="fee.title"
-                    >
-                        {{ fee.title }}
-                    </option>
-                </select>
-            </div>
-
-            <!-- Validity -->
-            <div class="space-y-2">
-                <p class="font-semibold">Validity</p>
-                <select
-                    v-model="form.selectedFeeId"
-                    class="w-full border-b border-gray-300 p-2 focus:outline-none"
-                    :disabled="!selectedTitle"
-                >
-                    <option disabled value="">-- Select Validity --</option>
-                    <option
-                        v-for="fee in filteredValidities"
-                        :key="fee.id"
-                        :value="fee.id"
-                    >
-                        {{ fee.validity }}
-                    </option>
-                </select>
-            </div>
-
-            <!-- Example Third Column (Amount) -->
-            <div class="space-y-2">
-                <p class="font-semibold">Amount</p>
-                <input
-                    type="text"
-                    :value="selectedFeeAmount"
-                    class="w-full border-b border-gray-300 bg-gray-100 p-2"
-                    readonly
-                />
-            </div>
+                    {{ fee.validity }} / {{ fee.title }}
+                </option>
+            </select>
         </div>
 
         <!-- Fully Paid Under Section -->
