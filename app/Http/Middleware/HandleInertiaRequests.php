@@ -31,64 +31,50 @@ class HandleInertiaRequests extends Middleware
      * Define the props that are shared by default with every Inertia response.
      */
     public function share(Request $request): array
-    {
-        // Split inspiring quote into message and author
-        [$message, $author] = str(Inspiring::quotes()->random())->explode('-');
-        $user = Auth::user();
-        // Only fetch applications if the user is authenticated
-        $applications = //$request->user()
-            ApproverGroupApprover::with('application',
-                                                          'application.accreditations',
-                                                          'application.user',
-                                                          'application.ApproverGroupApprovers.approver',
-                                                          'application.articleDetails',
-                                                          'application.selections',
-                                                          'application.uploads')
-                                ->where('approver_id',$user->id)
-                                ->orderBy('id', 'desc')
-                                ->get();
-    $userRole = ApproverSets::where('user_id', $user->id)->get(['approver_group_id','role','sequence']);
-        return array_merge(parent::share($request), [
-            // 🌐 Global app data
-            'app' => [  
-                'name' => config('app.name'),
-                'quote' => [
-                    'message' => trim($message),//
-                ],
-            ],
+{
+    [$message, $author] = str(Inspiring::quotes()->random())->explode('-');
 
-            // 👤 Authenticated user
-            'auth' => [
-                'user' => $request->user() ? [
-                    'id' => $request->user()->id,
-                    'name' => $request->user()->name,
-                    'email' => $request->user()->email,
-                    'role' => $userRole ?? null,
+    $user = $request->user();
 
-                    // add more fields if needed
-                ] : null,
-            ],
+    $applications = [];
+    $userRole = [];
 
-            // 📂 Sidebar state
-            'sidebarOpen' => !$request->hasCookie('sidebar_state') 
-                || $request->cookie('sidebar_state') === 'true',
+    if ($user) {
+        $applications = ApproverGroupApprover::with(
+                'application',
+                'application.accreditations',
+                'application.user',
+                'application.ApproverGroupApprovers.approver',
+                'application.articleDetails',
+                'application.selections',
+                'application.uploads'
+            )
+            ->where('approver_id', $user->id)
+            ->orderBy('id', 'desc')
+            ->get();
 
-            // 💬 Flash messages
-            'flash' => [
-                'success' => $request->session()->get('success'),
-                'error'   => $request->session()->get('error'),
-                'info'    => $request->session()->get('info'),
-            ],
-
-            // 📝 Applications
-            'applications' => $applications,
-
-            // 🧾 User details (optional)
-           'user_details' => $request->user()
-    ? $request->user()
-        ->load('details.businessType')
-        ->details
-    : null,
-        ]);
+        $userRole = ApproverSets::where('user_id', $user->id)
+            ->get(['approver_group_id','role','sequence']);
     }
+
+    return array_merge(parent::share($request), [
+        'app' => [
+            'name' => config('app.name'),
+            'quote' => [
+                'message' => trim($message),
+            ],
+        ],
+
+        'auth' => [
+            'user' => $user ? [
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
+                'role' => $userRole,
+            ] : null,
+        ],
+
+        'applications' => $applications,
+    ]);
+}
 }
