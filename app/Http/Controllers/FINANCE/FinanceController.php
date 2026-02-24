@@ -23,25 +23,14 @@ class FinanceController extends Controller
     {
         $this->appService = $appService;
     }
-    public function index(){
-        $user = auth()->user();
-    
-        $applications = ApproverGroupApprover::with('application',
-                                                      'application.accreditations',
-                                                          'application.user',
-                                                          'application.ApproverGroupApprovers.approver',
-                                                          'application.articleDetails',
-                                                          'application.selections',
-                                                          'application.uploads')
-                                ->where('approver_id',$user->id)
-                                ->orderBy('id', 'desc')
-                                ->get();
-                    
-            
-        return Inertia::render('FSD/FINANCE/Index',[
-                                'applications'=> $applications,
-                                ]);
-    }
+public function index(AppService $appService)
+{
+    $applications = $appService->getApplicationsForApprover(auth()->id());
+
+    return Inertia::render('FSD/FINANCE/Index', [
+        'applications' => $applications
+    ]);
+}
     
     public function show(Request $request)
     {  
