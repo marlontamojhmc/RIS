@@ -109,8 +109,8 @@ public function createApplication($type, $form_type, $form_id)
         'status' =>AppConstants::STATUS_APPROVED
     ]);
 
+    
     $sets->prepend($ownerSet);
-
     foreach ($sets as $set) {
         ApproverGroupApprover::create([
             'approver_group_id'   => $set->approver_group_id,
@@ -118,9 +118,10 @@ public function createApplication($type, $form_type, $form_id)
             'sequence'            => $set->sequence + 1,
             'role'                => $set->role,
             'application_form_id' => $application->id,
-            'status'              => AppConstants::STATUS_PENDING,
+            'status'              => $set->role === 'Owner' ?AppConstants::STATUS_APPROVED :AppConstants::STATUS_PENDING,
         ]);
     }
+    // dd($sets);
 
     return [
         'application'  => $application,
@@ -262,5 +263,21 @@ public function createApplication($type, $form_type, $form_id)
                 ];
             }),
         ];
+    }
+
+ public function getApplicationsForApprover($userId)
+    {
+        return ApproverGroupApprover::with([
+            'application',
+            'application.accreditations',
+            'application.user',
+            'application.ApproverGroupApprovers.approver',
+            'application.articleDetails',
+            'application.selections',
+            'application.uploads',
+        ])
+        ->where('approver_id', $userId)
+        ->orderBy('id', 'desc')
+        ->get();
     }
 }

@@ -45,7 +45,7 @@ Route::get('/', fn() => Inertia::render('Welcome'))->name('home');
 Route::middleware(['auth', 'verified'])->group(function () {
     //BDD
     Route::prefix('bdd')->group(function (){
-        Route::get('/dash', [BDDController::class, 'index'])->name('bdd.Dashboard');
+        Route::get('/dash', [BDDController::class, 'index'])->name('bddDashboard');
         Route::get('/mylocators',[BDDController::class, 'locators'])->name('bdd.myLocators');
         Route::post('/locator/saveProfile', [BDDController::class, 'saveLocatorProfile'])->name('locator.save');
     });
