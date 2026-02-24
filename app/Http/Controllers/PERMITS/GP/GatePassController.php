@@ -32,7 +32,7 @@ class GatePassController extends Controller
 {
     // Decode JSON form sent from Vue
     $form = json_decode($request->input('form'), true);
-    //dd($form);
+    // dd($form);
     $fee = isset($form['selectedFeeId']) ? PermitClearanceFee::find($form['selectedFeeId']) : null;
      $validity = $fee ? PermitHelper::computeValidity($fee->value) : now();
     $userSelectedOption = UserApplicationSelection::create([
@@ -42,7 +42,7 @@ class GatePassController extends Controller
     'Expired_at' => $validity->toDateTimeString(),
     'selected_at' => now(),
     'amount' => $fee->price,
-]);
+    ]);
 
 
 
