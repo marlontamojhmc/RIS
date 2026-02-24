@@ -128,6 +128,7 @@ const submitForm = async () => {
         const res = await axios.post('/permits/gatepass/submit', formData, {
             headers: { 'Content-Type': 'multipart/form-data' },
         });
+        console.log(res.data);
         toast.success(`${form.title} Permit submitted successfully!`);
     } catch (err) {
         console.error(err);
@@ -152,6 +153,7 @@ watch(
         console.log('id', newId);
         const fee = props.permitClearanceFees.find((f) => f.id === newId);
         form.amount = fee ? `₱${Number(fee.price).toFixed(2)}` : '';
+        form.selectedFeeId = newId; // Store selected fee ID in form data
         console.log('fee', form.amount);
     },
 );

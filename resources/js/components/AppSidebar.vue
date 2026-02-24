@@ -281,7 +281,6 @@ function clearNotification() {
                         <Link href="/">
                             <AppLogo class="h-8 w-auto" />
                         </Link>
-                        x
                     </SidebarMenuButton>
                 </SidebarMenuItem>
             </SidebarMenu>
