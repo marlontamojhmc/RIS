@@ -38,6 +38,10 @@ class ApproverGroupApprover extends Pivot
     {
         return $this->belongsTo(User::class, 'approver_id');
     }
+    /*=========function for detecting approver status ================================
+    this is how to use it in controller
+    ApproverGroupApprover::Pending()//laravel will remove the word scope automatically
+    =================================================================================*/
     public function scopePending($query)
 {
     return $query->where('status','!=' ,'Approved');
