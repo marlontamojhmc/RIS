@@ -35,27 +35,30 @@ class HandleInertiaRequests extends Middleware
     [$message, $author] = str(Inspiring::quotes()->random())->explode('-');
 
     $user = $request->user();
-
+    // dd($user);
     $applications = [];
     $userRole = [];
 
-    if ($user) {
-        $applications = ApproverGroupApprover::with(
-                'application',
-                'application.accreditations',
-                'application.user',
-                'application.ApproverGroupApprovers.approver',
-                'application.articleDetails',
-                'application.selections',
-                'application.uploads'
-            )
-            ->where('approver_id', $user->id)
-            ->orderBy('id', 'desc')
-            ->get();
+    // if ($user) {
+    //     $applications = ApproverGroupApprover::with(
+    //             'application',
+    //             'application.accreditations',
+    //             'application.user',
+    //             'application.ApproverGroupApprovers.approver',
+    //             'application.articleDetails',
+    //             'application.selections',
+    //             'application.uploads'
+    //         )
+    //         ->where('approver_id', $user->id)
+    //         ->orderBy('id', 'desc')
+    //         ->get();
+
+    //         }
+    if($user){
 
         $userRole = ApproverSets::where('user_id', $user->id)
-            ->get(['approver_group_id','role','sequence']);
-    }
+        ->get(['approver_group_id','role','sequence']);
+        }
 
     return array_merge(parent::share($request), [
         'app' => [
@@ -74,7 +77,7 @@ class HandleInertiaRequests extends Middleware
             ] : null,
         ],
 
-        'applications' => $applications,
+        // 'applications' => $applications,
     ]);
 }
 }
