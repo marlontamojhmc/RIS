@@ -9,7 +9,7 @@ use Inertia\Middleware;
 use App\Models\Locator\ApplicationModel;
 use App\Models\Locator\ApproverGroupApprover;
 use Illuminate\Support\Facades\Auth;
-
+use App\Models\UserDetails\UserDetail;
 class HandleInertiaRequests extends Middleware
 {
     /**
@@ -56,9 +56,11 @@ class HandleInertiaRequests extends Middleware
         $userRole = ApproverSets::where('user_id', $user->id)
             ->get(['approver_group_id','role','sequence']);
     }
-
+    $id = auth()->id();
+    $urole = UserDetail::with('role')->where('user_id',$id)->first();
+       
     return array_merge(parent::share($request), [
-        'app' => [
+         'app' => [
             'name' => config('app.name'),
             'quote' => [
                 'message' => trim($message),
@@ -71,6 +73,8 @@ class HandleInertiaRequests extends Middleware
                 'name' => $user->name,
                 'email' => $user->email,
                 'role' => $userRole,
+                'userRole' => $urole->role->name,
+                'details' =>$urole,
             ] : null,
         ],
 
