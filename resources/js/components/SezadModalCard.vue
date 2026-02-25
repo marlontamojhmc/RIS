@@ -8,8 +8,8 @@ import {
     CardTitle,
 } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Inertia } from '@inertiajs/inertia';
 import { useForm, usePage } from '@inertiajs/vue3';
+import axios from 'axios';
 import { computed, ref, watch } from 'vue';
 import { useToast } from 'vue-toastification';
 
@@ -90,7 +90,6 @@ const form = useForm({
     approvers: [] as any[],
 });
 
-
 const formPayment = useForm({
     application_forms_id: '',
     form_type: '',
@@ -116,50 +115,71 @@ const onClose = () => {
     showModal.value = false;
 };
 
-const submitPayment = () => {
-    formPayment.application_forms_id = form.application_id;
-    formPayment.form_type = form.form_type;
-    formPayment.form_number = form.form_number;
-    formPayment.form_id = form.form_id;
+const submitPayment = async () => {
+    try {
+        const response = await axios.post('/fsd/accept-payment', {
+            application_forms_id: form.application_id,
+            form_type: form.form_type,
+            form_number: form.form_number,
+            form_id: form.form_id,
+            is_number: formPayment.is_number,
+            amount: formPayment.amount,
+        });
 
-    formPayment.post('accept-payment', {
-        onSuccess: () => {
+        const data = response.data;
+
+        if (data.success) {
             toast.success('Payment processed successfully.');
-            formPayment.reset();
             openPayment.value = false;
 
-            Inertia.reload({
-                only: ['applications'],
-                preserveState: true,
-            });
-        },
-        onError: () => {
-            toast.error('Something went wrong.');
-        },
-    });
+            // update finance approver in UI
+            const approver = form.approvers.find(
+                (a) => a.approver?.id === data.approver_id,
+            );
+
+            if (approver) {
+                approver.status = 'Approved';
+            }
+
+            // update overall form status
+            form.status = data.status;
+        }
+    } catch (error) {
+        console.error(error);
+        toast.error('Payment failed.');
+    }
 };
 
-const onApprove = () => {
-    approveForm.user_id = page.props.auth.user.id;
-    approveForm.application_form_id = form.application_id;
-    approveForm.approver_group_id = props.userRole.approver_group_id;
-    approveForm.sequence = Number(props.userRole.sequence);
+const onApprove = async () => {
+    try {
+        const response = await axios.post('/sezad/approve', {
+            user_id: page.props.auth.user.id,
+            application_form_id: form.application_id,
+            approver_group_id: props.userRole.approver_group_id,
+            sequence: Number(props.userRole.sequence),
+        });
 
-    approveForm.post('/sezad/approve', {
-        onSuccess: () => {
+        const data = response.data;
+
+        if (data.success) {
+            // update UI
+            const approver = form.approvers.find(
+                (a) => a.approver?.id === data.approver_id,
+            );
+
+            if (approver) {
+                approver.status = data.status;
+            }
+
+            form.status = data.status;
+
             toast.success('Application approved successfully.');
-            Inertia.reload({
-                only: ['applications'],
-                preserveState: true,
-                preserveScroll: true,
-            });
-        },
-        onError: () => {
-            toast.error('Something went wrong.');
-        },
-    });
+        }
+    } catch (error) {
+        console.error(error);
+        toast.error('Approval failed.');
+    }
 };
-
 const formatDate = (value: string | null) => {
     if (!value) return '';
     const date = new Date(value);
@@ -187,8 +207,8 @@ watch(
     () => props.applicationProps,
     (app) => {
         if (!app || !app.application) return;
-
-        form.application_id = app.id;
+        console.log('Application Prop Changed:', app);
+        form.application_id = app.application.id;
         form.control_number = app.control_number ?? '';
         form.form_title = app.application.form_title ?? '';
         form.form_number = app.application.form_number ?? '';
@@ -203,14 +223,13 @@ watch(
     },
     { immediate: true },
 );
-console.log(application);
+console.log(form.approvers.length);
 </script>
 
 <template>
     <Card
         class="relative z-10 max-h-[90vh] w-full overflow-y-auto border-2 border-amber-50"
     >
-        >
         <!-- Header -->
         <CardHeader>
             <div class="flex w-full items-start justify-between">
@@ -292,7 +311,8 @@ console.log(application);
                     <div
                         v-if="
                             userRole.role == 'Finance' &&
-                            items.status != 'Approved'
+                            form.approvers[Number(userRole.sequence)]?.status ==
+                                'Pending'
                         "
                     >
                         <div class="flex gap-2">

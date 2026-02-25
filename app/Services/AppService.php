@@ -265,7 +265,7 @@ public function createApplication($type, $form_type, $form_id)
         ];
     }
 
- public function getApplicationsForApprover($userId)
+    public function getApplicationsForApprover($userId)
     {
         return ApproverGroupApprover::with([
             'application',

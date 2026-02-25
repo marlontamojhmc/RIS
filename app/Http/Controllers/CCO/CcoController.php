@@ -10,21 +10,29 @@ use App\Models\User;
 use Illuminate\Support\Facades\Gate;
 use App\Models\Locator\ApplicationModel;
 use App\Models\ApproverGroup;
-
+use App\Services\AppService;
 class CcoController extends Controller
 {   
     
-    public function index(){
-        $user = auth()->user();
-                $applications = ApproverGroupApprover::with('application')
-                                ->where('approver_id', auth()->id())
-                                ->orderBy('id', 'desc')
-                                ->get();
+       public function index(AppService $appService)
+    {
+        $applications = $appService->getApplicationsForApprover(auth()->id());
 
-        return Inertia::render('sezad/CCO/Index',[
-                                 'applications'=> $applications,
-                                ]);
-        }
+        return Inertia::render('sezad/Manager/Index', [
+            'applications' => $applications
+        ]);
+    }
+    // public function index(){
+    //     $user = auth()->user();
+    //             $applications = ApproverGroupApprover::with('application')
+    //                             ->where('approver_id', auth()->id())
+    //                             ->orderBy('id', 'desc')
+    //                             ->get();
+
+    //     return Inertia::render('sezad/CCO/Index',[
+    //                              'applications'=> $applications,
+    //                             ]);
+    //     }
     public function show($id){
         $user = auth()->user();
         $application = ApplicationModel::with(['articleDetails','approval', 'uploads', 'selections','options'])

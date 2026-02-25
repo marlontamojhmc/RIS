@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import { Eye } from 'lucide-vue-next';
-
+import { Eye, Pencil, Trash2 } from 'lucide-vue-next';
 interface UserRole {
     role: string;
     sequence: number | string;
@@ -27,10 +26,11 @@ const emit = defineEmits(['onOpenModal']);
 const handleView = (app) => {
     emit('onOpenModal', app);
 };
+console.log(userRole);
 </script>
 
 <template>
-    <!-- {{ userRole }} -->
+    <!-- {{ userRole.sequence }} -->
     <div
         class="overflow-x-auto rounded-lg border border-gray-300 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-900"
     >
@@ -112,21 +112,23 @@ const handleView = (app) => {
                         >
                             <Eye class="h-5 w-5" />
                         </button>
-                        <!-- <button
-              @click="emit('edit', app)"
-              class="text-green-600 hover:text-green-800 p-1 rounded-full hover:bg-green-50 dark:text-green-400 dark:hover:text-green-300 dark:hover:bg-green-900/30 transition"
-              title="Edit"
-            >
-              <Pencil class="w-5 h-5" />
-            </button>
-           
-            <button
-              @click="emit('delete', app)"
-              class="text-red-600 hover:text-red-800 p-1 rounded-full hover:bg-red-50 dark:text-red-400 dark:hover:text-red-300 dark:hover:bg-red-900/30 transition"
-              title="Delete"
-            >
-              <Trash2 class="w-5 h-5" />
-            </button> -->
+                        <button
+                            v-show="userRole.role == 'Manager'"
+                            @click="emit('edit', app)"
+                            class="rounded-full p-1 text-green-600 transition hover:bg-green-50 hover:text-green-800 dark:text-green-400 dark:hover:bg-green-900/30 dark:hover:text-green-300"
+                            title="Edit"
+                        >
+                            <Pencil class="h-5 w-5" />
+                        </button>
+
+                        <button
+                            v-show="userRole.role == 'Manager'"
+                            @click="emit('delete', app)"
+                            class="rounded-full p-1 text-red-600 transition hover:bg-red-50 hover:text-red-800 dark:text-red-400 dark:hover:bg-red-900/30 dark:hover:text-red-300"
+                            title="Delete"
+                        >
+                            <Trash2 class="h-5 w-5" />
+                        </button>
                     </td>
                 </tr>
             </tbody>

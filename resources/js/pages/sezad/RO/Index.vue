@@ -52,6 +52,7 @@ const onOpenModal = (app: any) => {
 const onClose = () => {
     showModal.value = false;
 };
+
 </script>
 
 <template>
