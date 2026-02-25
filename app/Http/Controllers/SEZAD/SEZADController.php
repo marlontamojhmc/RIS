@@ -16,6 +16,8 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use App\Models\Locator\ApplicationModel;
+
 
 class SEZADController extends Controller
 {
@@ -168,8 +170,9 @@ class SEZADController extends Controller
     // update status of approvers
  public function updateStatus(Request $request)
 {
+    // dump($request->all());
     $user_id = $request->user()->id ?? null;
-
+    $isLastApprover = $request->input('isLastApprover');
     $approver = ApproverGroupApprover::where('application_form_id', $request['application_form_id'])
         ->where('approver_id', $user_id)
         ->first();
@@ -180,7 +183,15 @@ class SEZADController extends Controller
 
     $approver->status = 'Approved';
     $approver->save();
-
+    if($isLastApprover){
+    $update_application = ApplicationModel::where('id',$request['application_form_id'])->first();
+    if(!$update_application){
+      return response()->json(['success' => false, 'message' => 'Application form not found'], 404);
+    }
+    $update_application->status = 'Approved';
+    $update_application->save();
+    }
+    
     // Return updated approver and status
     return response()->json([
         'success' => true,
