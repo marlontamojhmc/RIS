@@ -67,7 +67,7 @@ onUnmounted(() => {
                     >
                         <!-- Header -->
                         <div
-                            class="flex items-center justify-between border-b px-4 py-3"
+                            class="flex-end flex items-center justify-between border-b px-4 py-1"
                         >
                             <slot name="header" />
                             <button

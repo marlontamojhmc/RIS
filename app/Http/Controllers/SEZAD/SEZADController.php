@@ -166,29 +166,26 @@ class SEZADController extends Controller
 
 
     // update status of approvers
-    public function updateStatus(Request $request){
+ public function updateStatus(Request $request)
+{
     $user_id = $request->user()->id ?? null;
-    // dd($request);
-    // $validated = $request->validated();
 
-    // dd($validated);
-
-    // $applicationForApproval = ApplicationForApproval::where('application_id', $validated['application_forms_id'])->first();
-    // if (!$applicationForApproval) {
-    //     abort(404, 'Application for Approval not found');
-    // }
-    // $applicationForApproval->IS_Number = $validated['is_number'] ?? null;
-    // $applicationForApproval->payment_status = 'Paid' ?? null;
-    // $applicationForApproval->save();
-
-
-    // update approver group approver status to paid
     $approver = ApproverGroupApprover::where('application_form_id', $request['application_form_id'])
-    ->where('approver_id', $user_id)
-                ->first();
+        ->where('approver_id', $user_id)
+        ->first();
+
+    if (!$approver) {
+        return response()->json(['success' => false, 'message' => 'Approver not found'], 404);
+    }
 
     $approver->status = 'Approved';
     $approver->save();
-             return redirect()->back()->with('success', 'Status changed to approved.');
+
+    // Return updated approver and status
+    return response()->json([
+        'success' => true,
+        'approver_id' => $approver->approver_id,
+        'status' => $approver->status,
+    ]);
 }
 }
