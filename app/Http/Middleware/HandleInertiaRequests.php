@@ -9,7 +9,7 @@ use Inertia\Middleware;
 use App\Models\Locator\ApplicationModel;
 use App\Models\Locator\ApproverGroupApprover;
 use Illuminate\Support\Facades\Auth;
-
+use App\Models\UserDetails\UserDetail;
 class HandleInertiaRequests extends Middleware
 {
     /**
@@ -35,33 +35,13 @@ class HandleInertiaRequests extends Middleware
     [$message, $author] = str(Inspiring::quotes()->random())->explode('-');
 
     $user = $request->user();
-    // dd($user);
-    $applications = [];
-    $userRole = [];
 
-    // if ($user) {
-    //     $applications = ApproverGroupApprover::with(
-    //             'application',
-    //             'application.accreditations',
-    //             'application.user',
-    //             'application.ApproverGroupApprovers.approver',
-    //             'application.articleDetails',
-    //             'application.selections',
-    //             'application.uploads'
-    //         )
-    //         ->where('approver_id', $user->id)
-    //         ->orderBy('id', 'desc')
-    //         ->get();
-
-    //         }
-    if($user){
-
-        $userRole = ApproverSets::where('user_id', $user->id)
-        ->get(['approver_group_id','role','sequence']);
-        }
-
+   
+    $id = auth()->id();
+    $urole = UserDetail::with('role')->where('user_id',$id)->first();
+       
     return array_merge(parent::share($request), [
-        'app' => [
+         'app' => [
             'name' => config('app.name'),
             'quote' => [
                 'message' => trim($message),
@@ -73,11 +53,11 @@ class HandleInertiaRequests extends Middleware
                 'id' => $user->id,
                 'name' => $user->name,
                 'email' => $user->email,
-                'role' => $userRole,
+                'userRole' => $urole->role->name,
+                'details' =>$urole,
             ] : null,
         ],
 
-        // 'applications' => $applications,
     ]);
 }
 }
