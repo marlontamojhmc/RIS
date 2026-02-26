@@ -70,6 +70,7 @@ const permissions: Permissions = {
 
 const user = propsAny.auth?.user ?? {};
 const userDetails = user.details ?? {};
+
 // console.log('userRole_id= '+userDetails.role_id);
 // console.log('userDepartment_id= '+userDetails.department_id);
 // console.log('userPermission_id= '+userDetails.permission_id);
@@ -98,22 +99,28 @@ const roles = {
         userDetails.user_function_id === null,
 
     OSAC:
-        userDetails.role_id === 4 &&
-        userDetails.permission_id === 2 &&
-        userDetails.department_id === null &&
-        userDetails.user_function_id === null,
+        user?.details.user_function_id === 4 &&
+        user?.details.role_id === 2 &&
+        user?.details.department_id === 12 &&
+        user?.details.business_type_id === null,
 
     Locator:
-        userDetails.role_id === 3 &&
-        page.props.user_details?.business_type?.id === 4,
+        user?.userRole === 'locator' && userDetails?.user_function_id === 4,
 
     Cco:
         userDetails.role_id === 2 &&
         userDetails.permission_id === 2 &&
         userDetails.user_function_id === null &&
         userDetails.department_id === 12,
-};
 
+    finance: user?.details.department_id === 10 && user?.details.role_id === 2,
+    sezadManager:
+        user?.details.department_id === 2 &&
+        user?.details.role_id === 2 &&
+        user?.details.user_function_id === 5,
+};
+console.log(`user Role: ${JSON.stringify(user, null, 2)}`);
+console.log(`user Function : ${userDetails?.user_function_id}`);
 /* ===============================
    NAVIGATION ITEMS
    =============================== */
@@ -222,8 +229,57 @@ const navConfig: Record<string, NavItem[]> = {
     ],
     osac: [
         { title: 'OSAC Dashboard', href: '/osac/dashboard', icon: LayoutGrid },
+        {
+            title: 'Permits',
+            href: '/',
+            icon: LayoutGrid,
+            children: [
+                { title: 'Approved', href: '/', icon: '' },
+                { title: 'Pending', href: '/', icon: '' },
+            ],
+        },
     ],
     cco: [{ title: 'Custom Officer', href: '#', icon: LayoutGrid }],
+    finance: [
+        {
+            title: 'Permits',
+            href: '/',
+            icon: LayoutGrid,
+            children: [
+                { title: 'Approved', href: '/', icon: '' },
+                { title: 'Pending', href: '/', icon: '' },
+            ],
+        },
+    ],
+    sezadManager: [
+        {
+            title: 'Permits',
+            href: '/',
+            icon: LayoutGrid,
+            children: [
+                { title: 'Approved', href: '/', icon: '' },
+                { title: 'Pending', href: '/', icon: '' },
+            ],
+        },
+        {
+            title: 'Accreditations',
+            href: '/',
+            icon: LayoutGrid,
+            children: [
+                { title: 'Approved', href: '/', icon: '' },
+                { title: 'Pending', href: '/', icon: '' },
+            ],
+        },
+        {
+            title: 'ATO',
+            href: '/',
+            icon: LayoutGrid,
+            children: [
+                { title: 'Approved', href: '/', icon: '' },
+                { title: 'Pending', href: '/', icon: '' },
+            ],
+        },
+    ],
 };
 
 // Push nav items based on roles & permissions
@@ -244,7 +300,8 @@ else if (roles.Vendor) mainNavItems.push(...navConfig.vendor);
 else if (roles.ServiceProvider) mainNavItems.push(...navConfig.serviceProvider);
 else if (roles.OSAC) mainNavItems.push(...navConfig.osac);
 else if (roles.Cco) mainNavItems.push(...navConfig.cco);
-
+else if (roles.finance) mainNavItems.push(...navConfig.finance);
+else if (roles.sezadManager) mainNavItems.push(...navConfig.sezadManager);
 /* ===============================
    NOTIFICATIONS
    =============================== */

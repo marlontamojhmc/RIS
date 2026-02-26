@@ -35,7 +35,11 @@ const user = page.props.auth.user;
 <template>
     <AppLayout :breadcrumbs="breadcrumbItems">
         <Head title="Profile settings" />
-        {{ page }}
+        <span
+            class="inline-block rounded-full bg-gray-100 px-3 py-1 text-xs font-semibold text-gray-800"
+        >
+            User Role: {{ user.userRole }}
+        </span>
         <SettingsLayout>
             <div class="flex flex-col space-y-6">
                 <HeadingSmall
@@ -49,8 +53,24 @@ const user = page.props.auth.user;
                     v-slot="{ errors, processing, recentlySuccessful }"
                 >
                     <div class="grid gap-2">
+                        <Label for="userRole">User Role:</Label>
+
+                        <Input
+                            id="userRole"
+                            class="mt-1 block w-full"
+                            name="userRole"
+                            type="text"
+                            :value="user.userRole"
+                            required
+                            autocomplete="name"
+                            placeholder="user Role"
+                        />
+                        <InputError class="mt-2" :message="errors.userRole" />
+                    </div>
+                    <div class="grid gap-2">
                         <Label for="name">Name</Label>
                         <Input
+                            type="text"
                             id="name"
                             class="mt-1 block w-full"
                             name="name"
