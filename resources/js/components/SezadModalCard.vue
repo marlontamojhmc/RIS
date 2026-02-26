@@ -10,7 +10,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { useForm, usePage } from '@inertiajs/vue3';
 import axios from 'axios';
-import { computed, ref, watch } from 'vue';
+import { ref, watch } from 'vue';
 import { useToast } from 'vue-toastification';
 
 /* -----------------------
@@ -25,25 +25,18 @@ interface UserRole {
 interface ApplicationItem {
     id: number;
     control_number?: string | null;
-
     application?: {
         form_title?: string;
         form_number?: string;
         form_type?: string;
         created_at?: string;
         status?: string;
-
-        user?: {
-            name?: string;
-        };
-
+        user?: { name?: string };
         approver_group_approvers?: {
             role: string;
             status: string;
             updated_at?: string;
-            approver?: {
-                name?: string;
-            };
+            approver?: { id?: number; name?: string };
         }[];
     } | null;
 }
@@ -63,14 +56,14 @@ const page = usePage();
 /* -----------------------
 Applications from parent
 ----------------------- */
-const application = computed(() => props.applicationProps);
+// const application = computed(() => props.applicationProps);
 
 const toast = useToast();
 
 /* -----------------------
 Refs
 ----------------------- */
-const showModal = ref(false);
+// const showModal = ref(false);
 const openPayment = ref(false);
 // const applications = datas.value;
 /* -----------------------
@@ -82,6 +75,7 @@ const form = useForm({
     form_id: '',
     application_date: '',
     application_id: 0,
+
     status: '',
     approved_date: '',
     form_number: '',
@@ -100,20 +94,20 @@ const formPayment = useForm({
     amount: '',
 });
 
-const approveForm = useForm({
-    user_id: 0,
-    application_form_id: '',
-    approver_group_id: 0,
-    sequence: 0,
-});
+// const approveForm = useForm({
+//     user_id: 0,
+//     application_form_id: '',
+//     approver_group_id: 0,
+//     sequence: 0,
+// });
 
 const openPaymentFooter = (value: boolean) => {
     openPayment.value = value;
 };
 
-const onClose = () => {
-    showModal.value = false;
-};
+// const onClose = () => {
+//     showModal.value = false;
+// };
 
 const submitPayment = async () => {
     try {
@@ -151,12 +145,19 @@ const submitPayment = async () => {
 };
 
 const onApprove = async () => {
+    const userId = page.props.auth.user.id;
+    let isLastApprover = false;
+    const lastApprover = form.approvers[form.approvers.length - 1];
+
+    isLastApprover = lastApprover.approver_id === userId;
+
     try {
         const response = await axios.post('/sezad/approve', {
             user_id: page.props.auth.user.id,
             application_form_id: form.application_id,
             approver_group_id: props.userRole.approver_group_id,
             sequence: Number(props.userRole.sequence),
+            isLastApprover: isLastApprover,
         });
 
         const data = response.data;
@@ -172,6 +173,7 @@ const onApprove = async () => {
             }
 
             form.status = data.status;
+            form.application_form_status = 'Approved';
 
             toast.success('Application approved successfully.');
         }
@@ -209,6 +211,8 @@ watch(
         if (!app || !app.application) return;
         console.log('Application Prop Changed:', app);
         form.application_id = app.application.id;
+
+        // form.application_form_status = app.application.status ?? '';
         form.control_number = app.control_number ?? '';
         form.form_title = app.application.form_title ?? '';
         form.form_number = app.application.form_number ?? '';
@@ -220,10 +224,12 @@ watch(
         form.form_id = app.application?.id ?? '';
         const last = app.application.approver_group_approvers?.at(-1);
         form.approved_date = last?.updated_at ?? '';
+
+        console.log('Form Approvers', form.approvers);
     },
     { immediate: true },
 );
-console.log(form.approvers.length);
+// console.log(form.approvers.length);
 </script>
 
 <template>
@@ -293,6 +299,7 @@ console.log(form.approvers.length);
                                 "
                             >
                                 {{ a.status }}
+                                <!-- {{ form.application_form_status }} -->
                             </span>
                         </li>
                     </ol>

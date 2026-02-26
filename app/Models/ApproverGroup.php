@@ -13,6 +13,7 @@ class ApproverGroup extends Model
     protected $fillable = [
         'name',
         'description',
+        "purpose"
     ];
 
     /**
