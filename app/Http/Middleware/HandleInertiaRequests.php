@@ -36,26 +36,7 @@ class HandleInertiaRequests extends Middleware
 
     $user = $request->user();
 
-    $applications = [];
-    $userRole = [];
-
-    if ($user) {
-        $applications = ApproverGroupApprover::with(
-                'application',
-                'application.accreditations',
-                'application.user',
-                'application.ApproverGroupApprovers.approver',
-                'application.articleDetails',
-                'application.selections',
-                'application.uploads'
-            )
-            ->where('approver_id', $user->id)
-            ->orderBy('id', 'desc')
-            ->get();
-
-        $userRole = ApproverSets::where('user_id', $user->id)
-            ->get(['approver_group_id','role','sequence']);
-    }
+   
     $id = auth()->id();
     $urole = UserDetail::with('role')->where('user_id',$id)->first();
        
@@ -72,13 +53,11 @@ class HandleInertiaRequests extends Middleware
                 'id' => $user->id,
                 'name' => $user->name,
                 'email' => $user->email,
-                'role' => $userRole,
                 'userRole' => $urole->role->name,
                 'details' =>$urole,
             ] : null,
         ],
 
-        'applications' => $applications,
     ]);
 }
 }
