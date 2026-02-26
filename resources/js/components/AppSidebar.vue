@@ -119,8 +119,7 @@ const roles = {
         user?.details.role_id === 2 &&
         user?.details.user_function_id === 5,
 };
-console.log(`user Role: ${JSON.stringify(user, null, 2)}`);
-console.log(`user Function : ${userDetails?.user_function_id}`);
+
 /* ===============================
    NAVIGATION ITEMS
    =============================== */
@@ -234,6 +233,7 @@ const navConfig: Record<string, NavItem[]> = {
             href: '/',
             icon: LayoutGrid,
             children: [
+                { title: 'Permit List', href: '/sezad/osac', icon: '' },
                 { title: 'Approved', href: '/', icon: '' },
                 { title: 'Pending', href: '/', icon: '' },
             ],
