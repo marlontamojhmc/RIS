@@ -4,7 +4,7 @@ import SezadModalCard from '@/components/SezadModalCard.vue';
 import Modal from '@/components/View/Modal.vue';
 import AppLayout from '@/layouts/AppLayout.vue';
 import type { PageProps as InertiaPageProps } from '@inertiajs/core';
-import { useForm, usePage } from '@inertiajs/vue3';
+import { usePage } from '@inertiajs/vue3';
 import { ref } from 'vue';
 
 interface UserRole {
@@ -52,7 +52,6 @@ const onOpenModal = (app: any) => {
 const onClose = () => {
     showModal.value = false;
 };
-
 </script>
 
 <template>
