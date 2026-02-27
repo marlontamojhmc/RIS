@@ -1,5 +1,5 @@
 import { AppPageProps } from '@/types/index';
-
+import Echo from 'laravel-echo';
 // Extend ImportMeta interface for Vite...
 declare module 'vite/client' {
     interface ImportMetaEnv {
@@ -22,5 +22,13 @@ declare module 'vue' {
         $inertia: typeof Router;
         $page: Page;
         $headManager: ReturnType<typeof createHeadManager>;
+    }
+}
+
+declare global {
+    interface Window {
+        // We tell TS we are using 'reverb' as the driver
+        Echo: Echo<'reverb'>;
+        Pusher: any;
     }
 }

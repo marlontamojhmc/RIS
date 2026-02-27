@@ -191,7 +191,7 @@ class SEZADController extends Controller
     $update_application->status = 'Approved';
     $update_application->save();
     }
-    
+    event(new \App\Events\ApplicationUpdateEvent($request->application_form_id));
     // Return updated approver and status
     return response()->json([
         'success' => true,
