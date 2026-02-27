@@ -10,8 +10,25 @@ import axios from 'axios';
 import Vue3EasyDataTable from 'vue3-easy-data-table';
 import 'vue3-easy-data-table/dist/style.css';
 
+<<<<<<< HEAD
+=======
+import { createInertiaApp } from '@inertiajs/vue3'
+import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers'
+// import type { DefineComponent } from 'vue'
+// import { createApp, h } from 'vue'
+import { initializeTheme } from './composables/useAppearance'
+import axios from 'axios'
+import Vue3EasyDataTable from 'vue3-easy-data-table'
+import 'vue3-easy-data-table/dist/style.css'
+>>>>>>> 51b450213d4e6e032777f5015dcd211a9537ac90
 import Toast, { POSITION } from 'vue-toastification';
 import 'vue-toastification/dist/index.css';
+import { configureEcho } from '@laravel/echo-vue';
+import './echo';
+import { createApp, h, DefineComponent } from 'vue';
+configureEcho({
+    broadcaster: 'reverb',
+});
 
 // ✅ Ziggy
 import { ZiggyVue } from 'ziggy-js';

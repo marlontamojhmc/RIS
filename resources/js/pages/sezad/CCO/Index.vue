@@ -4,9 +4,9 @@ import SezadModalCard from '@/components/SezadModalCard.vue';
 import Modal from '@/components/View/Modal.vue';
 import AppLayout from '@/layouts/AppLayout.vue';
 import type { PageProps as InertiaPageProps } from '@inertiajs/core';
-import { usePage } from '@inertiajs/vue3';
-import { ref } from 'vue';
+import { router, usePage } from '@inertiajs/vue3';
 
+import { onMounted, ref, watch } from 'vue';
 interface UserRole {
     role: string;
     sequence: number | string;
@@ -52,6 +52,31 @@ const onOpenModal = (app: any) => {
 const onClose = () => {
     showModal.value = false;
 };
+onMounted(() => {
+    // We use window.Echo directly because it's already configured via app.ts
+    window.Echo.channel('applications') // Public channel
+        .listen('.application.updated', (e: any) => {
+            console.log('line59');
+            router.reload({ only: ['applications'] });
+        });
+});
+watch(
+    () => props.applications,
+    (newApps) => {
+        if (selectedApplication.value) {
+            // Find the fresh data for the application currently open in the modal
+            const freshData = newApps.find(
+                (app) => app.id === selectedApplication.value.id,
+            );
+            if (freshData) {
+                console.log('line72 refreshed');
+                selectedApplication.value = freshData;
+                // This line triggers the watcher inside SezadModalCard.vue
+            }
+        }
+    },
+    { deep: true },
+);
 </script>
 
 <template>
@@ -59,7 +84,7 @@ const onClose = () => {
         <!-- <AppSidebarLayout> -->
         <div>
             <h1 class="mb-4 text-center text-2xl font-bold">
-                CCO/CCA Dashboard
+                Registration Officer Dashboard
             </h1>
         </div>
         <div class="p-1.5">

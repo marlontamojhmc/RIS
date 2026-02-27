@@ -17,6 +17,7 @@ class CcoController extends Controller
        public function index(AppService $appService)
     {
 
+<<<<<<< HEAD
     $user = auth()->id();
         
        $applications = ApproverGroupApprover::with(
@@ -35,6 +36,8 @@ class CcoController extends Controller
                                                 ->orderBy('id', 'desc')
                                                 ->get();
 
+=======
+>>>>>>> 51b450213d4e6e032777f5015dcd211a9537ac90
         return Inertia::render('sezad/CCO/Index', [
             'applications' => $applications
         ]);

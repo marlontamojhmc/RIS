@@ -93,7 +93,7 @@ class ApplicationsController extends Controller
             'application_form_id' => null,
             'form' => $formOptions,
             'approverGroupId' => null,
-            'applications' => $application,
+            'applications'=>$application
 
         ]);
     }

@@ -9,8 +9,10 @@ use Illuminate\Support\Facades\Gate;
 use App\Models\Locator\ApplicationModel;
 use App\Models\ApproverGroup;
 use App\Helpers\AppConstants;
+use App\Services\AppService;
 class OsacController extends Controller
 {
+<<<<<<< HEAD
    
    public function index()
    { 
@@ -34,8 +36,18 @@ class OsacController extends Controller
       return Inertia::render('sezad/OSAC/Index',[
          'applications'=> $applications,
       ]);
+=======
+
+public function index(AppService $appService)
+{
+    $applications = $appService->getApplicationsForApprover(auth()->id());
+
+    return Inertia::render('sezad/OSAC/Index', [
+        'applications' => $applications
+    ]);
+}
+>>>>>>> 51b450213d4e6e032777f5015dcd211a9537ac90
     
-   }
    public function create()
    {
       return Inertia::render('sezad/OSAC/Create',[]);

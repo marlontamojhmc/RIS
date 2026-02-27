@@ -37,10 +37,18 @@ class HandleInertiaRequests extends Middleware
     $user = $request->user();
 
 //    dd($user);
+if($user){
+
     $id = auth()->id();
     $urole = UserDetail::with('role')->where('user_id',$id)->first();
+<<<<<<< HEAD
         $userRole = ApproverSets::where('user_id', $id)
             ->get(['approver_group_id','role','sequence']);
+=======
+    $userRole = ApproverSets::where('user_id', $user->id)
+    ->get(['approver_group_id','role','sequence']);
+    }
+>>>>>>> 51b450213d4e6e032777f5015dcd211a9537ac90
     return array_merge(parent::share($request), [
          'app' => [
             'name' => config('app.name'),
