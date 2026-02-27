@@ -71,10 +71,6 @@ const permissions: Permissions = {
 const user = propsAny.auth?.user ?? {};
 const userDetails = user.details ?? {};
 
-// console.log('userRole_id= '+userDetails.role_id);
-// console.log('userDepartment_id= '+userDetails.department_id);
-// console.log('userPermission_id= '+userDetails.permission_id);
-// console.log('useFunction_id= '+userDetails.user_function_id);
 /* ===============================
    ROLE CHECKS
    =============================== */
@@ -114,12 +110,17 @@ const roles = {
         userDetails.department_id === 12,
 
     finance: user?.details.department_id === 10 && user?.details.role_id === 2,
+
+    registerOfficer:
+        user?.details.business_type_id === null &&
+        user?.details.department_id === 12 &&
+        user?.details.user_function_id === 12 &&
+        user?.details.position_id === 60,
     sezadManager:
         user?.details.department_id === 2 &&
         user?.details.role_id === 2 &&
         user?.details.user_function_id === 5,
 };
-
 /* ===============================
    NAVIGATION ITEMS
    =============================== */
@@ -239,13 +240,57 @@ const navConfig: Record<string, NavItem[]> = {
             ],
         },
     ],
-    cco: [{ title: 'Custom Officer', href: '#', icon: LayoutGrid }],
+    cco: [
+        { title: 'Custom Officer', href: '/', icon: LayoutGrid },
+        {
+            title: 'Permits',
+            href: '/',
+            icon: LayoutGrid,
+            children: [
+                { title: 'Permit List', href: '/sezad/cco', icon: '' },
+                { title: 'Approved', href: '/', icon: '' },
+                { title: 'Pending ', href: '/', icon: '' },
+            ],
+        },
+    ],
     finance: [
         {
             title: 'Permits',
             href: '/',
             icon: LayoutGrid,
             children: [
+                { title: 'Approved', href: '/', icon: '' },
+                { title: 'Pending', href: '/', icon: '' },
+            ],
+        },
+    ],
+    registerOfficer: [
+        {
+            title: 'Permits',
+            href: '/',
+            icon: LayoutGrid,
+            children: [
+                { title: 'Permit List', href: '/sezad/ro', icon: '' },
+                { title: 'Approved', href: '/', icon: '' },
+                { title: 'Pending ', href: '/', icon: '' },
+            ],
+        },
+        {
+            title: 'Accreditations',
+            href: '/',
+            icon: LayoutGrid,
+            children: [
+                { title: 'Accreditation List', href: '', icon: '' },
+                { title: 'Approved', href: '/', icon: '' },
+                { title: 'Pending', href: '/', icon: '' },
+            ],
+        },
+        {
+            title: 'ATO',
+            href: '/',
+            icon: LayoutGrid,
+            children: [
+                { title: 'ATO list', href: '/', icon: '' },
                 { title: 'Approved', href: '/', icon: '' },
                 { title: 'Pending', href: '/', icon: '' },
             ],
@@ -302,6 +347,7 @@ else if (roles.OSAC) mainNavItems.push(...navConfig.osac);
 else if (roles.Cco) mainNavItems.push(...navConfig.cco);
 else if (roles.finance) mainNavItems.push(...navConfig.finance);
 else if (roles.sezadManager) mainNavItems.push(...navConfig.sezadManager);
+else if (roles.registerOfficer) mainNavItems.push(...navConfig.registerOfficer);
 /* ===============================
    NOTIFICATIONS
    =============================== */

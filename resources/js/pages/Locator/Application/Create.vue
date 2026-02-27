@@ -165,12 +165,12 @@ function selectForm(f: any) {
     createForm.type = f.form_type;
     createForm.approver_group_id = f.approver_group_id;
     approvalForm.approver_group_id = f.approver_group_id;
-    buttonVisible.value = true;
 }
 </script>
 
 <template>
     <LocatorAppSidebarLayout :breadcrumbs="breadcrumbs">
+        {{ processing }}
         <TopCard :stats="stat" />
 
         <div

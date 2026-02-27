@@ -31,7 +31,7 @@ class ApplicationsController extends Controller
      * Display a listing of the resource.
      */
     public function index()
-    {
+    { 
         abort(403);
         $application = ApplicationModel::with(['selections.option', 'selections.user'])
             ->latest()
@@ -78,21 +78,22 @@ class ApplicationsController extends Controller
      * Show the form for creating a new resource.
      */
     public function create()
-    {
+    {    
         $user = auth()->user();
         // pwedeng natin macheck ang applicationModel kung anong form yung inapplyan ng user
         //  gamit yung id ng application_form table
-        $application = ApplicationModel::find(516);
+        $application = ApplicationModel::all();
         // $formId = $application->form_id;
         // dd($user->atoApplication);
         // check if user has approved ATO if it does remove ATO to the Option
         $formOptions = $this->service->getFormOptionsForUser();
-
+        
         return Inertia::render('Locator/Application/Create', [
             'user' => $user,
             'application_form_id' => null,
             'form' => $formOptions,
             'approverGroupId' => null,
+            'applications' => $application,
 
         ]);
     }
@@ -101,23 +102,27 @@ class ApplicationsController extends Controller
      * Store a newly created resource in storage.
      */
     public function store(Request $request)
-    {   
+    {  
         $user = auth()->user();
+        $start = microtime(true);
         if ($request->type === 'Accreditation') {
             $result = $this->service->createApplication($request->form_name, $request->type, $request->form_id);
+            \Log::info('Service Time: ' . (microtime(true) - $start));
         } elseif ($request->type === 'Permit') {
             $result = $this->service->createApplication($request->form_name, $request->type, $request->form_id);
+            \Log::info('Service Time: ' . (microtime(true) - $start));
         } else {
             $result = $this->service->createApplication($request->form_name, $request->type, $request->form_id);
+            \Log::info('Service Time: ' . (microtime(true) - $start));
         }
 
-        $GcValidity = Form::with('permitClearanceFees')->findOrFail(1);
-        $BicValidity = Form::with('permitClearanceFees')->findOrFail(2);
-        $BocValidity = Form::with('permitClearancefees')->findOrFail(3);
-        $TbocValidity = Form::with('permitClearancefees')->findOrFail(4);
-        $LpcValidity = Form::with('permitClearancefees')->findOrFail(5);
-        $application = $result['application'];
-        $approverForm = $result['approverForm'];
+        
+        
+        
+       
+       $application = $result['application'];
+        
+        
 
         if ($request->form_id === 8) {
             return Inertia::render('ATO/ATO-Business-Enterprise-Create', [
@@ -126,6 +131,7 @@ class ApplicationsController extends Controller
                 'application_form_number' => $application->form_number,
             ]);
         } elseif ($request->form_id === 9) {
+            $approverForm = $result['approverForm'];
             return Inertia::render('ATO/Accommodation-Create', [
                 'form_id' => $request->form_id,
                 'form_number' => $application->form_number,
@@ -145,6 +151,7 @@ class ApplicationsController extends Controller
                 'application_group_id' => $approverForm->approver_group_id,
             ]);
         } elseif ($request->form_id === 12) {
+            $approverForm = $result['approverForm'];
             return Inertia::render('Accreditation/TradeFair/AccreditationForm', [
                 'form_number' => $application->form_number,
                 'application_id' => $application->id,
@@ -152,12 +159,14 @@ class ApplicationsController extends Controller
             ]);
 
         } elseif ($request->form_id === 14) {
+            $approverForm = $result['approverForm'];
             return Inertia::render('Accreditation/Provisional/ProvisionalGrantForm', [
                 'form_number' => $application->form_number,
                 'application_id' => $application->id,
                 'application_group_id' => $approverForm->approver_group_id,
             ]);
         } elseif ($request->form_id === 1) {
+            $GcValidity = Form::with('permitClearanceFees')->findOrFail(1);
             return Inertia::render('PERMITS/GP/GatePass', [
                 'user' => $user,
                 'form_id' =>$request->form_id,
@@ -169,6 +178,7 @@ class ApplicationsController extends Controller
             ]);
 
         } elseif ($request->form_id === 2) {
+            $BicValidity = Form::with('permitClearanceFees')->findOrFail(2);
             return Inertia::render('PERMITS/BIC/BringInClearance', [
                 'user' => $user,
                 'application' => $application,
@@ -178,6 +188,7 @@ class ApplicationsController extends Controller
                 'permitClearanceFees' => $BicValidity->permitClearanceFees,
             ]);
         } elseif ($request->form_id === 3) {
+            $BocValidity = Form::with('permitClearancefees')->findOrFail(3);
             return Inertia::render('PERMITS/BOC/BringOutClearance', [
                 'user' => $user,
                 'application' => $application,
@@ -187,6 +198,7 @@ class ApplicationsController extends Controller
                 'permitClearanceFees' => $BocValidity->permitClearanceFees,
             ]);
         } elseif ($request->form_id === 4) {
+            $TbocValidity = Form::with('permitClearancefees')->findOrFail(4);
             return Inertia::render('PERMITS/TBOC/TemporaryBringOutClearance', [
                 'user' => $user,
                 'application' => $application,
@@ -196,6 +208,7 @@ class ApplicationsController extends Controller
                 'permitClearanceFees' => $TbocValidity->permitClearanceFees,
             ]);
         } elseif ($request->form_id === 5) {
+             $LpcValidity = Form::with('permitClearancefees')->findOrFail(5);
             return Inertia::render('PERMITS/LPC/LocalPurchaseClearance', [
                 'user' => $user,
                 'application' => $application,
@@ -205,6 +218,7 @@ class ApplicationsController extends Controller
                 'permitClearanceFees' => $LpcValidity->permitClearanceFees,
             ]);
         } else {
+            $approverForm = $result['approverForm'];
             return Inertia::render('Locator/Application/Create', [
                 'user' => $user,
                 'application_form_id' => $application->id, // Pass the new ID

@@ -84,8 +84,9 @@ class AppService
      * STORE
      * ------------------------*/
 public function createApplication($type, $form_type, $form_id)
-{
+{    $start = microtime(true);
     $user = Auth::user();
+    \Log::info('Auth: ' . (microtime(true) - $start));
 
     $application = ApplicationModel::create([
         'form_title' => $type,
@@ -93,8 +94,9 @@ public function createApplication($type, $form_type, $form_id)
         'user_id'    => $user->id,
         'form_id'    => $form_id,
     ]);
+    \Log::info('Create Application: ' . (microtime(true) - $start));
      $approverForm = Form::findOrFail($form_id);
-
+     \Log::info('Find Form: ' . (microtime(true) - $start));
     $sets = ApproverSets::where(
         'approver_group_id',
         $approverForm->approver_group_id
@@ -108,7 +110,7 @@ public function createApplication($type, $form_type, $form_id)
         'sequence' => 0,
         'status' =>AppConstants::STATUS_APPROVED
     ]);
-
+    \Log::info('Get Sets: ' . (microtime(true) - $start));
     
     $sets->prepend($ownerSet);
     foreach ($sets as $set) {
@@ -122,7 +124,7 @@ public function createApplication($type, $form_type, $form_id)
         ]);
     }
     // dd($sets);
-
+   \Log::info('Insert Approvers: ' . (microtime(true) - $start));
     return [
         'application'  => $application,
         'approverForm' => $approverForm,

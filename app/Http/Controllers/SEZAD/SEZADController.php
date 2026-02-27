@@ -23,6 +23,7 @@ class SEZADController extends Controller
 {
     public function index()
     {
+        
         $user = Auth::user();
         $businessTypes = BusinessType::all();
         $tempUsers = TemporaryUser::latest()->get();

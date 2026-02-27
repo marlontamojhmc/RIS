@@ -28,6 +28,7 @@ use App\Http\Controllers\TestPdfController;
 use App\Models\Accreditation\Accreditation;
 use App\Http\Controllers\Applications\ApplicationsController;
 use App\Http\Controllers\FINANCE\FinanceController;
+use App\Http\Controllers\Sezad2Controller;
 
 /*
 |--------------------------------------------------------------------------
@@ -170,7 +171,8 @@ Route::get('/422', function(){
    abort(422);
 });
 
-
+Route::get('/sezad/control/{id}', [Sezad2Controller::class, 'index'])->name('test.index.sezad');
+Route::get('/sezad/createapp',[Sezad2Controller::class,'create'])->name('test.create.sezad');
 Route::get('/test-pdf', [TestPdfController::class, 'index']);
 Route::get('/pdf/{id}/generate', [TestPdfController::class, 'generate'])
     ->name('pdf.generate');
