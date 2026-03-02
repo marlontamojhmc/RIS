@@ -3,77 +3,117 @@ import ApplicationFormsTable from '@/components/ApplicationFormsTable.vue';
 import SezadModalCard from '@/components/SezadModalCard.vue';
 import Modal from '@/components/View/Modal.vue';
 import AppLayout from '@/layouts/AppLayout.vue';
-import type { PageProps as InertiaPageProps } from '@inertiajs/core';
-import { router, usePage } from '@inertiajs/vue3';
-
+import { usePage } from '@inertiajs/vue3';
 import { onMounted, ref, watch } from 'vue';
+
 interface UserRole {
     role: string;
     sequence: number | string;
     approver_group_id: number;
 }
+
 interface Application {
     id: number;
     control_number?: string;
-    application?: {
-        form_title?: string;
-        form_number?: string;
-        status?: string;
-    } | null;
+    form_title?: string;
+    form_number?: string;
+    status?: string;
+    approver_group_approvers?: any[];
+    [key: string]: any;
 }
-interface PageProps extends InertiaPageProps {
+
+interface PageProps extends Record<string, unknown> {
+    name: string;
+    quote: { message: string; author: string };
+    sidebarOpen: boolean;
     auth: {
-        user: InertiaPageProps['auth']['user'] & {
+        user: {
+            id: number;
+            name: string;
+            email: string;
+            email_verified_at: string | null;
+            created_at: string;
+            updated_at: string;
             role: UserRole[];
         };
     };
-}
-const props = defineProps<{
     applications: Application[];
-}>();
+}
 
 const page = usePage<PageProps>();
+const props = defineProps<{ applications: Application[] }>();
 
 const userRole = page.props.auth.user.role[0];
-const applications = props.applications;
+const applications = ref<Application[]>(
+    props.applications ? [...props.applications] : [],
+);
 const showModal = ref(false);
 const selectedApplication = ref<Application | null>(null);
 
-const onOpenModal = (app: any) => {
-    console.log('Selected Application:', app);
-    selectedApplication.value = app;
-
+const onOpenModal = (app: Application) => {
+    // Clone to ensure a clean reference for the modal
+    selectedApplication.value = JSON.parse(JSON.stringify(app));
     showModal.value = true;
-    console.log(
-        'Selected Application after setting:',
-        selectedApplication.value,
-    );
 };
+
 const onClose = () => {
     showModal.value = false;
 };
+
 onMounted(() => {
-    // We use window.Echo directly because it's already configured via app.ts
-    window.Echo.channel('applications') // Public channel
-        .listen('.application.updated', (e: any) => {
-            console.log('line59');
-            router.reload({ only: ['applications'] });
-        });
+    if (!window.Echo) {
+        console.error('Echo is not defined. Check your bootstrap.js');
+        return;
+    }
+
+    window.Echo.channel('applications').listen(
+        '.ApplicationUpdated',
+        (event: any) => {
+            const newAppData = event.application;
+            if (!newAppData) return;
+
+            const index = applications.value.findIndex((item: any) => {
+                const id = item.application?.id || item.id;
+                return Number(id) === Number(newAppData.id);
+            });
+
+            if (index !== -1) {
+                const oldItem = applications.value[index];
+
+                // Build the update to match your exact component prop needs
+                const updatedItem = {
+                    ...oldItem,
+                    ...newAppData, // This puts id, status, etc. at the top
+                    application: newAppData, // Keeps the nested version for sub-components
+
+                    // CRITICAL: Pull the array out of the nested application to the TOP level
+                    approver_group_approvers:
+                        newAppData.approver_group_approvers,
+                };
+
+                // Update the array reactively
+                applications.value.splice(index, 1, updatedItem);
+
+                // Force update the selected application for the modal
+                if (selectedApplication.value) {
+                    const currentId =
+                        selectedApplication.value.application?.id ||
+                        selectedApplication.value.id;
+                    if (Number(currentId) === Number(newAppData.id)) {
+                        // We use a nextTick or a fresh assignment to ensure Vue sees the nested change
+                        selectedApplication.value = { ...updatedItem };
+                        console.log('MODAL DATA REPLACED');
+                    }
+                }
+            }
+        },
+    );
 });
+
 watch(
     () => props.applications,
     (newApps) => {
-        if (selectedApplication.value) {
-            // Find the fresh data for the application currently open in the modal
-            const freshData = newApps.find(
-                (app) => app.id === selectedApplication.value.id,
-            );
-            if (freshData) {
-                console.log('line72 refreshed');
-                selectedApplication.value = freshData;
-                // This line triggers the watcher inside SezadModalCard.vue
-            }
-        }
+        applications.value = [...newApps];
     },
     { deep: true },
 );
@@ -81,29 +121,26 @@ watch(
 
 <template>
     <AppLayout>
-        <!-- <AppSidebarLayout> -->
         <div>
             <h1 class="mb-4 text-center text-2xl font-bold">
                 Registration Officer Dashboard
             </h1>
         </div>
+
         <div class="p-1.5">
-            <pre>
-                <!-- {{ applications }} -->
-            </pre>
             <ApplicationFormsTable
                 :userRole="userRole"
                 :applications="applications"
                 @onOpenModal="onOpenModal"
             />
+
             <Modal :show="showModal" @close="onClose" maxWidth="max-w-2xl">
                 <SezadModalCard
+                    v-if="selectedApplication"
                     :applicationProps="selectedApplication"
                     :userRole="userRole"
                 />
             </Modal>
         </div>
-
-        <!-- </AppSidebarLayout> -->
     </AppLayout>
 </template>

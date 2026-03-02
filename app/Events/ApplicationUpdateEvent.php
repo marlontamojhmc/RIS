@@ -1,5 +1,5 @@
 <?php
- namespace App\Events;
+namespace App\Events;
 
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
@@ -11,23 +11,22 @@ class ApplicationUpdateEvent implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    public $applicationId;
+    public $application;
 
-    public function __construct($applicationId)
-    {
-        $this->applicationId = $applicationId;
-    }
-
-public function broadcastOn(): array
+public function __construct($application)
 {
-    
-    return [
-        new Channel('applications'), // Remove 'Private'
-    ];
+    // It's often safer to convert to array for broadcasting 
+    // to avoid Serialization issues with complex Eloquent models
+    $this->application = $application; 
 }
+
+    public function broadcastOn()
+    {
+        return new Channel('applications');
+    }
 
     public function broadcastAs()
     {
-        return 'application.updated';
+        return 'ApplicationUpdated';
     }
 }
