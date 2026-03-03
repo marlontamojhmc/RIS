@@ -28,6 +28,9 @@ use App\Http\Controllers\TestPdfController;
 use App\Models\Accreditation\Accreditation;
 use App\Http\Controllers\Applications\ApplicationsController;
 use App\Http\Controllers\FINANCE\FinanceController;
+use App\Events\ApplicationUpdateEvent;
+use App\Http\Controllers\OSAC\OsacController;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -37,7 +40,16 @@ use App\Http\Controllers\FINANCE\FinanceController;
 | Keep all URL names intact. Organized by section for clarity.
 |
 */
+// Reverb
+Route::get('/reverb-test',function () {
+    return Inertia::render('sezad');
+});
+Route::get('/event',function(){
+    $message = 'ssssss';
+    ApplicationUpdateEvent::dispatch($message);
 
+    return response("Event dispatched with message ".$message,200);
+});
 // 🔹 Public Route
 Route::get('/', fn() => Inertia::render('Welcome'))->name('home');
 

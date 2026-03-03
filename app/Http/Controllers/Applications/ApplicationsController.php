@@ -82,7 +82,7 @@ class ApplicationsController extends Controller
         $user = auth()->user();
         // pwedeng natin macheck ang applicationModel kung anong form yung inapplyan ng user
         //  gamit yung id ng application_form table
-        $application = ApplicationModel::find(516);
+        $application = ApplicationModel::all();
         // $formId = $application->form_id;
         // dd($user->atoApplication);
         // check if user has approved ATO if it does remove ATO to the Option
@@ -93,6 +93,7 @@ class ApplicationsController extends Controller
             'application_form_id' => null,
             'form' => $formOptions,
             'approverGroupId' => null,
+            'applications'=>$application
 
         ]);
     }

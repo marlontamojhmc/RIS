@@ -17,6 +17,10 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use App\Models\Locator\ApplicationModel;
+use App\Events\ApplicationUpdateEvent;
+
+use App\Services\AppService;
+
 
 
 class SEZADController extends Controller
@@ -168,35 +172,47 @@ class SEZADController extends Controller
 
 
     // update status of approvers
- public function updateStatus(Request $request)
+public function updateStatus(Request $request)
 {
-    // dump($request->all());
-    $user_id = $request->user()->id ?? null;
-    $isLastApprover = $request->input('isLastApprover');
-    $approver = ApproverGroupApprover::where('application_form_id', $request['application_form_id'])
-        ->where('approver_id', $user_id)
-        ->first();
+    try {
+        $applicationId = $request->input('application_form_id');
+        $user_id = $request->user()->id;
+        $isLastApprover = filter_var($request->input('isLastApprover'), FILTER_VALIDATE_BOOLEAN);
 
-    if (!$approver) {
-        return response()->json(['success' => false, 'message' => 'Approver not found'], 404);
-    }
+        DB::transaction(function () use ($user_id, $isLastApprover, $applicationId) {
+            ApproverGroupApprover::where('application_form_id', $applicationId)
+                ->where('approver_id', $user_id)
+                ->update([
+                    'status' => 'Approved', 
+                    'acted_at' => now(),
+                    'updated_at' => now()
+                ]);
 
-    $approver->status = 'Approved';
-    $approver->save();
-    if($isLastApprover){
-    $update_application = ApplicationModel::where('id',$request['application_form_id'])->first();
-    if(!$update_application){
-      return response()->json(['success' => false, 'message' => 'Application form not found'], 404);
+            if ($isLastApprover) {
+                ApplicationModel::where('id', $applicationId)->update(['status' => 'Approved']);
+            }
+        });
+
+        // Fetch fresh data with specific relations
+        $app = ApplicationModel::with(['user'])->findOrFail($applicationId);
+        $approvers = ApproverGroupApprover::with('approver')
+            ->where('application_form_id', $applicationId)
+            ->get();
+
+        // Build a clean array for broadcasting
+        $broadcastData = $app->toArray();
+        $broadcastData['approver_group_approvers'] = $approvers->toArray();
+
+        // Send the ARRAY, not the Model object
+        broadcast(new ApplicationUpdateEvent($broadcastData)); 
+
+        return response()->json([
+            'success' => true,
+            'application' => $broadcastData
+        ]);
+
+    } catch (\Exception $e) {
+        return response()->json(['error' => $e->getMessage()], 500);
     }
-    $update_application->status = 'Approved';
-    $update_application->save();
-    }
-    
-    // Return updated approver and status
-    return response()->json([
-        'success' => true,
-        'approver_id' => $approver->approver_id,
-        'status' => $approver->status,
-    ]);
 }
 }

@@ -18,7 +18,7 @@ class CcoController extends Controller
     {
         $applications = $appService->getApplicationsForApprover(auth()->id());
 
-        return Inertia::render('sezad/Manager/Index', [
+        return Inertia::render('sezad/CCO/Index', [
             'applications' => $applications
         ]);
     }
