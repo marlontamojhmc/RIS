@@ -13,15 +13,16 @@ use App\Models\ApproverGroup;
 use App\Services\AppService;
 class SezadManagerController extends Controller
 {
-       public function index(AppService $appService)
-    {
-        $applications = $appService->getApplicationsForApprover(auth()->id());
+public function index(AppService $appService)
+{
+    $applications = $appService->getApplicationsForApprover(auth()->id());
 
-        return Inertia::render('sezad/Manager/Index', [
-            'applications' => $applications
-        ]);
-    }
-    
+    // FIX: Remove 'Manager/' and ensure the casing matches your filename
+    // If your file is index.vue (lowercase), use 'sezad/index'
+    return Inertia::render('sezad/index', [
+        'applications' => $applications
+    ]);
+}
    // public function index()
    // {
    //    // if (Gate::denies('access-sezadManager')) {

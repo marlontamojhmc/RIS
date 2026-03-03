@@ -13,14 +13,7 @@ use App\Services\AppService;
 class OsacController extends Controller
 {
 
-public function index(AppService $appService)
-{
-    $applications = $appService->getApplicationsForApprover(auth()->id());
 
-    return Inertia::render('sezad/OSAC/Index', [
-        'applications' => $applications
-    ]);
-}
     
    public function create()
    {

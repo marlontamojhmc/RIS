@@ -12,7 +12,6 @@ interface UserRole {
     approver_group_id: number;
 }
 
-// Fixed Interface: 'control_number' is string | undefined to match the plugin's expectation
 interface Application {
     id: number;
     control_number?: string;
@@ -45,12 +44,16 @@ const page = usePage<PageProps>();
 const props = defineProps<{ applications: Application[] }>();
 
 const userRole = page.props.auth.user.role[0];
-const applications = ref<Application[]>([...props.applications]);
+console.log('index UserRole', userRole);
+const applications = ref<Application[]>(
+    props.applications ? [...props.applications] : [],
+);
 const showModal = ref(false);
 const selectedApplication = ref<Application | null>(null);
 
 const onOpenModal = (app: Application) => {
-    selectedApplication.value = app;
+    // Clone to ensure a clean reference for the modal
+    selectedApplication.value = JSON.parse(JSON.stringify(app));
     showModal.value = true;
 };
 
@@ -59,49 +62,49 @@ const onClose = () => {
 };
 
 onMounted(() => {
-    if (!window.Echo) return;
+    if (!window.Echo) {
+        console.error('Echo is not defined. Check your bootstrap.js');
+        return;
+    }
 
     window.Echo.channel('applications').listen(
         '.ApplicationUpdated',
         (event: any) => {
-            // Get the application from the event
-            const updatedApp = event.application ? event.application : event;
-            const targetId = Number(updatedApp.id);
+            const newAppData = event.application;
+            if (!newAppData) return;
 
-            console.log('Searching for targetId:', targetId);
-            console.log(
-                'Current IDs in table:',
-                applications.value.map((a) => a.id),
-            );
-
-            // IMPROVED SEARCH: Check root ID and nested ID
-            const index = applications.value.findIndex((a) => {
-                const rootId = a.id ? Number(a.id) : null;
-                const nestedId = a.application?.id
-                    ? Number(a.application.id)
-                    : null;
-                return rootId === targetId || nestedId === targetId;
+            const index = applications.value.findIndex((item: any) => {
+                const id = item.application?.id || item.id;
+                return Number(id) === Number(newAppData.id);
             });
 
             if (index !== -1) {
-                console.log('Match found at index:', index);
+                // Create the updated object
+                const updatedItem = {
+                    ...applications.value[index],
+                    ...newAppData,
+                    application: newAppData,
+                    // Ensure the list is at the top level for the watcher
+                    approver_group_approvers:
+                        newAppData.approver_group_approvers,
+                };
 
-                // Update the table
-                applications.value.splice(index, 1, updatedApp);
+                // Update the main table
+                applications.value.splice(index, 1, updatedItem);
 
-                // Force Update Modal
+                // SYNC THE MODAL
                 if (selectedApplication.value) {
-                    const selectedId =
-                        selectedApplication.value.id ||
-                        selectedApplication.value.application?.id;
-                    if (Number(selectedId) === targetId) {
-                        selectedApplication.value = { ...updatedApp }; // Spread to trigger deep reactivity
+                    const currentId =
+                        selectedApplication.value.application?.id ||
+                        selectedApplication.value.id;
+                    if (Number(currentId) === Number(newAppData.id)) {
+                        // Use a fresh object reference to trigger the watcher in SezadModalCard
+                        selectedApplication.value = JSON.parse(
+                            JSON.stringify(updatedItem),
+                        );
+                        console.log('MODAL DATA REPLACED - Syncing Approvers');
                     }
                 }
-            } else {
-                console.warn(
-                    `ID ${targetId} still not found in current table rows.`,
-                );
             }
         },
     );
@@ -120,7 +123,7 @@ watch(
     <AppLayout>
         <div>
             <h1 class="mb-4 text-center text-2xl font-bold">
-                Registration Officer Dashboard
+                {{ userRole?.role }} Dashboard
             </h1>
         </div>
 

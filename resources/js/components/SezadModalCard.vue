@@ -25,6 +25,7 @@ interface UserRole {
 interface ApplicationItem {
     id: number;
     control_number?: string | null;
+    status?: string;
     application?: {
         id: number;
         form_title?: string;
@@ -83,7 +84,15 @@ Actions
 ----------------------- */
 const submitPayment = async () => {
     try {
-        const response = await axios.post('/fsd/accept-payment', {
+        // console.log({
+        //     application_id: form.application_id,
+        //     form_type: form.form_type,
+        //     form_number: form.form_number,
+        //     form_id: form.form_id,
+        //     is_number: formPayment.is_number,
+        //     amount: formPayment.amount,
+        // });
+        const response = await axios.post('/sezad/accept-payment', {
             application_forms_id: form.application_id,
             form_type: form.form_type,
             form_number: form.form_number,
@@ -175,17 +184,22 @@ watch(
 
         // Handle the broadcast structure vs the initial Inertia prop structure
         const source = app.application ? app.application : app;
-
+        console.log('SOURCE', source);
         console.log('Syncing Modal. Status:', source.status);
 
         form.application_id = source.id;
         form.status = source.status ?? '';
-        form.form_title = source.form_title ?? '';
-
+        form.form_title = (source as any).form_title ?? '';
+        form.application_date = (source as any)?.created_at ?? '';
+        form.control_number = (source as any)?.control_number ?? '';
+        form.locator_name = (source as any)?.user?.name ?? '';
+        form.form_number = (source as any)?.form_number ?? '';
+        form.form_type = (source as any).form_type ?? '';
+        form.form_id = String(source.id);
         // The fix: Explicitly update approvers from the broadcast data
-        if (source.approver_group_approvers) {
+        if ((source as any).approver_group_approvers) {
             form.approvers = JSON.parse(
-                JSON.stringify(source.approver_group_approvers),
+                JSON.stringify((source as any).approver_group_approvers),
             );
             console.log(
                 'Signatories updated successfully:',
