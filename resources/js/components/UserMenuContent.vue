@@ -1,5 +1,4 @@
 <script setup lang="ts">
-//import UserInfo from '@/components/UserInfo.vue';
 import {
     DropdownMenuGroup,
     DropdownMenuItem,
@@ -9,29 +8,28 @@ import {
 import { logout } from '@/routes';
 import { edit } from '@/routes/profile';
 import type { User } from '@/types';
-import { Link, router } from '@inertiajs/vue3';
-import { LogOut, Settings, BellRing } from 'lucide-vue-next';
+import { Link, router, usePage } from '@inertiajs/vue3';
+import { BellRing, LogOut, Settings } from 'lucide-vue-next';
 import { ref } from 'vue';
+import { route } from 'ziggy-js';
 
-
-
+const page = usePage();
+const notificationsUrl = route('sezad.notifications');
 const props = defineProps<{
     user: User;
     hasNotification: boolean;
 }>();
 
-
 const hasNotification = ref(props.hasNotification);
 const emit = defineEmits<{
-    (e: 'clear-notification'): void
+    (e: 'clear-notification'): void;
 }>();
-
 
 function clearNotification() {
     emit('clear-notification');
     hasNotification.value = false;
 }
-console.log("hasNotification in UserMenuContent:", hasNotification.value);
+
 const handleLogout = () => {
     router.flushAll();
 };
@@ -40,7 +38,7 @@ const handleLogout = () => {
 <template>
     <DropdownMenuLabel class="p-0 font-normal">
         <div class="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
-            <!-- <UserInfo :user="props.user" :show-email="true" :has-notification=false @clear-notification="clearNotification" /> -->
+            <!-- User info can go here -->
         </div>
     </DropdownMenuLabel>
 
@@ -58,12 +56,24 @@ const handleLogout = () => {
         <DropdownMenuSeparator />
 
         <!-- Notifications -->
-         <DropdownMenuItem :as-child="true" @click="emit('clear-notification')">
-        <Link class="flex items-center px-2 py-1 w-full relative" prefetch @click="clearNotification">
-            <BellRing class="mr-2 h-4 w-4" />
-            <span>Notifications</span>
-            <span v-if="props.hasNotification" class="absolute top-2 right-2 w-4 h-4 bg-red-500 rounded-full"></span>
-        </Link>
+        <DropdownMenuItem :as-child="true">
+            <Link
+                :href="notificationsUrl"
+                class="relative flex w-full items-center px-2 py-1"
+            >
+                <BellRing class="mr-2 h-4 w-4" />
+                <span>Notifications</span>
+                <span
+                    v-if="page.props.auth.user?.count_notification > 0"
+                    class="absolute top-4 right-4 mr-4 inline-flex translate-x-1/2 -translate-y-1/2 transform items-center justify-center rounded-full bg-red-500 px-2 py-1 text-xs leading-none font-bold text-white"
+                >
+                    {{ page.props.auth.user.count_notification }}
+                </span>
+                <span
+                    v-if="hasNotification"
+                    class="absolute top-2 right-2 h-4 w-4 rounded-full bg-red-500"
+                ></span>
+            </Link>
         </DropdownMenuItem>
     </DropdownMenuGroup>
 
@@ -71,7 +81,13 @@ const handleLogout = () => {
 
     <!-- Logout -->
     <DropdownMenuItem :as-child="true">
-        <Link class="block w-full" :href="logout()" @click="handleLogout" as="button" data-test="logout-button">
+        <Link
+            class="block w-full"
+            :href="logout()"
+            @click.prevent="handleLogout"
+            as="button"
+            data-test="logout-button"
+        >
             <LogOut class="mr-2 h-4 w-4" />
             Log out
         </Link>

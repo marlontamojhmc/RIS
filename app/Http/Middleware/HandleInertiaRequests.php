@@ -60,6 +60,7 @@ if($user){
                 'userRole' => $urole->role->name,
                 'role'=>  $userRole,
                 'details' =>$urole,
+                'count_notification'=> $user->notifications->count(),
             ] : null,
         ],
 

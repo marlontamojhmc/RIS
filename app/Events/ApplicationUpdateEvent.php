@@ -3,19 +3,20 @@
 
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
-use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
+use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class ApplicationUpdateEvent implements ShouldBroadcast
+class ApplicationUpdateEvent implements ShouldBroadcastNow
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    public $applicationId;
+    public $message;
 
-    public function __construct($applicationId)
+    public function __construct($message)
     {
-        $this->applicationId = $applicationId;
+        $this->message = $message;
+        logger('ApplicationUpdateEvent fired');
     }
 
 public function broadcastOn(): array
@@ -26,8 +27,5 @@ public function broadcastOn(): array
     ];
 }
 
-    public function broadcastAs()
-    {
-        return 'application.updated';
-    }
+   
 }

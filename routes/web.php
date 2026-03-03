@@ -28,7 +28,9 @@ use App\Http\Controllers\TestPdfController;
 use App\Models\Accreditation\Accreditation;
 use App\Http\Controllers\Applications\ApplicationsController;
 use App\Http\Controllers\FINANCE\FinanceController;
-
+use App\Events\ApplicationUpdateEvent;
+use App\Events\NotificationEvent;
+use App\Notifications\SezrisNotification;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -37,6 +39,19 @@ use App\Http\Controllers\FINANCE\FinanceController;
 | Keep all URL names intact. Organized by section for clarity.
 |
 */
+//reverb
+//===============reverb================//
+Route::get('/reverb-test', function () {
+    return Inertia::render('Post/Index');
+});
+Route::get('/event', function () {
+    $user = auth()->user()->fresh();
+    $message = "Your application has been approved!";
+    $user->notify(new SezrisNotification($message));
+    NotificationEvent::dispatch($message);
+     
+    return response("{$message}", 200);
+});
 
 // 🔹 Public Route
 Route::get('/', fn() => Inertia::render('Welcome'))->name('home');

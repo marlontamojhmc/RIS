@@ -112,6 +112,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
 import axios from "axios";
+import Input from "@/components/ui/input/Input.vue";
 
 // Loading state
 const loading = ref(false);
