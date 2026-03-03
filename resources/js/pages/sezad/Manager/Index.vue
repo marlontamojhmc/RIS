@@ -61,7 +61,10 @@ const onClose = () => {
 };
 
 onMounted(() => {
-    if (!window.Echo) return;
+    if (!window.Echo) {
+        console.error('Echo is not defined. Check your bootstrap.js');
+        return;
+    }
 
     window.Echo.channel('applications').listen(
         '.ApplicationUpdated',
@@ -75,37 +78,37 @@ onMounted(() => {
             });
 
             if (index !== -1) {
-                const oldItem = applications.value[index];
-
-                // Build the update to match your exact component prop needs
+                // Create the updated object
                 const updatedItem = {
-                    ...oldItem,
-                    ...newAppData, // This puts id, status, etc. at the top
-                    application: newAppData, // Keeps the nested version for sub-components
-
-                    // CRITICAL: Pull the array out of the nested application to the TOP level
+                    ...applications.value[index],
+                    ...newAppData,
+                    application: newAppData,
+                    // Ensure the list is at the top level for the watcher
                     approver_group_approvers:
                         newAppData.approver_group_approvers,
                 };
 
-                // Update the array reactively
+                // Update the main table
                 applications.value.splice(index, 1, updatedItem);
 
-                // Force update the selected application for the modal
+                // SYNC THE MODAL
                 if (selectedApplication.value) {
                     const currentId =
                         selectedApplication.value.application?.id ||
                         selectedApplication.value.id;
                     if (Number(currentId) === Number(newAppData.id)) {
-                        // We use a nextTick or a fresh assignment to ensure Vue sees the nested change
-                        selectedApplication.value = { ...updatedItem };
-                        console.log('MODAL DATA REPLACED');
+                        // Use a fresh object reference to trigger the watcher in SezadModalCard
+                        selectedApplication.value = JSON.parse(
+                            JSON.stringify(updatedItem),
+                        );
+                        console.log('MODAL DATA REPLACED - Syncing Approvers');
                     }
                 }
             }
         },
     );
 });
+
 watch(
     () => props.applications,
     (newApps) => {

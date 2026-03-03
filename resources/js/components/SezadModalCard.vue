@@ -171,25 +171,29 @@ Watcher
 watch(
     () => props.applicationProps,
     (app) => {
-        if (!app || !app.application) return;
+        if (!app) return;
 
-        form.application_id = app.application.id;
-        form.control_number = app.control_number ?? '';
-        form.form_title = app.application.form_title ?? '';
-        form.form_number = app.application.form_number ?? '';
-        form.status = app.application.status ?? '';
-        form.application_date = app.application.created_at ?? '';
-        form.locator_name = app.application.user?.name ?? '';
-        form.approvers = app.application.approver_group_approvers ?? [];
-        form.form_type = app.application.form_type ?? '';
-        form.form_id = String(app.application.id) ?? '';
+        // Handle the broadcast structure vs the initial Inertia prop structure
+        const source = app.application ? app.application : app;
 
-        const last = app.application.approver_group_approvers
-            ?.filter((a) => a.updated_at)
-            .at(-1);
-        form.approved_date = last?.updated_at ?? '';
+        console.log('Syncing Modal. Status:', source.status);
+
+        form.application_id = source.id;
+        form.status = source.status ?? '';
+        form.form_title = source.form_title ?? '';
+
+        // The fix: Explicitly update approvers from the broadcast data
+        if (source.approver_group_approvers) {
+            form.approvers = JSON.parse(
+                JSON.stringify(source.approver_group_approvers),
+            );
+            console.log(
+                'Signatories updated successfully:',
+                form.approvers.length,
+            );
+        }
     },
-    { immediate: true },
+    { immediate: true, deep: true },
 );
 </script>
 
