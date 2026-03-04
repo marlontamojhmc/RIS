@@ -49,11 +49,6 @@ const props = defineProps<{
     userId: number;
     sequence: any;
 }>();
-
-// const page = usePage();
-const toast = useToast();
-const openPayment = ref(false);
-
 /* -----------------------
 Forms
 ----------------------- */
@@ -72,6 +67,11 @@ const form = useForm({
     user_app_selection: [] as any[],
     // fee_option: [] as any[],
 });
+// const page = usePage();
+const toast = useToast();
+const openPayment = ref(false);
+
+
 
 const formPayment = useForm({
     is_number: '',
@@ -322,39 +322,39 @@ console.log('apps', props.applicationProps);
                     <span> Form Number: {{ form.form_number }} </span><br />
                     <span> Form Type: {{ form.form_type }} </span><br />
                     <hr />
-                    <span> Amount: {{ form.user_app_selection.amount }} </span
+                    <span> Amount: {{ (form.user_app_selection as any).amount }} </span
                     ><br />
                     <span>
                         Date From:
-                        {{ form.user_app_selection.selected_at }} </span
+                        {{ (form.user_app_selection as any).selected_at }} </span
                     ><br />
                     <span>
-                        Date To:{{ form.user_app_selection.Expired_at }} </span
+                        Date To:{{(form.user_app_selection as any).Expired_at }} </span
                     ><br />
                     <span>
                         Code:
-                        {{ form.user_app_selection.fee_option.code }} </span
+                        {{ (form.user_app_selection as any).fee_option.code }} </span
                     ><br />
                     <span
                         >Description:
-                        {{ form.user_app_selection.fee_option.description }}
+                        {{ (form.user_app_selection as any).fee_option.description }}
                     </span>
                     <br />
                     <span
                         >Price:
-                        {{ form.user_app_selection.fee_option.price }} </span
+                        {{ (form.user_app_selection as any).fee_option.price }} </span
                     ><br />
                     <span
                         >Fee Title:
-                        {{ form.user_app_selection.fee_option.title }} </span
+                        {{ (form.user_app_selection as any).fee_option.title }} </span
                     ><br />
                     <span>
                         Validity:
-                        {{ form.user_app_selection.fee_option.validity }} </span
+                        {{ (form.user_app_selection as any).fee_option.validity }} </span
                     ><br />
                     <span
                         >Value:
-                        {{ form.user_app_selection.fee_option.value }}
+                        {{ (form.user_app_selection as any).fee_option.value }}
                     </span>
                 </div>
                 <!-- approvers status -->

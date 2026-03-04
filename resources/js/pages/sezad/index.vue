@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import ApplicationFormsTable from '@/components/ApplicationFormsTable.vue';
+import SezadTimeline from '@/components/sezad/SezadTimeline.vue';
 import SezadModalCard from '@/components/SezadModalCard.vue';
 import Modal from '@/components/View/Modal.vue';
 import AppLayout from '@/layouts/AppLayout.vue';
 import { usePage } from '@inertiajs/vue3';
 import { onMounted, ref, watch } from 'vue';
-
 interface UserRole {
     role: string;
     sequence: number | string;
@@ -55,17 +55,25 @@ console.log('check', sequence);
 const applications = ref<Application[]>(
     props.applications ? [...props.applications] : [],
 );
-const showModal = ref(false);
+const showRecords = ref(false);
+const showTimeline = ref(false);
 const selectedApplication = ref<Application | null>(null);
 
-const onOpenModal = (app: Application) => {
+const onOpenRecords = (app: Application) => {
     // Clone to ensure a clean reference for the modal
     selectedApplication.value = JSON.parse(JSON.stringify(app));
-    showModal.value = true;
+    showRecords.value = true;
+};
+const onOpenTimeline = (app: Application) => {
+    // Clone to ensure a clean reference for the modal
+    selectedApplication.value = JSON.parse(JSON.stringify(app));
+    showTimeline.value = true;
 };
 
 const onClose = () => {
-    showModal.value = false;
+    showRecords.value = false;
+    showTimeline.value = false;
+    // selectedApplication.value = null;
 };
 
 onMounted(() => {
@@ -138,11 +146,21 @@ watch(
             <ApplicationFormsTable
                 :userRole="userRole"
                 :applications="applications"
-                @onOpenModal="onOpenModal"
+                @onOpenRecords="onOpenRecords"
+                @onOpenTimeline="onOpenTimeline"
             />
 
-            <Modal :show="showModal" @close="onClose" maxWidth="max-w-2xl">
+            <Modal :show="showRecords" @close="onClose" maxWidth="max-w-2xl">
                 <SezadModalCard
+                    v-if="selectedApplication"
+                    :applicationProps="selectedApplication"
+                    :userRole="userRole"
+                    :userId="userId"
+                    :sequence="sequence"
+                />
+            </Modal>
+            <Modal :show="showTimeline" @close="onClose" maxWidth="max-w-2xl">
+                <SezadTimeline
                     v-if="selectedApplication"
                     :applicationProps="selectedApplication"
                     :userRole="userRole"
