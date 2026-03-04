@@ -145,7 +145,7 @@ public function payment(PaymentRequest $request)
             'status' => 'Approved'
         ]);
     }
-broadcast(new \App\Events\ApplicationUpdateEvent($request->application_form_id))->toOthers();
+    broadcast(new \App\Events\ApplicationUpdateEvent($request->application_form_id))->toOthers();
     return response()->json([
         'success' => true,
         'status' => 'Paid',

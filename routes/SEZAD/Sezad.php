@@ -1,4 +1,5 @@
 <?php
+use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\OSAC\OsacController;
 use App\Http\Controllers\SEZAD\SezadManagerController;
 use App\Http\Controllers\CCO\CcoController;
@@ -7,10 +8,13 @@ use App\Http\Controllers\SEZAD\RO\RegistrationOfficerController;
 use App\Http\Controllers\SEZAD\SEZADController;
 
      Route::prefix('sezad')->group(function () {
-        //RO
-         Route::get('/ro', [RegistrationOfficerController::class, 'index'])->name('ro.index');
-        //CCO/CCA
-        Route::get('/cco', [CcoController::class, 'index'])->name('cco.index');
+      // access index
+      Route::get('/', [SEZADController::class, 'index'])->name('sezad.index');
+      // approve per signatory
+      Route::post('/approve', [SEZADController::class, 'updateStatus'])->name('signatory.approve');
+      // approve/payment for finance signatory
+      Route::post('/accept-payment', [SEZADController::class, 'payment'])->name('sezad');
+      //CCO/CCA
         Route::get('/cco/{id}/show', [CcoController::class, 'show'])->name('cco.show');
         //Osac Processor
         Route::post('/store2',[OsacController::class,'store2'])->name('osac.store2');
@@ -23,18 +27,11 @@ use App\Http\Controllers\SEZAD\SEZADController;
         Route::get('/osac/accreditations',[OsacController::class,'AccreditationPage'])->name('osac.accreditation');
         Route::get('/osac/permits',[OsacController::class,'PermitsPage'])->name('osac.permits');
         Route::get('/osac/Provisional',[OsacController::class,'ProvisionalGrantPage'])->name('osac.provisionalGrant');
-        //Sezad Manager
-         Route::get('/manager', [SezadManagerController::class, 'index'])->name('sezad.manager.index');
-         Route::get('/manager/{id}/show', [SezadManagerController::class, 'show'])->name('sezad.manager.show');
-        Route::post('/approve', [SEZADController::class, 'updateStatus'])->name('signatory.approve');
+     }); //Sezad Manager
+         // Route::get('/manager', [SezadManagerController::class, 'index'])->name('sezad.manager.index');
 
-     })->name('sezad');
-   
-      //FSD
-      Route::prefix('fsd')->group(function(){
-            //FINANCE
-        Route::get('/finance',[FinanceController::class, 'index'])->name('fsd.finance.index');
-        //Route::get('/finance/{id}/show/{form_type}', [FinanceController::class, 'show'])->name('finance.show')->name('fsd.finance.show');
-        Route::post('/finance', [FinanceController::class, 'show'])->name('finance.show')->name('fsd.finance2.show');
-        Route::post('/accept-payment', [FinanceController::class, 'payment'])->name('finance.payment');
+        
+        //FSD
+        Route::prefix('fsd')->group(function(){
+         Route::post('/accept-payment', [FinanceController::class, 'payment'])->name('finance.payment');
       });

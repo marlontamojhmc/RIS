@@ -15,7 +15,7 @@ import {
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
 
-import { sezadDashboard, usersDashboard } from '@/routes';
+// import { sezadDashboard, usersDashboard } from '@/routes';
 import type { NavItem } from '@/types';
 import type { PageProps } from '@inertiajs/core';
 import { Link, usePage } from '@inertiajs/vue3';
@@ -129,8 +129,8 @@ const footerNavItems: NavItem[] = [];
 const navConfig: Record<string, NavItem[]> = {
     admin: [
         { title: 'Dashboard', href: '/dashboard', icon: LayoutGrid },
-        { title: 'Users', href: usersDashboard(), icon: SquareUserRound },
-        { title: 'SEZAD', href: sezadDashboard(), icon: Folder },
+        { title: 'Users', href: '/user', icon: SquareUserRound },
+        { title: 'SEZAD', href: '/sezad', icon: Folder },
         { title: 'BDD Created Users', href: '/bdd', icon: BookOpen },
         { title: 'Locator', href: '/locator', icon: LayoutGrid },
         {
@@ -149,9 +149,7 @@ const navConfig: Record<string, NavItem[]> = {
             icon: Eye,
         },
     ],
-    sezadManager: [
-        { title: 'SEZAD Dashboard', href: '/sezad', icon: LayoutGrid },
-    ],
+
     accreditationSpsnbe: [
         {
             title: 'Service Provider / Supplier',
@@ -251,6 +249,7 @@ const navConfig: Record<string, NavItem[]> = {
         },
     ],
     sezadManager: [
+        { title: 'SEZAD Dashboard', href: '/sezad', icon: LayoutGrid },
         {
             title: 'Permits',
             href: '/',

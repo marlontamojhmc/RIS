@@ -39,7 +39,7 @@ class UserApplicationSelection extends Model
     return $this->belongsTo(ApplicationModel::class, 'application_id');
 }
 
-    public function feeoption()
+    public function feeOption()
     {
     return $this->belongsTo(PermitClearanceFee::class,'option_id');
     }

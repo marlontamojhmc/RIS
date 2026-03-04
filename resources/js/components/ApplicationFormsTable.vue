@@ -21,12 +21,16 @@ const props = defineProps<{
     applications: Application[];
 }>();
 const userRole = props.userRole;
-const emit = defineEmits(['onOpenModal']);
+const emit = defineEmits(['onOpenRecords', 'onOpenTimeline']);
 
-const handleView = (app) => {
-    emit('onOpenModal', app);
+const handleViewRecords = (app: any) => {
+    emit('onOpenRecords', app);
 };
-console.log(userRole);
+const handleViewTime = (app: any) => {
+    emit('onOpenTimeline', app);
+};
+
+// console.log(userRole);
 </script>
 
 <template>
@@ -111,11 +115,18 @@ console.log(userRole);
                         class="flex items-center justify-center gap-2 px-4 py-2 text-sm"
                     >
                         <button
-                            @click="handleView(app)"
+                            @click="handleViewRecords(app)"
                             class="rounded-full p-1 text-blue-600 transition hover:bg-blue-50 hover:text-blue-800 dark:text-blue-400 dark:hover:bg-blue-900/30 dark:hover:text-blue-300"
                             title="View"
                         >
                             <Eye class="h-5 w-5" />
+                        </button>
+                        <button
+                            @click="handleViewTime(app)"
+                            class="rounded-full p-1 text-blue-600 transition hover:bg-blue-50 hover:text-blue-800 dark:text-blue-400 dark:hover:bg-blue-900/30 dark:hover:text-blue-300"
+                            title="View"
+                        >
+                            <Eye class="h-5 w-2" />
                         </button>
                         <button
                             v-show="userRole.role == 'Manager'"
