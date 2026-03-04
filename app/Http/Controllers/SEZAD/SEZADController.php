@@ -23,14 +23,13 @@ use App\Http\Requests\PaymentRequest;
 use App\Models\Locator\ApplicationForApproval;
 
 class SEZADController extends Controller
-{    public $service;
-     public function __construct(AppService $appService){
-        $this->service = $appService;
-     }
-    public function index()
-    {  
-    $applications = $this->service->getApplicationsForApprover(Auth::id());
-   
+{
+public function index(AppService $appService)
+{
+    $applications = $appService->getApplicationsForApprover(auth()->id());
+
+    // FIX: Remove 'Manager/' and ensure the casing matches your filename
+    // If your file is index.vue (lowercase), use 'sezad/index'
     return Inertia::render('sezad/index', [
         'applications' => $applications
     ]);
