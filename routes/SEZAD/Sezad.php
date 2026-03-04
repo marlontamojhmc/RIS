@@ -32,6 +32,6 @@ use App\Http\Controllers\SEZAD\SEZADController;
 
         
         //FSD
-        Route::prefix('fsd')->group(function(){
-         Route::post('/accept-payment', [FinanceController::class, 'payment'])->name('finance.payment');
-      });
+      //   Route::prefix('fsd')->group(function(){
+      //    Route::post('/accept-payment', [FinanceController::class, 'payment'])->name('finance.payment');
+      // });

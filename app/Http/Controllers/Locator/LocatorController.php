@@ -20,9 +20,9 @@ class LocatorController extends Controller
 
         $user = auth()->user();
 
-        if (Gate::denies('access-locator')) {
-            abort(403, 'Unauthorized');
-        }
+        // if (Gate::denies('access-locator')) {
+        //     abort(403, 'Unauthorized');
+        // }
 
         $AppForapprovals = $user->approvals;
         $applications = auth()->user()?->applications ?? [];
