@@ -2,7 +2,6 @@
 import {
     Card,
     CardContent,
-    CardDescription,
     CardFooter,
     CardHeader,
     CardTitle,
@@ -70,6 +69,8 @@ const form = useForm({
     control_number: '',
     locator_name: '',
     approvers: [] as any[],
+    user_app_selection: [] as any[],
+    // fee_option: [] as any[],
 });
 
 const formPayment = useForm({
@@ -85,10 +86,16 @@ const userSequence =
         ? parseFloat(props.sequence[0]?.sequence)
         : parseFloat(props.sequence[1]?.sequence);
 console.log('Sequence', userSequence);
+
+const activeTab = ref(1);
 // console.log('formTYpe',);
 /* -----------------------
 Actions
 ----------------------- */
+const setTab = (tabNumber: number) => {
+    activeTab.value = tabNumber;
+};
+
 const submitPayment = async () => {
     try {
         const response = await axios.post('/sezad/accept-payment', {
@@ -190,11 +197,16 @@ watch(
         form.status = source.status ?? '';
         form.form_title = (source as any).form_title ?? '';
         form.application_date = (source as any)?.created_at ?? '';
+        form.approved_date = (source as any)?.updated_at ?? '';
         form.control_number = (source as any)?.control_number ?? '';
         form.locator_name = (source as any)?.user?.name ?? '';
         form.form_number = (source as any)?.form_number ?? '';
         form.form_type = (source as any).form_type ?? '';
         form.form_id = String(source.id);
+        form.user_app_selection = (source as any)?.user_app_selection[0] ?? [];
+        // form.fee_option =
+        //     (source as any)?.user_app_selection[0].fee_option ?? [];
+
         // The fix: Explicitly update approvers from the broadcast data
         if ((source as any).approver_group_approvers) {
             form.approvers = JSON.parse(
@@ -210,71 +222,183 @@ watch(
 );
 console.log('FORM', form);
 console.log('ID', props.userId);
+console.log('apps', props.applicationProps);
 </script>
 
 <template>
-    <Card
-        class="relative z-10 max-h-[90vh] w-full overflow-y-auto border-2 border-amber-50"
-    >
+    <Card class="relative z-10 max-h-[90vh] w-full border-2 border-amber-50">
         <CardHeader>
-            <div class="flex w-full items-start justify-between">
-                <div>
+            <div class="flex flex-row justify-between">
+                <div class="flex flex-col">
                     <CardTitle>{{ form.form_title }}</CardTitle>
-                    <CardDescription>
-                        Status:
-                        <span class="font-bold uppercase">{{
-                            form.status
-                        }}</span>
-                    </CardDescription>
-                </div>
-            </div>
-        </CardHeader>
 
-        <CardContent class="space-y-4">
-            <div class="flex flex-row justify-between gap-4">
-                <div class="space-y-1 text-sm">
+                    <span class="">
+                        <strong>Status: </strong>{{ form.status }}</span
+                    >
+                    <span>
+                        <strong>Locator: </strong>
+                        {{ form.locator_name }}
+                    </span>
+                </div>
+                <div class="mr-5 space-y-1 text-sm">
                     <p>
                         <strong>App Date:</strong>
                         {{ formatDate(form.application_date) }}
                     </p>
                     <p>
                         <strong>Approved Date:</strong>
-                        {{ formatDate(form.approved_date) || '---' }}
+                        {{
+                            form.status == 'Approved'
+                                ? formatDate(form.approved_date)
+                                : '---'
+                        }}
                     </p>
-                    <p><strong>Control #:</strong> {{ form.control_number }}</p>
-                    <p><strong>Locator:</strong> {{ form.locator_name }}</p>
+                    <p>
+                        <strong>Control #:</strong>
+                        {{ form.control_number }}
+                    </p>
                 </div>
-
-                <div v-if="form.approvers.length" class="w-1/2">
-                    <h3 class="mb-2 text-sm font-semibold text-gray-800">
+            </div>
+            <div class="w-full border-b border-gray-200">
+                <ol
+                    class="hide-scrollbar flex overflow-x-auto whitespace-nowrap"
+                >
+                    <li
+                        @click="setTab(1)"
+                        :class="[
+                            'mr-4',
+                            'cursor-pointer',
+                            'rounded-md',
+                            'px-4',
+                            'py-2',
+                            'text-xs',
+                            'font-medium',
+                            'hover:bg-gray-100',
+                        ]"
+                    >
+                        Application Information
+                    </li>
+                    <li
+                        @click="setTab(2)"
+                        :class="[
+                            'mr-4',
+                            'cursor-pointer',
+                            'rounded-md',
+                            'px-4',
+                            'py-2',
+                            'text-xs',
+                            'font-medium',
+                            'hover:bg-gray-100',
+                        ]"
+                    >
                         Approvers
-                    </h3>
-                    <ol class="space-y-1">
-                        <li
-                            v-for="(a, i) in form.approvers"
-                            :key="i"
-                            class="flex items-center justify-between rounded-lg border bg-gray-50 px-2 py-1 shadow-sm"
-                        >
-                            <div class="flex flex-col">
-                                <span class="text-xs font-bold text-gray-900">{{
-                                    a.approver?.name || 'Pending...'
-                                }}</span>
-                                <span
-                                    class="text-[10px] text-gray-500 uppercase"
-                                    >{{ a.role }}</span
-                                >
-                            </div>
-                            <span
-                                class="rounded-full border px-2 py-0.5 text-[10px] font-bold capitalize"
-                                :class="
-                                    statusClasses[normalizeStatus(a.status)] ||
-                                    'bg-gray-100 text-gray-600'
-                                "
+                    </li>
+                    <!-- border-b-2 border-primary -->
+                    <li
+                        @click="setTab(3)"
+                        :class="[
+                            'mr-4',
+                            'cursor-pointer',
+                            'rounded-md',
+                            'px-4',
+                            'py-2',
+                            'text-xs',
+                            'font-medium',
+                            'hover:bg-gray-100',
+                        ]"
+                    >
+                        TimeLine
+                    </li>
+                </ol>
+            </div>
+        </CardHeader>
+
+        <CardContent class="space-y-4">
+            <!-- {{ activeTab }} -->
+            <div class="flex w-full flex-col items-center justify-between">
+                <!-- information -->
+                <div v-if="activeTab == 1" class="w-full p-4">
+                    <span> Form ID: {{ form.form_id }} </span><br />
+                    <span> Form Number: {{ form.form_number }} </span><br />
+                    <span> Form Type: {{ form.form_type }} </span><br />
+                    <hr />
+                    <span> Amount: {{ form.user_app_selection.amount }} </span
+                    ><br />
+                    <span>
+                        Date From:
+                        {{ form.user_app_selection.selected_at }} </span
+                    ><br />
+                    <span>
+                        Date To:{{ form.user_app_selection.Expired_at }} </span
+                    ><br />
+                    <span>
+                        Code:
+                        {{ form.user_app_selection.fee_option.code }} </span
+                    ><br />
+                    <span
+                        >Description:
+                        {{ form.user_app_selection.fee_option.description }}
+                    </span>
+                    <br />
+                    <span
+                        >Price:
+                        {{ form.user_app_selection.fee_option.price }} </span
+                    ><br />
+                    <span
+                        >Fee Title:
+                        {{ form.user_app_selection.fee_option.title }} </span
+                    ><br />
+                    <span>
+                        Validity:
+                        {{ form.user_app_selection.fee_option.validity }} </span
+                    ><br />
+                    <span
+                        >Value:
+                        {{ form.user_app_selection.fee_option.value }}
+                    </span>
+                </div>
+                <!-- approvers status -->
+                <div v-else-if="activeTab == 2" class="w-full p-4">
+                    <div v-if="form.approvers.length">
+                        <h3 class="mb-2 text-sm font-semibold text-gray-800">
+                            Approvers
+                        </h3>
+                        <ol class="space-y-1">
+                            <li
+                                v-for="(a, i) in form.approvers"
+                                :key="i"
+                                class="flex items-center justify-between rounded-lg border bg-gray-50 px-2 py-1 shadow-sm"
                             >
-                                {{ a.status }}
-                            </span>
-                        </li>
-                    </ol>
+                                <div class="flex flex-col">
+                                    <span
+                                        class="text-xs font-bold text-gray-900"
+                                        >{{
+                                            a.approver?.name || 'Pending...'
+                                        }}</span
+                                    >
+                                    <span
+                                        class="text-[10px] text-gray-500 uppercase"
+                                        >{{ a.role }}</span
+                                    >
+                                </div>
+                                <span
+                                    class="rounded-full border px-2 py-0.5 text-[10px] font-bold capitalize"
+                                    :class="
+                                        statusClasses[
+                                            normalizeStatus(a.status)
+                                        ] || 'bg-gray-100 text-gray-600'
+                                    "
+                                >
+                                    {{ a.status }}
+                                </span>
+                            </li>
+                        </ol>
+                    </div>
+                </div>
+                <div v-else-if="activeTab == 3" class="w-full p-4">
+                    <h3 class="mb-2 text-sm font-semibold text-gray-800">
+                        Time Line
+                    </h3>
                 </div>
             </div>
 
