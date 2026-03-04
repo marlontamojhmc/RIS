@@ -23,12 +23,15 @@ use App\Http\Requests\PaymentRequest;
 use App\Models\Locator\ApplicationForApproval;
 
 class SEZADController extends Controller
-{
-    public function index(AppService $appService)
-{
-    $applications = $appService->getApplicationsForApprover(Auth::id());
-
-    return Inertia::render('sezad/Index', [
+{    public $service;
+     public function __construct(AppService $appService){
+        $this->service = $appService;
+     }
+    public function index()
+    {  
+    $applications = $this->service->getApplicationsForApprover(Auth::id());
+   
+    return Inertia::render('sezad/index', [
         'applications' => $applications
     ]);
 }

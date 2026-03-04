@@ -10,6 +10,7 @@ class RoleAccessMiddleware
 {
     public function handle(Request $request, Closure $next)
     {
+       
         $user = Auth::user();
 
         if ($request->is('login') || $request->is('logout')) {
@@ -22,7 +23,7 @@ class RoleAccessMiddleware
         }
 
         $details = $user->details;
-
+     
         if ($details) {
             // Determine roles
             $isSuperAdmin = (
@@ -35,7 +36,7 @@ class RoleAccessMiddleware
             $isSezadUser = ($details->department_id == 12 &&
                         $details->role_id == 2);
             $isLocator = ($details->role_id == 3);
-            $isSezadUser = null;
+            
             $isLocator = ($details->role_id == 2);
             $isOsac = ($details->position_id == 36 &&
                         $details->department_id == 12 &&
@@ -48,9 +49,9 @@ class RoleAccessMiddleware
            
             // Super Admin: allow only /dashboard and /sezad
             if ($isSuperAdmin) {
-                if (! $request->is('dashboard') && ! $request->is('sezad') && ! $request->is('sezad/*')) {
-                    return redirect('/dashboard');
-                }
+                // if (! $request->is('dashboard') && ! $request->is('sezad') && ! $request->is('sezad/*')) {
+                //     return redirect('/dashboard');
+                // }
             }
             // SEZAD user: allow only /sezad
             elseif ($isSezadUser) {
@@ -59,19 +60,19 @@ class RoleAccessMiddleware
                 }
             }
             // // Locator user: allow only /locator
-            elseif ($isLocator) {
+        //     elseif ($isLocator) {
                 
-                    //  return redirect('/bdd');
+        //   return redirect('/locator');
              
-             } elseif($isCco)
-             {
-                  return redirect('/cco');
-             }elseif($isOsac){
-                return redirect('/osac');
-             }
-            // Optionally: handle users with unknown roles
+        //      } elseif($isCco)
+        //      {
+        //           return redirect('/sezad');
+        //      }elseif($isOsac){
+        //         return redirect('/sezad');
+        //      }
+        //     // Optionally: handle users with unknown roles
             else {
-                return redirect('/dashboard');
+                return redirect('/locator');
             }
         }
 

@@ -80,7 +80,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     | SEZAD
     |--------------------------------------------------------------------------
     */
-    Route::middleware(['auth', 'verified', 'role.access'])->group(function () {
+   // Route::middleware(['auth', 'verified', 'role.access'])->group(function () {
         /*
         |--------------------------------------------------------------------------
         | Users
@@ -123,7 +123,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::post('/temp-users/update', [SEZADController::class, 'updateTempUser']);
            
         });
-    });
+   //});
     /*
     |--------------------------------------------------------------------------
     | Address

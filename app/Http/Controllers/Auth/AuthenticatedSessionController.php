@@ -12,6 +12,7 @@ use Inertia\Inertia;
 use Inertia\Response;
 use Laravel\Fortify\Features;
 use Illuminate\Support\Facades\DB;
+use App\Models\UserDetails\UserDetail;
 
 class AuthenticatedSessionController extends Controller
 {
@@ -31,13 +32,13 @@ class AuthenticatedSessionController extends Controller
      */
 public function store(LoginRequest $request): RedirectResponse
 {
+    // Validate credentials
     $user = $request->validateCredentials();
 
-    $user_details = DB::table('user_details')
-        ->where('user_id', $user->id)
-        ->first();
+    // Fetch user details
+    $userDetails = UserDetail::where('user_id', $user->id)->first();
 
-    // 2FA check (no session write yet)
+    // 2FA check
     if (
         Features::enabled(Features::twoFactorAuthentication()) &&
         $user->hasEnabledTwoFactorAuthentication()
@@ -50,27 +51,31 @@ public function store(LoginRequest $request): RedirectResponse
         return to_route('two-factor.login');
     }
 
-    // LOGIN FIRST
+    // Log the user in
     Auth::login($user, $request->boolean('remember'));
     $request->session()->regenerate();
 
+    // Flash welcome message
     $request->session()->flash('success', 'Welcome back! Login successful.');
-    //  THEN STORE SESSION DATA
-    $request->session()->put('user_details', $user_details);
-    // Redirect rules (unchanged)
-     if (
-        $user_details &&
-        $user_details->department_id == 9 &&
-        $user_details->division_id == 3 &&
-        $user_details->role_id == 1 &&
-        $user_details->permission_id == 1
+
+    // Store user details in session
+    $request->session()->put('user_details', $userDetails);
+
+    // Clear any previously stored intended URL
+    $request->session()->forget('url.intended');
+    // dd($userDetails->isRO());
+    // Role-based redirects
+    if (
+        $userDetails->isOsac() ||
+        $userDetails->isSezadManager() ||
+        $userDetails->isCCO() ||
+        $userDetails->isRO()
     ) {
-        return redirect()->intended(route('dashboard', false));
+        return redirect('/sezad');
     }
 
-    // ... rest unchanged
-
-    return redirect()->intended(route('dashboard', false));
+    // Default redirect
+    return redirect()->route('locator');
 }
 
     /**
