@@ -9,7 +9,7 @@ use App\Http\Controllers\SEZAD\SEZADController;
 
      Route::prefix('sezad')->group(function () {
       // access index
-      Route::get('/', [SezadManagerController::class, 'index'])->name('sezad.index');
+      Route::get('/', [SEZADController::class, 'index'])->name('sezad.index');
       // approve per signatory
       Route::post('/approve', [SEZADController::class, 'updateStatus'])->name('signatory.approve');
       // approve/payment for finance signatory

@@ -24,11 +24,13 @@ use App\Models\Locator\ApplicationForApproval;
 
 class SEZADController extends Controller
 {
-    public function index(AppService $appService)
+public function index(AppService $appService)
 {
-    $applications = $appService->getApplicationsForApprover(Auth::id());
+    $applications = $appService->getApplicationsForApprover(auth()->id());
 
-    return Inertia::render('sezad/Index', [
+    // FIX: Remove 'Manager/' and ensure the casing matches your filename
+    // If your file is index.vue (lowercase), use 'sezad/index'
+    return Inertia::render('sezad/index', [
         'applications' => $applications
     ]);
 }

@@ -274,6 +274,7 @@ public function createApplication($type, $form_type, $form_id)
             'application.ApproverGroupApprovers.approver',
             'application.articleDetails',
             'application.selections',
+            'application.userAppSelection.feeOption',
             'application.uploads',
         ])
         ->where('approver_id', $userId)
