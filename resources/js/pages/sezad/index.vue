@@ -17,6 +17,7 @@ interface Application {
     control_number?: string;
     form_title?: string;
     form_number?: string;
+    form_type?: string;
     status?: string;
     approver_group_approvers?: any[];
     [key: string]: any;
@@ -34,6 +35,7 @@ interface PageProps extends Record<string, unknown> {
             email_verified_at: string | null;
             created_at: string;
             updated_at: string;
+            details?: any;
             role: UserRole[];
         };
     };
@@ -44,6 +46,12 @@ const page = usePage<PageProps>();
 const props = defineProps<{ applications: Application[] }>();
 
 const userRole = page.props.auth.user.role[0];
+const userId = page.props.auth.user.details.user_id;
+// console.log('index UserRole', userRole);
+// console.log('index UserID', userId);
+const sequence = page.props.auth.user.role as UserRole[];
+console.log('check', sequence);
+
 const applications = ref<Application[]>(
     props.applications ? [...props.applications] : [],
 );
@@ -122,7 +130,7 @@ watch(
     <AppLayout>
         <div>
             <h1 class="mb-4 text-center text-2xl font-bold">
-                Registration Officer Dashboard
+                {{ userRole?.role }} Dashboard
             </h1>
         </div>
 
@@ -138,6 +146,8 @@ watch(
                     v-if="selectedApplication"
                     :applicationProps="selectedApplication"
                     :userRole="userRole"
+                    :userId="userId"
+                    :sequence="sequence"
                 />
             </Modal>
         </div>

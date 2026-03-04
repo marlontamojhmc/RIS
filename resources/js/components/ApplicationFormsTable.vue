@@ -26,7 +26,7 @@ const emit = defineEmits(['onOpenModal']);
 const handleView = (app) => {
     emit('onOpenModal', app);
 };
-console.log(userRole);
+// console.log(userRole);
 </script>
 
 <template>
@@ -77,7 +77,12 @@ console.log(userRole);
                 <tr
                     v-for="(app, index) in applications"
                     :key="app.id"
-                    class="text-center transition hover:bg-gray-50 dark:hover:bg-gray-800"
+                    :class="[
+                        'text-center transition duration-500',
+                        app.application?.status === 'Approved'
+                            ? 'bg-green-50'
+                            : '',
+                    ]"
                 >
                     <td class="px-4 py-2 align-middle text-sm">
                         {{ index + 1 }}

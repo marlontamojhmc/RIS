@@ -61,7 +61,7 @@ class RoleAccessMiddleware
             // // Locator user: allow only /locator
             elseif ($isLocator) {
                 
-                     return redirect('/bdd');
+                    //  return redirect('/bdd');
              
              } elseif($isCco)
              {

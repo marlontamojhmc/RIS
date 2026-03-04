@@ -17,38 +17,49 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use App\Models\Locator\ApplicationModel;
-
+use App\Events\ApplicationUpdateEvent;
+use App\Services\AppService;
+use App\Http\Requests\PaymentRequest;
+use App\Models\Locator\ApplicationForApproval;
 
 class SEZADController extends Controller
 {
-    public function index()
-    {
-        $user = Auth::user();
-        $businessTypes = BusinessType::all();
-        $tempUsers = TemporaryUser::latest()->get();
+    public function index(AppService $appService)
+{
+    $applications = $appService->getApplicationsForApprover(Auth::id());
 
-        if ($user instanceof User && method_exists($user, 'load')) {
-            $user->load([
-                'details' => function ($query) {
-                    $query->select(
-                        'id',
-                        'user_id',
-                        'permission_id',
-                        'role_id',
-                        'department_id',
-                        'division_id',
-                        'user_function_id'
-                    );
-                },
-            ]);
-        }
+    return Inertia::render('sezad/Index', [
+        'applications' => $applications
+    ]);
+}
+    // public function index()
+    // {
+    //     $user = Auth::user();
+    //     $businessTypes = BusinessType::all();
+    //     $tempUsers = TemporaryUser::latest()->get();
 
-        return Inertia::render('sezad/SezadDashboard', [
-            'user' => $user,
-            'usersTemp' => $tempUsers,
-            'businessTypes' => $businessTypes,
-        ]);
-    }
+    //     if ($user instanceof User && method_exists($user, 'load')) {
+    //         $user->load([
+    //             'details' => function ($query) {
+    //                 $query->select(
+    //                     'id',
+    //                     'user_id',
+    //                     'permission_id',
+    //                     'role_id',
+    //                     'department_id',
+    //                     'division_id',
+    //                     'user_function_id'
+    //                 );
+    //             },
+    //         ]);
+    //     }
+
+    //     return Inertia::render('sezad/SezadDashboard', [
+    //         'user' => $user,
+    //         'usersTemp' => $tempUsers,
+    //         'businessTypes' => $businessTypes,
+    //     ]);
+    // }
 
     public function updateTempUser(Request $request)
     {
@@ -168,35 +179,108 @@ class SEZADController extends Controller
 
 
     // update status of approvers
- public function updateStatus(Request $request)
+public function updateStatus(Request $request)
 {
-    // dump($request->all());
-    $user_id = $request->user()->id ?? null;
-    $isLastApprover = $request->input('isLastApprover');
-    $approver = ApproverGroupApprover::where('application_form_id', $request['application_form_id'])
-        ->where('approver_id', $user_id)
-        ->first();
+    // dd($request);
+    try {
+        $applicationId = $request->input('application_form_id');
+        $user_id = $request->user()->id;
+        $isLastApprover = filter_var($request->input('isLastApprover'), FILTER_VALIDATE_BOOLEAN);
 
-    if (!$approver) {
-        return response()->json(['success' => false, 'message' => 'Approver not found'], 404);
-    }
+        DB::transaction(function () use ($user_id, $isLastApprover, $applicationId) {
+            ApproverGroupApprover::where('application_form_id', $applicationId)
+                ->where('approver_id', $user_id)
+                ->update([
+                    'status' => 'Approved', 
+                    'acted_at' => now(),
+                    'updated_at' => now()
+                ]);
 
-    $approver->status = 'Approved';
-    $approver->save();
-    if($isLastApprover){
-    $update_application = ApplicationModel::where('id',$request['application_form_id'])->first();
-    if(!$update_application){
-      return response()->json(['success' => false, 'message' => 'Application form not found'], 404);
+            if ($isLastApprover) {
+                ApplicationModel::where('id', $applicationId)->update(['status' => 'Approved']);
+            }
+        });
+
+        // Fetch fresh data with specific relations
+        $app = ApplicationModel::with(['user'])->findOrFail($applicationId);
+        $approvers = ApproverGroupApprover::with('approver')
+            ->where('application_form_id', $applicationId)
+            ->get();
+
+        // Build a clean array for broadcasting
+        $broadcastData = $app->toArray();
+        $broadcastData['approver_group_approvers'] = $approvers->toArray();
+
+        // Send the ARRAY, not the Model object
+        broadcast(new ApplicationUpdateEvent($broadcastData)); 
+
+        return response()->json([
+            'success' => true,
+            'application' => $broadcastData
+        ]);
+
+    } catch (\Exception $e) {
+        return response()->json(['error' => $e->getMessage()], 500);
     }
-    $update_application->status = 'Approved';
-    $update_application->save();
+}
+
+public function payment(PaymentRequest $request) {
+    try {
+        $validated = $request->validated();
+        $appId = $validated['application_forms_id']; // Using the correct key from Axios
+        $user = auth()->user();
+
+        // 1. Update Payment Status
+        $applicationForApproval = ApplicationForApproval::where('application_id', $appId)->first();
+        if (!$applicationForApproval) {
+            return response()->json(['message' => 'Approval record not found'], 404);
+        }
+
+        $applicationForApproval->update([
+            'IS_Number' => $validated['is_number'] ?? null,
+            'payment_status' => 'Paid',
+        ]);
+
+        // 2. Update Approver Status
+        $approver = ApproverGroupApprover::where('application_form_id', $appId)
+            ->where('approver_id', $user->id)
+            ->first();
+
+        if ($approver) {
+            $approver->update(['status' => 'Approved']);
+        }
+
+        // 3. Get Fresh Data for Broadcast
+        // Ensure ApplicationModel is the correct name!
+        $app = ApplicationModel::with(['user'])->findOrFail($appId);
+        
+        $approvers = ApproverGroupApprover::with('approver')
+            ->where('application_form_id', $appId)
+            ->get();
+
+        $broadcastData = $app->toArray();
+        $broadcastData['approver_group_approvers'] = $approvers->toArray();
+
+        // 4. Broadcast
+        broadcast(new \App\Events\ApplicationUpdateEvent($broadcastData));
+
+        return response()->json([
+            'success' => true,
+            'status' => 'Paid',
+            'approver_id' => $user->id
+        ]);
+
+    } catch (\Exception $e) {
+        // This will tell you EXACTLY what went wrong in storage/logs/laravel.log
+        Log::error("Payment Error: " . $e->getMessage(), [
+            'file' => $e->getFile(),
+            'line' => $e->getLine()
+        ]);
+
+        return response()->json([
+            'success' => false,
+            'message' => 'Server Error: ' . $e->getMessage()
+        ], 500);
     }
-    
-    // Return updated approver and status
-    return response()->json([
-        'success' => true,
-        'approver_id' => $approver->approver_id,
-        'status' => $approver->status,
-    ]);
 }
 }

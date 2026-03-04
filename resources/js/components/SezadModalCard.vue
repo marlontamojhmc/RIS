@@ -8,7 +8,7 @@ import {
     CardTitle,
 } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { useForm, usePage } from '@inertiajs/vue3';
+import { useForm } from '@inertiajs/vue3';
 import axios from 'axios';
 import { ref, watch } from 'vue';
 import { useToast } from 'vue-toastification';
@@ -25,10 +25,12 @@ interface UserRole {
 interface ApplicationItem {
     id: number;
     control_number?: string | null;
+    status?: string;
     application?: {
+        form_type?: string;
+        id: number;
         form_title?: string;
         form_number?: string;
-        form_type?: string;
         created_at?: string;
         status?: string;
         user?: { name?: string };
@@ -37,35 +39,22 @@ interface ApplicationItem {
             status: string;
             updated_at?: string;
             approver?: { id?: number; name?: string };
+            approver_id?: number;
         }[];
     } | null;
 }
 
-/* -----------------------
-Props (Typed Properly)
------------------------ */
 const props = defineProps<{
     userRole: UserRole;
     applicationProps: ApplicationItem | null;
+    userId: number;
+    sequence: any;
 }>();
-/* -----------------------
-Page
------------------------ */
-const page = usePage();
 
-/* -----------------------
-Applications from parent
------------------------ */
-// const application = computed(() => props.applicationProps);
-
+// const page = usePage();
 const toast = useToast();
-
-/* -----------------------
-Refs
------------------------ */
-// const showModal = ref(false);
 const openPayment = ref(false);
-// const applications = datas.value;
+
 /* -----------------------
 Forms
 ----------------------- */
@@ -75,7 +64,6 @@ const form = useForm({
     form_id: '',
     application_date: '',
     application_id: 0,
-
     status: '',
     approved_date: '',
     form_number: '',
@@ -85,33 +73,25 @@ const form = useForm({
 });
 
 const formPayment = useForm({
-    application_forms_id: '',
-    form_type: '',
-    form_number: '',
-    form_id: '',
-    approver_id: '',
     is_number: '',
     amount: '',
 });
 
-// const approveForm = useForm({
-//     user_id: 0,
-//     application_form_id: '',
-//     approver_group_id: 0,
-//     sequence: 0,
-// });
-
 const openPaymentFooter = (value: boolean) => {
     openPayment.value = value;
 };
-
-// const onClose = () => {
-//     showModal.value = false;
-// };
-
+const userSequence =
+    props.applicationProps?.application?.form_type == 'Permit'
+        ? parseFloat(props.sequence[0]?.sequence)
+        : parseFloat(props.sequence[1]?.sequence);
+console.log('Sequence', userSequence);
+// console.log('formTYpe',);
+/* -----------------------
+Actions
+----------------------- */
 const submitPayment = async () => {
     try {
-        const response = await axios.post('/fsd/accept-payment', {
+        const response = await axios.post('/sezad/accept-payment', {
             application_forms_id: form.application_id,
             form_type: form.form_type,
             form_number: form.form_number,
@@ -120,23 +100,17 @@ const submitPayment = async () => {
             amount: formPayment.amount,
         });
 
-        const data = response.data;
-
-        if (data.success) {
+        if (response.data.success) {
             toast.success('Payment processed successfully.');
             openPayment.value = false;
 
-            // update finance approver in UI
-            const approver = form.approvers.find(
-                (a) => a.approver?.id === data.approver_id,
+            // Update local status immediately
+            const financeApprover = form.approvers.find(
+                (a) => a.role === 'Finance',
             );
+            if (financeApprover) financeApprover.status = 'Approved';
 
-            if (approver) {
-                approver.status = 'Approved';
-            }
-
-            // update overall form status
-            form.status = data.status;
+            form.status = response.data.status || 'Approved';
         }
     } catch (error) {
         console.error(error);
@@ -145,36 +119,30 @@ const submitPayment = async () => {
 };
 
 const onApprove = async () => {
-    const userId = page.props.auth.user.id;
-    let isLastApprover = false;
     const lastApprover = form.approvers[form.approvers.length - 1];
-
-    isLastApprover = lastApprover.approver_id === userId;
+    const isLastApprover =
+        (lastApprover.approver?.id || lastApprover.approver_id) ===
+        props.userId;
 
     try {
         const response = await axios.post('/sezad/approve', {
-            user_id: page.props.auth.user.id,
+            user_id: props.userId,
             application_form_id: form.application_id,
             approver_group_id: props.userRole.approver_group_id,
             sequence: Number(props.userRole.sequence),
             isLastApprover: isLastApprover,
         });
 
-        const data = response.data;
-
-        if (data.success) {
-            // update UI
-            const approver = form.approvers.find(
-                (a) => a.approver?.id === data.approver_id,
+        if (response.data.success) {
+            // Find current user's entry in the approvers list and update it
+            const currentApprover = form.approvers.find(
+                (a) => a.role === props.userRole.role,
             );
-
-            if (approver) {
-                approver.status = data.status;
+            if (currentApprover) {
+                currentApprover.status = 'Approved';
             }
 
-            form.status = data.status;
-            form.application_form_status = 'Approved';
-
+            form.status = response.data.status;
             toast.success('Application approved successfully.');
         }
     } catch (error) {
@@ -182,14 +150,17 @@ const onApprove = async () => {
         toast.error('Approval failed.');
     }
 };
+
+/* -----------------------
+Helpers
+----------------------- */
 const formatDate = (value: string | null) => {
     if (!value) return '';
-    const date = new Date(value);
     return new Intl.DateTimeFormat('en-US', {
         year: 'numeric',
         month: 'long',
         day: '2-digit',
-    }).format(date);
+    }).format(new Date(value));
 };
 
 const statusClasses: Record<string, string> = {
@@ -208,190 +179,186 @@ Watcher
 watch(
     () => props.applicationProps,
     (app) => {
-        if (!app || !app.application) return;
-        console.log('Application Prop Changed:', app);
-        form.application_id = app.application.id;
+        if (!app) return;
 
-        // form.application_form_status = app.application.status ?? '';
-        form.control_number = app.control_number ?? '';
-        form.form_title = app.application.form_title ?? '';
-        form.form_number = app.application.form_number ?? '';
-        form.status = app.application.status ?? '';
-        form.application_date = app.application.created_at ?? '';
-        form.locator_name = app.application.user?.name ?? '';
-        form.approvers = app.application.approver_group_approvers ?? [];
-        form.form_type = app.application.form_type ?? '';
-        form.form_id = app.application?.id ?? '';
-        const last = app.application.approver_group_approvers?.at(-1);
-        form.approved_date = last?.updated_at ?? '';
+        // Handle the broadcast structure vs the initial Inertia prop structure
+        const source = app.application ? app.application : app;
+        console.log('SOURCE', source);
+        console.log('Syncing Modal. Status:', source.status);
 
-        console.log('Form Approvers', form.approvers);
+        form.application_id = source.id;
+        form.status = source.status ?? '';
+        form.form_title = (source as any).form_title ?? '';
+        form.application_date = (source as any)?.created_at ?? '';
+        form.control_number = (source as any)?.control_number ?? '';
+        form.locator_name = (source as any)?.user?.name ?? '';
+        form.form_number = (source as any)?.form_number ?? '';
+        form.form_type = (source as any).form_type ?? '';
+        form.form_id = String(source.id);
+        // The fix: Explicitly update approvers from the broadcast data
+        if ((source as any).approver_group_approvers) {
+            form.approvers = JSON.parse(
+                JSON.stringify((source as any).approver_group_approvers),
+            );
+            console.log(
+                'Signatories updated successfully:',
+                form.approvers.length,
+            );
+        }
     },
-    { immediate: true },
+    { immediate: true, deep: true },
 );
-// console.log(form.approvers.length);
+console.log('FORM', form);
+console.log('ID', props.userId);
 </script>
 
 <template>
     <Card
         class="relative z-10 max-h-[90vh] w-full overflow-y-auto border-2 border-amber-50"
     >
-        <!-- Header -->
         <CardHeader>
             <div class="flex w-full items-start justify-between">
                 <div>
-                    <CardTitle>
-                        {{ form.form_title }}
-                    </CardTitle>
-
+                    <CardTitle>{{ form.form_title }}</CardTitle>
                     <CardDescription>
-                        Status: {{ form.status }}
+                        Status:
+                        <span class="font-bold uppercase">{{
+                            form.status
+                        }}</span>
                     </CardDescription>
                 </div>
             </div>
         </CardHeader>
 
-        <!-- Content -->
-        <CardContent class="space-y-1">
-            <div class="flex flex-row justify-between">
-                <!-- left -->
-                <div>
+        <CardContent class="space-y-4">
+            <div class="flex flex-row justify-between gap-4">
+                <div class="space-y-1 text-sm">
                     <p>
-                        Application Date:
+                        <strong>App Date:</strong>
                         {{ formatDate(form.application_date) }}
                     </p>
                     <p>
-                        Approved Date:
-                        {{ formatDate(form.approved_date) }}
+                        <strong>Approved Date:</strong>
+                        {{ formatDate(form.approved_date) || '---' }}
                     </p>
-                    <p>Control #: {{ form.control_number }}</p>
-                    <p>Locator: {{ form.locator_name }}</p>
+                    <p><strong>Control #:</strong> {{ form.control_number }}</p>
+                    <p><strong>Locator:</strong> {{ form.locator_name }}</p>
                 </div>
-                <!-- right -->
-                <div v-if="form.approvers.length">
-                    <h3 class="text-base font-semibold text-gray-800">
+
+                <div v-if="form.approvers.length" class="w-1/2">
+                    <h3 class="mb-2 text-sm font-semibold text-gray-800">
                         Approvers
                     </h3>
-
                     <ol class="space-y-1">
                         <li
                             v-for="(a, i) in form.approvers"
                             :key="i"
-                            class="flex items-center justify-between rounded-lg border bg-gray-50 px-1 py-1"
+                            class="flex items-center justify-between rounded-lg border bg-gray-50 px-2 py-1 shadow-sm"
                         >
-                            <!-- Left Section -->
                             <div class="flex flex-col">
-                                <span class="font-semibold text-gray-900">
-                                    {{ a.approver?.name }}
-                                </span>
-
-                                <span class="text-sm text-gray-500">
-                                    {{ a.role }}
-                                </span>
+                                <span class="text-xs font-bold text-gray-900">{{
+                                    a.approver?.name || 'Pending...'
+                                }}</span>
+                                <span
+                                    class="text-[10px] text-gray-500 uppercase"
+                                    >{{ a.role }}</span
+                                >
                             </div>
-
-                            <!-- Right Section (Status Badge) -->
                             <span
-                                class="rounded-full px-3 py-1 text-xs font-medium capitalize"
+                                class="rounded-full border px-2 py-0.5 text-[10px] font-bold capitalize"
                                 :class="
                                     statusClasses[normalizeStatus(a.status)] ||
                                     'bg-gray-100 text-gray-600'
                                 "
                             >
                                 {{ a.status }}
-                                <!-- {{ form.application_form_status }} -->
                             </span>
                         </li>
                     </ol>
                 </div>
             </div>
 
-            <div v-for="(items, index) in form.approvers" :key="index">
-                <div
-                    v-if="
-                        items.role == userRole.role &&
-                        form.approvers[Number(userRole.sequence) - 1]?.status ==
-                            'Approved'
-                    "
-                >
-                    <!-- Finance -->
+            <div
+                class="border-t pt-4"
+                v-if="normalizeStatus(form.status) !== 'approved'"
+            >
+                <div v-for="(item, index) in form.approvers" :key="index">
                     <div
                         v-if="
-                            userRole.role == 'Finance' &&
-                            form.approvers[Number(userRole.sequence)]?.status ==
-                                'Pending'
+                            item.role === userRole.role &&
+                            normalizeStatus(item.status) === 'pending'
                         "
                     >
-                        <div class="flex gap-2">
-                            <button
-                                v-show="!openPayment"
-                                type="button"
-                                @click="openPaymentFooter(true)"
-                                class="rounded-md bg-primary px-4 py-2 text-primary-foreground transition hover:bg-primary/90"
-                            >
-                                Proceed Payment
-                            </button>
+                        <div v-if="userRole.role === 'Finance'">
+                            <div class="flex gap-2">
+                                <button
+                                    v-if="!openPayment"
+                                    @click="openPaymentFooter(true)"
+                                    class="rounded-md bg-blue-600 px-4 py-2 text-sm text-white transition hover:bg-blue-700"
+                                >
+                                    Proceed Payment
+                                </button>
+                                <button
+                                    v-else
+                                    @click="openPaymentFooter(false)"
+                                    class="rounded-md bg-red-600 px-4 py-2 text-sm text-white transition hover:bg-red-700"
+                                >
+                                    Cancel
+                                </button>
+                            </div>
+                        </div>
 
+                        <div v-else>
                             <button
-                                v-show="openPayment"
-                                type="button"
-                                @click="openPaymentFooter(false)"
-                                class="rounded-md bg-destructive text-destructive-foreground transition hover:bg-destructive/90"
+                                v-show="
+                                    form.approvers[userSequence - 1].status ==
+                                        'Approved' &&
+                                    form.approvers[userSequence].status ==
+                                        'Pending'
+                                "
+                                @click="onApprove"
+                                class="rounded-md bg-green-600 px-6 py-2 font-semibold text-white transition hover:bg-green-700"
                             >
-                                Cancel
+                                Approve Application
                             </button>
                         </div>
-                    </div>
-                    <!-- Other Signatoriesd -->
-                    <div
-                        v-show="
-                            userRole.role != 'Finance' &&
-                            items.role == userRole.role &&
-                            form.approvers[Number(userRole.sequence) - 1]
-                                .status == 'Approved' &&
-                            items.status == 'Pending'
-                        "
-                    >
-                        <!-- {{ page }} -->
-                        <button @click="onApprove">Approve</button>
                     </div>
                 </div>
             </div>
         </CardContent>
 
-        <!-- Footer -->
-        <CardFooter v-show="openPayment" class="flex flex-row">
-            <div class="flex flex-col">
-                <div>
+        <CardFooter
+            v-if="openPayment"
+            class="flex flex-col gap-4 border-t bg-gray-50 p-4"
+        >
+            <div class="grid w-full grid-cols-2 gap-4">
+                <div class="space-y-1">
+                    <label class="text-xs font-bold text-gray-600"
+                        >IS Number</label
+                    >
                     <Input
                         type="number"
-                        name="text"
                         v-model="formPayment.is_number"
                         placeholder="Enter IS Number"
                     />
                 </div>
-                <div>
+                <div class="space-y-1">
+                    <label class="text-xs font-bold text-gray-600"
+                        >Amount</label
+                    >
                     <Input
                         type="number"
-                        name="amount"
                         v-model="formPayment.amount"
-                        placeholder="Amount"
+                        placeholder="0.00"
                     />
                 </div>
             </div>
-            <div class="flex flex-col">
-                <!-- <div>
-                                <Calendar v-model="formPayment.payment_date" />
-                            </div> -->
-                <div>
-                    <button
-                        class="rounded-md bg-primary px-4 py-2 text-white transition hover:bg-primary/90"
-                        @click="submitPayment"
-                    >
-                        Accept Button
-                    </button>
-                </div>
-            </div>
+            <button
+                class="w-full rounded-md bg-primary py-2 font-bold text-white transition hover:bg-primary/90"
+                @click="submitPayment"
+            >
+                Confirm & Accept Payment
+            </button>
         </CardFooter>
     </Card>
 </template>
