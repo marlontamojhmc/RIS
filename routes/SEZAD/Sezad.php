@@ -1,4 +1,5 @@
 <?php
+use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\OSAC\OsacController;
 use App\Http\Controllers\SEZAD\SezadManagerController;
 use App\Http\Controllers\CCO\CcoController;

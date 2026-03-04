@@ -26,7 +26,7 @@ class SEZADController extends Controller
 {
     public function index(AppService $appService)
 {
-    $applications = $appService->getApplicationsForApprover(auth()->id());
+    $applications = $appService->getApplicationsForApprover(Auth::id());
 
     return Inertia::render('sezad/Index', [
         'applications' => $applications

@@ -26,7 +26,7 @@ const emit = defineEmits(['onOpenModal']);
 const handleView = (app) => {
     emit('onOpenModal', app);
 };
-console.log(userRole);
+// console.log(userRole);
 </script>
 
 <template>

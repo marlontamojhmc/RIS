@@ -8,7 +8,7 @@ import {
     CardTitle,
 } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { useForm, usePage } from '@inertiajs/vue3';
+import { useForm } from '@inertiajs/vue3';
 import axios from 'axios';
 import { ref, watch } from 'vue';
 import { useToast } from 'vue-toastification';
@@ -27,10 +27,10 @@ interface ApplicationItem {
     control_number?: string | null;
     status?: string;
     application?: {
+        form_type?: string;
         id: number;
         form_title?: string;
         form_number?: string;
-        form_type?: string;
         created_at?: string;
         status?: string;
         user?: { name?: string };
@@ -47,9 +47,11 @@ interface ApplicationItem {
 const props = defineProps<{
     userRole: UserRole;
     applicationProps: ApplicationItem | null;
+    userId: number;
+    sequence: any;
 }>();
 
-const page = usePage();
+// const page = usePage();
 const toast = useToast();
 const openPayment = ref(false);
 
@@ -78,20 +80,17 @@ const formPayment = useForm({
 const openPaymentFooter = (value: boolean) => {
     openPayment.value = value;
 };
-
+const userSequence =
+    props.applicationProps?.application?.form_type == 'Permit'
+        ? parseFloat(props.sequence[0]?.sequence)
+        : parseFloat(props.sequence[1]?.sequence);
+console.log('Sequence', userSequence);
+// console.log('formTYpe',);
 /* -----------------------
 Actions
 ----------------------- */
 const submitPayment = async () => {
     try {
-        // console.log({
-        //     application_id: form.application_id,
-        //     form_type: form.form_type,
-        //     form_number: form.form_number,
-        //     form_id: form.form_id,
-        //     is_number: formPayment.is_number,
-        //     amount: formPayment.amount,
-        // });
         const response = await axios.post('/sezad/accept-payment', {
             application_forms_id: form.application_id,
             form_type: form.form_type,
@@ -120,14 +119,14 @@ const submitPayment = async () => {
 };
 
 const onApprove = async () => {
-    const userId = page.props.auth.user.id;
     const lastApprover = form.approvers[form.approvers.length - 1];
     const isLastApprover =
-        (lastApprover.approver?.id || lastApprover.approver_id) === userId;
+        (lastApprover.approver?.id || lastApprover.approver_id) ===
+        props.userId;
 
     try {
         const response = await axios.post('/sezad/approve', {
-            user_id: userId,
+            user_id: props.userId,
             application_form_id: form.application_id,
             approver_group_id: props.userRole.approver_group_id,
             sequence: Number(props.userRole.sequence),
@@ -209,6 +208,8 @@ watch(
     },
     { immediate: true, deep: true },
 );
+console.log('FORM', form);
+console.log('ID', props.userId);
 </script>
 
 <template>
@@ -288,7 +289,7 @@ watch(
                             normalizeStatus(item.status) === 'pending'
                         "
                     >
-                        <template v-if="userRole.role === 'Finance'">
+                        <div v-if="userRole.role === 'Finance'">
                             <div class="flex gap-2">
                                 <button
                                     v-if="!openPayment"
@@ -305,16 +306,22 @@ watch(
                                     Cancel
                                 </button>
                             </div>
-                        </template>
+                        </div>
 
-                        <template v-else>
+                        <div v-else>
                             <button
+                                v-show="
+                                    form.approvers[userSequence - 1].status ==
+                                        'Approved' &&
+                                    form.approvers[userSequence].status ==
+                                        'Pending'
+                                "
                                 @click="onApprove"
                                 class="rounded-md bg-green-600 px-6 py-2 font-semibold text-white transition hover:bg-green-700"
                             >
                                 Approve Application
                             </button>
-                        </template>
+                        </div>
                     </div>
                 </div>
             </div>

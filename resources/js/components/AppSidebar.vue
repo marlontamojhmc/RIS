@@ -149,9 +149,7 @@ const navConfig: Record<string, NavItem[]> = {
             icon: Eye,
         },
     ],
-    sezadManager: [
-        { title: 'SEZAD Dashboard', href: '/sezad', icon: LayoutGrid },
-    ],
+
     accreditationSpsnbe: [
         {
             title: 'Service Provider / Supplier',
@@ -251,6 +249,7 @@ const navConfig: Record<string, NavItem[]> = {
         },
     ],
     sezadManager: [
+        { title: 'SEZAD Dashboard', href: '/sezad', icon: LayoutGrid },
         {
             title: 'Permits',
             href: '/',
