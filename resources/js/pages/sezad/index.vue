@@ -40,6 +40,7 @@ interface PageProps extends Record<string, unknown> {
         };
     };
     applications: Application[];
+    appUrl: string;
 }
 
 const page = usePage<PageProps>();
@@ -55,6 +56,7 @@ console.log('check', sequence);
 const applications = ref<Application[]>(
     props.applications ? [...props.applications] : [],
 );
+const appUrl = page.props.appUrl;
 const showRecords = ref(false);
 const showTimeline = ref(false);
 const selectedApplication = ref<Application | null>(null);
@@ -132,12 +134,15 @@ watch(
     },
     { deep: true },
 );
+console.log(appUrl);
 </script>
 
 <template>
     <AppLayout>
         <div>
-            <h1 class="mb-4 text-center text-2xl font-bold">
+            <h1
+                class="mb-4 text-center text-2xl font-bold text-gray-900 dark:text-white"
+            >
                 {{ userRole?.role }} Dashboard
             </h1>
         </div>
@@ -157,6 +162,7 @@ watch(
                     :userRole="userRole"
                     :userId="userId"
                     :sequence="sequence"
+                    :appUrl="appUrl"
                 />
             </Modal>
             <Modal :show="showTimeline" @close="onClose" maxWidth="max-w-2xl">

@@ -51,6 +51,7 @@ if($user){
                 'message' => trim($message),
             ],
         ],
+        'appUrl'  => config('app.url'),
 
         'auth' => [
             'user' => $user ? [

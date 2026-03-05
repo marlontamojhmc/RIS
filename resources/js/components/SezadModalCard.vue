@@ -48,6 +48,7 @@ const props = defineProps<{
     applicationProps: ApplicationItem | null;
     userId: number;
     sequence: any;
+    appUrl: string;
 }>();
 /* -----------------------
 Forms
@@ -65,13 +66,22 @@ const form = useForm({
     locator_name: '',
     approvers: [] as any[],
     user_app_selection: [] as any[],
+    uploads: [] as any[],
     // fee_option: [] as any[],
 });
+const currentIndex = ref(0);
+
+const next = () => {
+    currentIndex.value = (currentIndex.value + 1) % form.uploads.length;
+};
+
+const prev = () => {
+    currentIndex.value =
+        (currentIndex.value - 1 + form.uploads.length) % form.uploads.length;
+};
 // const page = usePage();
 const toast = useToast();
 const openPayment = ref(false);
-
-
 
 const formPayment = useForm({
     is_number: '',
@@ -204,6 +214,7 @@ watch(
         form.form_type = (source as any).form_type ?? '';
         form.form_id = String(source.id);
         form.user_app_selection = (source as any)?.user_app_selection[0] ?? [];
+        form.uploads = (source as any)?.uploads ?? [];
         // form.fee_option =
         //     (source as any)?.user_app_selection[0].fee_option ?? [];
 
@@ -221,8 +232,9 @@ watch(
     { immediate: true, deep: true },
 );
 console.log('FORM', form);
-console.log('ID', props.userId);
+// console.log('ID', props.userId);
 console.log('apps', props.applicationProps);
+console.log('axios', props.appUrl);
 </script>
 
 <template>
@@ -307,7 +319,7 @@ console.log('apps', props.applicationProps);
                             'hover:bg-gray-100',
                         ]"
                     >
-                        TimeLine
+                        Uploads
                     </li>
                 </ol>
             </div>
@@ -322,47 +334,84 @@ console.log('apps', props.applicationProps);
                     <span> Form Number: {{ form.form_number }} </span><br />
                     <span> Form Type: {{ form.form_type }} </span><br />
                     <hr />
-                    <span> Amount: {{ (form.user_app_selection as any).amount }} </span
+                    <span>
+                        Amount:
+                        {{ (form.user_app_selection as any).amount }} </span
                     ><br />
                     <span>
                         Date From:
-                        {{ (form.user_app_selection as any).selected_at }} </span
+                        {{
+                            (form.user_app_selection as any).selected_at
+                        }} </span
                     ><br />
                     <span>
-                        Date To:{{(form.user_app_selection as any).Expired_at }} </span
+                        Date To:{{
+                            (form.user_app_selection as any).Expired_at
+                        }} </span
                     ><br />
-                    <span>
+                    <span v-if="(form.user_app_selection as any)?.fee_option">
                         Code:
-                        {{ (form.user_app_selection as any).fee_option.code }} </span
+                        {{ (form.user_app_selection as any).fee_option.code }}
+                    </span>
+                    <span v-else class="text-gray-400 italic">
+                        No fee option selected </span
                     ><br />
-                    <span
-                        >Description:
-                        {{ (form.user_app_selection as any).fee_option.description }}
+                    <span v-if="(form.user_app_selection as any)?.fee_option">
+                        Description:
+                        {{
+                            (form.user_app_selection as any).fee_option
+                                .description
+                        }}
+                    </span>
+                    <span v-else class="text-gray-400 italic">
+                        No fee description
                     </span>
                     <br />
                     <span
                         >Price:
-                        {{ (form.user_app_selection as any).fee_option.price }} </span
-                    ><br />
+                        {{
+                            form.user_app_selection &&
+                            (form.user_app_selection as any)?.fee_option
+                                ? (form.user_app_selection as any).fee_option
+                                      .price
+                                : 'N/A'
+                        }}
+                    </span>
+                    <br />
                     <span
                         >Fee Title:
-                        {{ (form.user_app_selection as any).fee_option.title }} </span
+                        {{
+                            form.user_app_selection &&
+                            (form.user_app_selection as any)?.fee_option
+                                ? (form.user_app_selection as any).fee_option
+                                      .title
+                                : 'N/A'
+                        }} </span
                     ><br />
                     <span>
                         Validity:
-                        {{ (form.user_app_selection as any).fee_option.validity }} </span
+                        {{
+                            form.user_app_selection &&
+                            (form.user_app_selection as any)?.fee_option
+                                ? (form.user_app_selection as any).fee_option
+                                      .validity
+                                : 'N/A'
+                        }} </span
                     ><br />
                     <span
                         >Value:
-                        {{ (form.user_app_selection as any).fee_option.value }}
+                        {{
+                            form.user_app_selection &&
+                            (form.user_app_selection as any)?.fee_option
+                                ? (form.user_app_selection as any).fee_option
+                                      .value
+                                : 'N/A'
+                        }}
                     </span>
                 </div>
                 <!-- approvers status -->
                 <div v-else-if="activeTab == 2" class="w-full p-4">
                     <div v-if="form.approvers.length">
-                        <h3 class="mb-2 text-sm font-semibold text-gray-800">
-                            Approvers
-                        </h3>
                         <ol class="space-y-1">
                             <li
                                 v-for="(a, i) in form.approvers"
@@ -395,13 +444,96 @@ console.log('apps', props.applicationProps);
                         </ol>
                     </div>
                 </div>
+                <!-- Uploads-->
                 <div v-else-if="activeTab == 3" class="w-full p-4">
-                    <h3 class="mb-2 text-sm font-semibold text-gray-800">
-                        Time Line
-                    </h3>
+                    <div
+                        v-if="form.uploads.length > 0"
+                        class="relative mx-auto w-full max-w-2xl"
+                    >
+                        <div
+                            class="flex h-64 items-center justify-center overflow-hidden rounded-lg border border-gray-200 bg-gray-50"
+                        >
+                            <a
+                                :href="`${appUrl}/storage/${form.uploads[currentIndex].file_path}`"
+                                target="_blank"
+                                title="Click to view full size"
+                                class="flex h-full w-full cursor-zoom-in items-center justify-center"
+                            >
+                                <img
+                                    :src="`${appUrl}/storage/${form.uploads[currentIndex].file_path}`"
+                                    alt="Uploaded Image"
+                                    class="h-full w-full object-contain transition-opacity duration-300 hover:opacity-90"
+                                />
+
+                                <div
+                                    class="absolute inset-0 flex items-center justify-center bg-black/5 opacity-0 transition-opacity group-hover:opacity-100"
+                                >
+                                    <span
+                                        class="rounded-full bg-white/90 px-3 py-1 text-xs font-medium shadow-sm"
+                                    >
+                                        View Full Size ↗
+                                    </span>
+                                </div>
+                            </a>
+                        </div>
+
+                        <div v-if="form.uploads.length > 1">
+                            <button
+                                @click="prev"
+                                class="absolute top-1/2 left-2 -translate-y-1/2 rounded-full bg-white/80 p-2 shadow hover:bg-white"
+                            >
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    class="h-6 w-6"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                    stroke="currentColor"
+                                >
+                                    <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        stroke-width="2"
+                                        d="M15 19l-7-7 7-7"
+                                    />
+                                </svg>
+                            </button>
+                            <button
+                                @click="next"
+                                class="absolute top-1/2 right-2 -translate-y-1/2 rounded-full bg-white/80 p-2 shadow hover:bg-white"
+                            >
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    class="h-6 w-6"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                    stroke="currentColor"
+                                >
+                                    <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        stroke-width="2"
+                                        d="M9 5l7 7-7 7"
+                                    />
+                                </svg>
+                            </button>
+                        </div>
+
+                        <div class="mt-2 text-center text-xs text-gray-500">
+                            {{ currentIndex + 1 }} of
+                            {{ form.uploads.length }} —
+                            {{ form.uploads[currentIndex].file_name }}
+                        </div>
+                    </div>
+
+                    <div
+                        v-else
+                        class="py-10 text-center text-sm text-gray-400 italic"
+                    >
+                        No uploads found.
+                    </div>
                 </div>
             </div>
-
+            <!-- Approvers -->
             <div
                 class="border-t pt-4"
                 v-if="normalizeStatus(form.status) !== 'approved'"
