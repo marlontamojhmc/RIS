@@ -19,8 +19,7 @@
         "laravel/tinker": "^2.10.1",
         "laravel/wayfinder": "^0.1.9",
         "league/oauth2-client": "^2.8",
-        "league/oauth2-google": "^4.0",
-        "tightenco/ziggy": "^2.6"
+        "league/oauth2-google": "^4.0"
     },
     "require-dev": {
         "barryvdh/laravel-debugbar": "^4.0",
