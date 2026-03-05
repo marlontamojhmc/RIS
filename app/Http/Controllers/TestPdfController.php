@@ -22,9 +22,15 @@ class TestPdfController extends Controller
     }
     public function generate($id){
         
-           $application = ApplicationModel::with(['articleDetails', 'uploads', 'selections','options'])
+           $application = ApplicationModel::with(['articleDetails',
+                                                    'userAppSelection',
+                                                    'uploads',
+                                                    'userAppSelection.feeOption',
+                                                    'approval',
+                                                  ])
     ->where('id', $id)
     ->first();
+    
      return view('pdf.gate-clearance', compact('application'));
     // $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('pdf.gate-clearance', [
     //     'application' => $application
