@@ -5,7 +5,7 @@ import SezadModalCard from '@/components/SezadModalCard.vue';
 import Modal from '@/components/View/Modal.vue';
 import AppLayout from '@/layouts/AppLayout.vue';
 import { usePage } from '@inertiajs/vue3';
-import { onMounted, ref, watch } from 'vue';
+import { nextTick, onMounted, ref, watch } from 'vue';
 interface UserRole {
     role: string;
     sequence: number | string;
@@ -61,14 +61,16 @@ const showRecords = ref(false);
 const showTimeline = ref(false);
 const selectedApplication = ref<Application | null>(null);
 
-const onOpenRecords = (app: Application) => {
+const onOpenRecords = async (app: Application) => {
     // Clone to ensure a clean reference for the modal
     selectedApplication.value = JSON.parse(JSON.stringify(app));
+    await nextTick();
     showRecords.value = true;
 };
-const onOpenTimeline = (app: Application) => {
+const onOpenTimeline = async (app: Application) => {
     // Clone to ensure a clean reference for the modal
     selectedApplication.value = JSON.parse(JSON.stringify(app));
+    await nextTick();
     showTimeline.value = true;
 };
 
@@ -88,38 +90,46 @@ onMounted(() => {
         '.ApplicationUpdated',
         (event: any) => {
             const newAppData = event.application;
-            if (!newAppData) return;
+            if (newAppData instanceof String) {
+                selectedApplication.value.application.control_number =
+                    newAppData;
+            } else {
+                console.log(newAppData);
+                if (!newAppData) return;
 
-            const index = applications.value.findIndex((item: any) => {
-                const id = item.application?.id || item.id;
-                return Number(id) === Number(newAppData.id);
-            });
+                const index = applications.value.findIndex((item: any) => {
+                    const id = item.application?.id || item.id;
+                    return Number(id) === Number(newAppData.id);
+                });
 
-            if (index !== -1) {
-                // Create the updated object
-                const updatedItem = {
-                    ...applications.value[index],
-                    ...newAppData,
-                    application: newAppData,
-                    // Ensure the list is at the top level for the watcher
-                    approver_group_approvers:
-                        newAppData.approver_group_approvers,
-                };
+                if (index !== -1) {
+                    // Create the updated object
+                    const updatedItem = {
+                        ...applications.value[index],
+                        ...newAppData,
+                        application: newAppData,
+                        // Ensure the list is at the top level for the watcher
+                        approver_group_approvers:
+                            newAppData.approver_group_approvers,
+                    };
 
-                // Update the main table
-                applications.value.splice(index, 1, updatedItem);
+                    // Update the main table
+                    applications.value.splice(index, 1, updatedItem);
 
-                // SYNC THE MODAL
-                if (selectedApplication.value) {
-                    const currentId =
-                        selectedApplication.value.application?.id ||
-                        selectedApplication.value.id;
-                    if (Number(currentId) === Number(newAppData.id)) {
-                        // Use a fresh object reference to trigger the watcher in SezadModalCard
-                        selectedApplication.value = JSON.parse(
-                            JSON.stringify(updatedItem),
-                        );
-                        console.log('MODAL DATA REPLACED - Syncing Approvers');
+                    // SYNC THE MODAL
+                    if (selectedApplication.value) {
+                        const currentId =
+                            selectedApplication.value.application?.id ||
+                            selectedApplication.value.id;
+                        if (Number(currentId) === Number(newAppData.id)) {
+                            // Use a fresh object reference to trigger the watcher in SezadModalCard
+                            selectedApplication.value = JSON.parse(
+                                JSON.stringify(updatedItem),
+                            );
+                            console.log(
+                                'MODAL DATA REPLACED - Syncing Approvers',
+                            );
+                        }
                     }
                 }
             }
@@ -134,7 +144,6 @@ watch(
     },
     { deep: true },
 );
-console.log(appUrl);
 </script>
 
 <template>

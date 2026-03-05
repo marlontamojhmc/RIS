@@ -9,7 +9,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { useForm } from '@inertiajs/vue3';
 import axios from 'axios';
-import { ref, watch } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { useToast } from 'vue-toastification';
 
 /* -----------------------
@@ -67,6 +67,7 @@ const form = useForm({
     approvers: [] as any[],
     user_app_selection: [] as any[],
     uploads: [] as any[],
+    articles: [] as any[],
     // fee_option: [] as any[],
 });
 const currentIndex = ref(0);
@@ -91,11 +92,18 @@ const formPayment = useForm({
 const openPaymentFooter = (value: boolean) => {
     openPayment.value = value;
 };
-const userSequence =
-    props.applicationProps?.application?.form_type == 'Permit'
-        ? parseFloat(props.sequence[0]?.sequence)
-        : parseFloat(props.sequence[1]?.sequence);
-console.log('Sequence', userSequence);
+
+const userSequence = computed(() => {
+    if (!props.sequence || props.sequence.length < 2) return 0;
+
+    const isPermit =
+        props.applicationProps?.application?.form_type === 'Permit';
+    const seqObj = isPermit ? props.sequence[0] : props.sequence[1];
+
+    return seqObj ? parseFloat(seqObj.sequence) : 0;
+});
+
+// console.log('Sequence', userSequence);
 
 const activeTab = ref(1);
 // console.log('formTYpe',);
@@ -213,8 +221,10 @@ watch(
         form.form_number = (source as any)?.form_number ?? '';
         form.form_type = (source as any).form_type ?? '';
         form.form_id = String(source.id);
-        form.user_app_selection = (source as any)?.user_app_selection[0] ?? [];
+        form.user_app_selection =
+            (source as any)?.user_app_selection?.[0] ?? [];
         form.uploads = (source as any)?.uploads ?? [];
+        form.articles = (source as any)?.article_details ?? [];
         // form.fee_option =
         //     (source as any)?.user_app_selection[0].fee_option ?? [];
 
@@ -234,12 +244,13 @@ watch(
 console.log('FORM', form);
 // console.log('ID', props.userId);
 console.log('apps', props.applicationProps);
-console.log('axios', props.appUrl);
+// console.log('article', form.articles);
 </script>
 
 <template>
     <Card class="relative z-10 max-h-[90vh] w-full border-2 border-amber-50">
         <CardHeader>
+            <!-- details -->
             <div class="flex flex-row justify-between">
                 <div class="flex flex-col">
                     <CardTitle>{{ form.form_title }}</CardTitle>
@@ -271,53 +282,50 @@ console.log('axios', props.appUrl);
                     </p>
                 </div>
             </div>
+            <!-- tabs -->
             <div class="w-full border-b border-gray-200">
                 <ol
                     class="hide-scrollbar flex overflow-x-auto whitespace-nowrap"
                 >
                     <li
                         @click="setTab(1)"
-                        :class="[
-                            'mr-4',
-                            'cursor-pointer',
-                            'rounded-md',
-                            'px-4',
-                            'py-2',
-                            'text-xs',
-                            'font-medium',
-                            'hover:bg-gray-100',
-                        ]"
+                        :class="`mr-4 cursor-pointer rounded-md px-4 py-2 text-xs font-medium hover:bg-gray-100 dark:hover:bg-blue-700 ${
+                            activeTab == 1
+                                ? 'border-b-4 border-b-blue-700 dark:border-b-blue-700'
+                                : ''
+                        }`"
                     >
                         Application Information
                     </li>
                     <li
                         @click="setTab(2)"
-                        :class="[
-                            'mr-4',
-                            'cursor-pointer',
-                            'rounded-md',
-                            'px-4',
-                            'py-2',
-                            'text-xs',
-                            'font-medium',
-                            'hover:bg-gray-100',
-                        ]"
+                        :class="`mr-4 cursor-pointer rounded-md px-4 py-2 text-xs font-medium hover:bg-gray-100 dark:hover:bg-blue-700 ${
+                            activeTab == 2
+                                ? 'border-b-4 border-b-blue-700 dark:border-b-blue-700'
+                                : ''
+                        }`"
                     >
                         Approvers
                     </li>
                     <!-- border-b-2 border-primary -->
                     <li
                         @click="setTab(3)"
-                        :class="[
-                            'mr-4',
-                            'cursor-pointer',
-                            'rounded-md',
-                            'px-4',
-                            'py-2',
-                            'text-xs',
-                            'font-medium',
-                            'hover:bg-gray-100',
-                        ]"
+                        :class="`mr-4 cursor-pointer rounded-md px-4 py-2 text-xs font-medium hover:bg-gray-100 dark:hover:bg-blue-700 ${
+                            activeTab == 3
+                                ? 'border-b-4 border-b-blue-700 dark:border-b-blue-700'
+                                : ''
+                        }`"
+                    >
+                        Article Details
+                    </li>
+                    <!--  -->
+                    <li
+                        @click="setTab(4)"
+                        :class="`mr-4 cursor-pointer rounded-md px-4 py-2 text-xs font-medium hover:bg-gray-100 dark:hover:bg-blue-700 ${
+                            activeTab == 4
+                                ? 'border-b-4 border-b-blue-700 dark:border-b-blue-700'
+                                : ''
+                        }`"
                     >
                         Uploads
                     </li>
@@ -444,8 +452,26 @@ console.log('axios', props.appUrl);
                         </ol>
                     </div>
                 </div>
-                <!-- Uploads-->
+                <!-- articles-->
                 <div v-else-if="activeTab == 3" class="w-full p-4">
+                    <div
+                        v-for="(item, index) in form.articles"
+                        :key="item.id || index"
+                    >
+                        <span> Price: {{ item?.Price }} </span><br />
+                        <span>
+                            Marks and Number:
+                            {{ item?.marks_and_number }} </span
+                        ><br />
+                        <span> Quantity: {{ item?.qty }} </span>
+                        <hr class="my-4 border-t-2 border-black" />
+                        <!-- {{ item?.status }} -->
+                        <!-- {{ item?.verified_at }} -->
+                        <!-- {{ item }} -->
+                    </div>
+                </div>
+                <!-- Uploads-->
+                <div v-else-if="activeTab == 4" class="w-full p-4">
                     <div
                         v-if="form.uploads.length > 0"
                         class="relative mx-auto w-full max-w-2xl"
@@ -545,7 +571,14 @@ console.log('axios', props.appUrl);
                             normalizeStatus(item.status) === 'pending'
                         "
                     >
-                        <div v-if="userRole.role === 'Finance'">
+                        <div
+                            v-if="
+                                userRole.role === 'Finance' &&
+                                form.approvers[userSequence - 1].status ==
+                                    'Approved' &&
+                                form.approvers[userSequence].status == 'Pending'
+                            "
+                        >
                             <div class="flex gap-2">
                                 <button
                                     v-if="!openPayment"

@@ -6,10 +6,12 @@ use App\Http\Controllers\CCO\CcoController;
 use App\Http\Controllers\FINANCE\FinanceController;
 use App\Http\Controllers\SEZAD\RO\RegistrationOfficerController;
 use App\Http\Controllers\SEZAD\SEZADController;
+use App\Http\Controllers\TimeLogController;
 
      Route::prefix('sezad')->group(function () {
       // access index
       Route::get('/', [SEZADController::class, 'index'])->name('sezad.index');
+      // Route::get('/', [TimeLogController::class, 'index'])->name('sezad.index');
       // approve per signatory
       Route::post('/approve', [SEZADController::class, 'updateStatus'])->name('signatory.approve');
       // approve/payment for finance signatory
