@@ -36,7 +36,7 @@ const handleViewTime = (app: any) => {
 <template>
     <!-- {{ userRole.sequence }} -->
     <div
-        class="overflow-x-auto rounded-lg border border-gray-300 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-900"
+        class="overflow-x-auto rounded-lg border border-gray-300 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-100"
     >
         <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
             <thead class="bg-gray-100 dark:bg-gray-800">
@@ -83,12 +83,14 @@ const handleViewTime = (app: any) => {
                     :key="app.id"
                     :class="[
                         'text-center transition duration-500',
-                        app.application?.status === 'Approved'
-                            ? 'bg-green-50'
-                            : '',
+                        // app.application?.status === 'Approved'
+                        //     ? 'bg-green-50'
+                        //     : '',
                     ]"
                 >
-                    <td class="px-4 py-2 align-middle text-sm">
+                    <td
+                        class="px-4 py-2 align-middle text-sm dark:text-gray-100"
+                    >
                         {{ index + 1 }}
                     </td>
                     <td
@@ -119,14 +121,14 @@ const handleViewTime = (app: any) => {
                             class="rounded-full p-1 text-blue-600 transition hover:bg-blue-50 hover:text-blue-800 dark:text-blue-400 dark:hover:bg-blue-900/30 dark:hover:text-blue-300"
                             title="View"
                         >
-                            <Eye class="h-5 w-5" />
+                            <Eye class="h-5 w-5 dark:text-gray-100" />
                         </button>
                         <button
                             @click="handleViewTime(app)"
                             class="rounded-full p-1 text-blue-600 transition hover:bg-blue-50 hover:text-blue-800 dark:text-blue-400 dark:hover:bg-blue-900/30 dark:hover:text-blue-300"
                             title="View"
                         >
-                            <Eye class="h-5 w-2" />
+                            <Eye class="h-5 w-2 dark:text-gray-100" />
                         </button>
                         <button
                             v-show="userRole.role == 'Manager'"
