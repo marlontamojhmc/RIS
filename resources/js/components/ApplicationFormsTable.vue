@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { Eye, Pencil, Trash2 } from 'lucide-vue-next';
+import { Eye } from 'lucide-vue-next';
+import { watch } from 'vue';
 interface UserRole {
     role: string;
     sequence: number | string;
@@ -8,7 +9,7 @@ interface UserRole {
 
 interface Application {
     id: number;
-    control_number?: string;
+    control_number?: string | null;
     application?: {
         form_title?: string;
         form_number?: string;
@@ -20,7 +21,7 @@ const props = defineProps<{
     userRole: UserRole;
     applications: Application[];
 }>();
-const userRole = props.userRole;
+// const userRole = props.userRole;
 const emit = defineEmits(['onOpenRecords', 'onOpenTimeline']);
 
 const handleViewRecords = (app: any) => {
@@ -29,7 +30,13 @@ const handleViewRecords = (app: any) => {
 const handleViewTime = (app: any) => {
     emit('onOpenTimeline', app);
 };
-
+watch(
+    () => props.applications,
+    (app) => {
+        if (!app) return;
+        console.log(app);
+    },
+);
 // console.log(userRole);
 </script>
 
@@ -130,23 +137,23 @@ const handleViewTime = (app: any) => {
                         >
                             <Eye class="h-5 w-2 dark:text-gray-100" />
                         </button>
-                        <button
+                        <!-- <button
                             v-show="userRole.role == 'Manager'"
                             @click="emit('edit', app)"
                             class="rounded-full p-1 text-green-600 transition hover:bg-green-50 hover:text-green-800 dark:text-green-400 dark:hover:bg-green-900/30 dark:hover:text-green-300"
                             title="Edit"
                         >
                             <Pencil class="h-5 w-5" />
-                        </button>
+                        </button> -->
 
-                        <button
+                        <!-- <button
                             v-show="userRole.role == 'Manager'"
                             @click="emit('delete', app)"
                             class="rounded-full p-1 text-red-600 transition hover:bg-red-50 hover:text-red-800 dark:text-red-400 dark:hover:bg-red-900/30 dark:hover:text-red-300"
                             title="Delete"
                         >
                             <Trash2 class="h-5 w-5" />
-                        </button>
+                        </button> -->
                     </td>
                 </tr>
             </tbody>

@@ -276,6 +276,7 @@ public function createApplication($type, $form_type, $form_id)
             'application.selections',
             'application.userAppSelection.feeOption',
             'application.uploads',
+            'application.timeLogs'
         ])
         ->where('approver_id', $userId)
         ->orderBy('id', 'desc')

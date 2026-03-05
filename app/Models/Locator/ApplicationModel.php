@@ -169,4 +169,7 @@ public function approverGroupApprovers()
         'id',
     );
 }
+public function timeLogs(){
+    return $this->hasMany(\App\Models\TimeLog::class, 'app_form_id', 'id');
+}
 }

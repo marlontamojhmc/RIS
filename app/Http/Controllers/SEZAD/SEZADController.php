@@ -21,7 +21,7 @@ use App\Events\ApplicationUpdateEvent;
 use App\Services\AppService;
 use App\Http\Requests\PaymentRequest;
 use App\Models\Locator\ApplicationForApproval;
-
+use App\Helpers\PermitHelper;
 class SEZADController extends Controller
 {
 public function index(AppService $appService)
@@ -225,23 +225,30 @@ public function updateStatus(Request $request)
         return response()->json(['error' => $e->getMessage()], 500);
     }
 }
-
 public function payment(PaymentRequest $request) {
     try {
         $validated = $request->validated();
         $appId = $validated['application_forms_id']; // Using the correct key from Axios
         $user = auth()->user();
-
         // 1. Update Payment Status
         $applicationForApproval = ApplicationForApproval::where('application_id', $appId)->first();
+        // dd($applicationForApproval);
         if (!$applicationForApproval) {
             return response()->json(['message' => 'Approval record not found'], 404);
+        }else{
+            // UPDATE application_for_approval tbl is_num payment_stat
+            $applicationForApproval->IS_Number = $validated['is_number'];
+            $applicationForApproval->payment_status = 'Paid';
+            $applicationForApproval->save();
+            // UPDATE App_form tbl control number
+            $controlNumber = PermitHelper::controlNumberGenerate();
+            $applicationModel = ApplicationModel::where('id',$appId)->first();
+            $applicationModel->control_number = $controlNumber;
+            $applicationModel->save();
+        //   $applicationModel = ApplicationModel::where('id',$appId)->first();
+            $broadcastControlNumber = $applicationModel->control_number;
+            broadcast(new \App\Events\ApplicationUpdateEvent($broadcastControlNumber));
         }
-
-        $applicationForApproval->update([
-            'IS_Number' => $validated['is_number'] ?? null,
-            'payment_status' => 'Paid',
-        ]);
 
         // 2. Update Approver Status
         $approver = ApproverGroupApprover::where('application_form_id', $appId)
