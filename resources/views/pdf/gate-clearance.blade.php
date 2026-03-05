@@ -6,15 +6,16 @@
     <style>
         body { font-family: sans-serif; margin: 20px; font-size: 10px; }
         .container { width: 100%; }
-        .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid black; padding-bottom: 10px; }
+        .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid green; padding-bottom: 10px; }
         .title { font-size: 14px; font-weight: bold; }
-        .section { margin-top: 15px; }
+        .section { margin-top: 15px; border-bottom: 1px solid green; padding-bottom: 10px; }
         table { width: 100%; border-collapse: collapse; }
         th, td { border: 1px solid black; padding: 5px; text-align: left; vertical-align: top; }
         .note { font-weight: bold; margin-top: 15px; }
         .signature-area { margin-top: 50px; display: flex; justify-content: space-between; }
         .signature-block { text-align: center; width: 30%; }
         .signature-line { border-top: 1px solid black; margin-top: 5px; padding-top: 3px; }
+        input[type=checkbox] { transform: scale(1.2); margin-right: 5px; }
     </style>
 </head>
 <body>
@@ -23,11 +24,9 @@
 
     {{-- HEADER --}}
     <div class="header">
-        
-            <img src="{{asset('storage/loctr/T67wirLP4lcwOKlYZlLOaS8OUgDGppKwKgFxudVL.png')}}" height="40">
-       
-        <div class="title">{{ $application->form_title }}</div>
-        <div><code>{{ $application->status }}</code></div>
+        <img src="https://www.jhmc.com.ph/wp-content/uploads/2025/08/Your-paragraph-text-4.png" height="150">
+        <div class="title">{{ $application->form_title ?? 'Gate Pass' }}</div>
+        <div><code>{{ $application->status ?? 'N/A' }}</code></div>
     </div>
 
     {{-- FORM INFO --}}
@@ -35,11 +34,11 @@
         <table>
             <tr>
                 <td colspan="2">Document Code: N/A</td>
-                <td>Control No. {{ $application->control_number ?? 'N/A' }}</td>
+                <td>Control No.: {{ $application->control_number ?? 'N/A' }}</td>
             </tr>
             <tr>
-                <td colspan="2">Effectivity Date: {{ $application->created_at->format('F d, Y') }}</td>
-                <td>GP No. {{ $application->form_number }}</td>
+                <td colspan="2">Effectivity Date: {{ optional($application->updated_at)->format('F d, Y') ?? 'N/A' }}</td>
+                <td>GP No.: {{ $application->form_number ?? 'N/A' }}</td>
             </tr>
             <tr>
                 <td colspan="3">
@@ -63,39 +62,47 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach($application->articleDetails as $item)
+                @forelse($application->articleDetails ?? [] as $item)
                 <tr>
-                    <td>{{ $item->marks_and_number }}</td>
-                    <td>{{ $item->qty }}</td>
-                    <td>{{ $item->detailed_description_of_article }}</td>
-                    <td>{{ $item->gross_weight }}</td>
+                    <td>{{ $item->marks_and_number ?? '' }}</td>
+                    <td>{{ $item->qty ?? '' }}</td>
+                    <td>{{ $item->detailed_description_of_article ?? '' }}</td>
+                    <td>{{ $item->gross_weight ?? '' }}</td>
                 </tr>
-                @endforeach
+                @empty
+                <tr>
+                    <td colspan="4" style="text-align: center;">No articles found</td>
+                </tr>
+                @endforelse
             </tbody>
         </table>
     </div>
 
     {{-- PAYMENT & DATES --}}
-    @php 
-        $selection = $application->selections->first();
+    @php
+        $selection = $application->userAppSelection ?? collect();
+        $selection = $selection->first();
+        $approval = $application->approval ?? collect();
+        $approval = $approval->first();
+        $uploads = $application->uploads ?? collect();
     @endphp
 
     <div class="section">
         <table>
             <tr>
-                <td>SI NUMBER: {{ $application->created_at->format('F d, Y') }}</td>
-                <td>FULLY PAID UNDER: {{ $application->created_at->format('F d, Y') }}</td>
+                <td>SI NUMBER: {{ $approval->IS_Number ?? 'N/A' }}</td>
+                <td>PAYMENT STATUS: {{ $approval->payment_status ?? 'N/A' }}</td>
                 <td>AMOUNT: ₱{{ $selection->amount ?? '0.00' }}</td>
             </tr>
             <tr>
-                <td>DATE OF DELIVERY: {{ $application->created_at->format('F d, Y') }}</td>
-                <td>DATE: {{ $application->created_at->format('F d, Y') }}</td>
-                <td>EXPIRATION DATE: {{ $selection->Expired_at ?? 'N/A' }}</td>
+                <td>DATE OF DELIVERY: {{ $selection && $selection->selected_at ? \Carbon\Carbon::parse($selection->selected_at)->format('F d, Y') : 'N/A' }}</td>
+                <td>DATE: {{ $selection && $selection->created_at ? \Carbon\Carbon::parse($selection->created_at)->format('F d, Y') : 'N/A' }}</td>
+                <td>EXPIRATION DATE: {{ $selection && $selection->Expired_at ? \Carbon\Carbon::parse($selection->Expired_at)->format('F d, Y') : 'N/A' }}</td>
             </tr>
         </table>
     </div>
 
-    {{-- STATIC CHECKLIST AND NOTES --}}
+    {{-- SUPPORTING DOCUMENTS & FEES --}}
     <div class="section">
         <table>
             <thead>
@@ -107,30 +114,17 @@
             <tbody>
                 <tr>
                     <td>
-                        [ ] Invoice/s<br>
-                        [ ] Packing List<br>
-                        [] Delivery Receipt<br>
-                        [ ] Inventory List<br>
-                        [] Purchase Order<br>
-                        [] N/A (Local Articles)
+                        <label><input type="checkbox" {{ $uploads->contains(fn($u) => str_contains(strtolower($u->file_name), 'invoice')) ? 'checked' : '' }}> Invoice/s</label><br>
+                        <label><input type="checkbox" {{ $uploads->contains(fn($u) => str_contains(strtolower($u->file_name), 'packing')) ? 'checked' : '' }}> Packing List</label><br>
+                        <label><input type="checkbox" {{ $uploads->contains(fn($u) => str_contains(strtolower($u->file_name), 'delivery')) ? 'checked' : '' }}> Delivery Receipt</label><br>
+                        <label><input type="checkbox" {{ $uploads->contains(fn($u) => str_contains(strtolower($u->file_name), 'inventory')) ? 'checked' : '' }}> Inventory List</label><br>
+                        <label><input type="checkbox" {{ $uploads->contains(fn($u) => str_contains(strtolower($u->file_name), 'purchase')) ? 'checked' : '' }}> Purchase Order</label><br>
+                        <label><input type="checkbox" {{ $uploads->contains(fn($u) => str_contains(strtolower($u->file_name), 'local')) ? 'checked' : '' }}> N/A (Local Articles)</label>
                     </td>
                     <td>
-                        @php
-                         $option= $application->options->first();
-                         @endphp
-                        {{ $option->name }}
-                        {{ $option->validity }}
-                        
-                        {{--application name validity
-                         [] P10,000.00 and below, 1 Time Validity<br>
-                        [ ] P10,000.01 to P50,000.00, 1 Time Validity<br>
-                        [ ] More than P50,000.00, 1 Time Validity<br><br>
-
-                        [ ] P10,000.00 and below, 5 Day Validity<br>
-                        [ ] P10,000.01 to P50,000.00, 5 Day Validity<br><br>
-
-                        [ ] P10,000.00 and below, 20 Day Validity<br>
-                        [ ] P10,000.01 to P50,000.00, 20 Day Validity --}}
+                        Selected Option: {{ optional($selection->feeOption)->title ?? 'N/A' }}<br>
+                        Validity: {{ optional($selection->feeOption)->validity ?? 'N/A' }}<br>
+                        Price: {{ optional($selection->feeOption)->price ?? '0.00' }}
                     </td>
                 </tr>
             </tbody>
@@ -151,14 +145,14 @@
     <div class="signature-area">
         <div class="signature-block">
             <div class="signature-line">Customs Representative</div>
-            Permit No: {{ $application->form_number }}
+            Permit No: {{ $application->form_number ?? 'N/A' }}
         </div>
         <div class="signature-block">
             <div class="signature-line">GERALD B. DUAGAN</div>
             SEZ/OSAC Manager
         </div>
     </div>
-</div>
 
+</div>
 </body>
 </html>
