@@ -7,9 +7,8 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import AuthBase from '@/layouts/AuthLayout.vue';
-import { register } from '@/routes';
 import { request } from '@/routes/password';
-import { Form, Head } from '@inertiajs/vue3';
+import { Form } from '@inertiajs/vue3';
 import { LoaderCircle } from 'lucide-vue-next';
 
 defineProps<{
@@ -38,7 +37,7 @@ defineProps<{
             v-slot="{ errors, processing }"
             class="flex flex-col gap-6"
         >
-            <div class="grid gap-6">
+            <div class="grid gap-6 text-black dark:text-gray-400">
                 <div class="grid gap-2">
                     <Label for="email">Email address</Label>
                     <Input
@@ -49,6 +48,7 @@ defineProps<{
                         autofocus
                         :tabindex="1"
                         autocomplete="email"
+                        class="text-black dark:text-gray-400"
                         placeholder="email@example.com"
                     />
                     <InputError :message="errors.email" />
@@ -99,8 +99,6 @@ defineProps<{
                     Log in
                 </Button>
             </div>
-
-
         </Form>
     </AuthBase>
 </template>

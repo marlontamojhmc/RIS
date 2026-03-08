@@ -370,6 +370,7 @@ function submitForm() {
                         v-model="form.pcic.emailPrimary"
                         type="email"
                         placeholder="Primary Email Address"
+                        
                     />
                     <Input
                         v-model="form.pcic.emailSecondary"

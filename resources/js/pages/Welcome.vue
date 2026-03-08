@@ -25,7 +25,11 @@ import { Check } from 'lucide-vue-next';
       /> -->
 
             <!-- Heading -->
-            <h2 class="mb-6 text-center text-2xl font-semibold">RIS</h2>
+            <h2
+                class="mb-6 text-center text-2xl font-semibold text-black dark:text-gray-400"
+            >
+                RIS
+            </h2>
 
             <!-- Navigation (login button or dashboard) -->
             <nav class="flex w-full flex-col items-center gap-4">
