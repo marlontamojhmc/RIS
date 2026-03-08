@@ -49,8 +49,8 @@ const handleLogout = () => {
         <!-- Settings -->
         <DropdownMenuItem :as-child="true">
             <Link class="block w-full" :href="edit()" prefetch as="button">
-                <Settings class="mr-2 h-4 w-4" />
-                Settings
+                <Settings class="mr-2 h-4 w-4 text-black dark:text-gray-400" />
+                <p class="text-black dark:text-gray-400">Settings</p>
             </Link>
         </DropdownMenuItem>
 
@@ -84,7 +84,7 @@ const handleLogout = () => {
             data-test="logout-button"
         >
             <LogOut class="mr-2 h-4 w-4" />
-            Log out
+            <p class="text-black dark:text-gray-400">Log out</p>
         </Link>
     </DropdownMenuItem>
 </template>

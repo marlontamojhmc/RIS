@@ -24,7 +24,7 @@ const delegatedProps = computed(() => {
 })
 </script>
 
-<template>
+<template >
   <SidebarMenuButtonChild v-if="!tooltip" v-bind="{ ...delegatedProps, ...$attrs }">
     <slot />
   </SidebarMenuButtonChild>
