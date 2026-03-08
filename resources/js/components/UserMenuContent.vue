@@ -12,6 +12,9 @@ import type { User } from '@/types';
 import { Link, router } from '@inertiajs/vue3';
 import { BellRing, LogOut, Settings } from 'lucide-vue-next';
 import { ref } from 'vue';
+import { route } from 'ziggy-js';
+
+const notificationsUrl = route('sezad.notifications');
 
 const props = defineProps<{
     user: User;
@@ -56,12 +59,11 @@ const handleLogout = () => {
         <!-- Notifications -->
         <DropdownMenuItem :as-child="true" @click="emit('clear-notification')">
             <Link
+                :href="notificationsUrl"
                 class="relative flex w-full items-center px-2 py-1"
-                prefetch
-                @click="clearNotification"
             >
                 <BellRing class="mr-2 h-4 w-4" />
-                <span class="text-black dark:text-gray-400">Notifications</span>
+                <span>Notifications</span>
                 <span
                     v-if="props.hasNotification"
                     class="absolute top-2 right-2 h-4 w-4 rounded-full bg-red-500"
